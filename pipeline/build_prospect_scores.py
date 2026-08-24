@@ -12,7 +12,7 @@ Methodology:
   total weighted PA vs a fixed threshold. Small-sample levels contribute near-neutral
   values; full-season data contributes at face value.
 
-  level_weight = LEVEL_DISCOUNT factors (AAA=1.00 → R=0.75).
+  level_weight = LEVEL_DISCOUNT factors (AAA=1.00 → R=0.10).
   Per-level shrinkage:
     level_den    = sum(PA × level_wt) for that player × level
     shrink       = min(level_den / threshold, 1.0)
@@ -75,7 +75,7 @@ MAX_PROSPECT_AGE  = 24
 MIN_SEASON        = 2025
 MLB_PA_EXCL       = 50
 
-LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.87, "A+": 0.80, "A": 0.80, "R": 0.75}
+LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 
 TOOLS_PA_THRESH    = 250
 ABILITY_PA_THRESH  = 175
@@ -135,7 +135,7 @@ def main() -> None:
         usecols=["PlayerId", "Season", "Level", "ABILITY_Score", "Discipline_Flag"],
     )
     scores = tools.merge(ability, on=["PlayerId", "Season", "Level"], how="left")
-    scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.75)
+    scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
     print(f"Loaded {len(scores):,} player-season rows")
 

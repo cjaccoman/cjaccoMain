@@ -1,0 +1,366 @@
+"""Build historical player comparison dataset and prospect comparator tool.
+
+Dataset (data/computed/player_comps.csv):
+  One row per player. For each MiLB level (AAA, AA, A+, A, R):
+    PPPA_Z_{level}  -- PA-weighted mean PPPA_Z_SL across all seasons at that level
+    Age_{level}     -- PA-weighted mean age at that level
+    PA_{level}      -- total PA at that level
+
+  MLB outcomes:
+    graduated       -- reached 100+ PA in MLB
+    FirstYr_PPPA_Z  -- PPPA_Z in first MLB season with PA >= 100
+    Career_PPPA_Z   -- PA-weighted career MLB PPPA_Z (seasons PA >= 50)
+    Career_MLB_PA   -- total career MLB PA (seasons PA >= 50)
+    MLB_Season      -- year of MLB debut
+
+  ID columns: MLBAM_ID, PlayerId (FanGraphs), Name
+
+Comparator:
+  find_comps(player_name_or_id, n=10, min_shared_levels=1)
+
+  For each candidate in the historical pool, compute a weighted Euclidean
+  distance over shared MiLB levels:
+    - Features per level: PPPA_Z (z-scored within level across the pool),
+      and Age (z-scored within level)
+    - Level weight: LEVEL_DISCOUNT (AAA=1.00 → R=0.10) — higher levels
+      count more toward similarity
+    - PA weight: min(PA_query, PA_candidate) / PA_THRESHOLD, capped at 1.
+      More data = more reliable comp
+    - Distance only computed on levels where both players have PA >= MIN_COMP_PA
+
+  Returns top-N comps with their MLB outcomes, so you can see what similar
+  profiles historically produced.
+
+Usage:
+  python analysis/build_player_comps.py            # build dataset + print sample comps
+  python analysis/build_player_comps.py --name "Max Clark"
+  python analysis/build_player_comps.py --name "Josue De Paula" --n 15
+"""
+
+import argparse
+import numpy as np
+import pandas as pd
+from pathlib import Path
+
+DATA  = Path(__file__).resolve().parent.parent / "data"
+OUT   = DATA / "computed" / "player_comps.csv"
+
+LEVELS         = ["AAA", "AA", "A+", "A", "R"]
+LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
+MIN_COMP_PA    = 80    # minimum PA at a level to count in distance calculation
+PA_THRESHOLD   = 300   # PA at which level gets full weight in distance
+AGE_WEIGHT     = 0.5   # relative weight of age vs. PPPA_Z in distance per level
+
+
+# ---------------------------------------------------------------------------
+# Build dataset
+# ---------------------------------------------------------------------------
+
+def build_dataset() -> pd.DataFrame:
+    ovr  = pd.read_csv(DATA / "historical" / "ovr_hist_data.csv")
+    milb = pd.read_csv(DATA / "api" / "milb_hitting.csv")
+    mlb  = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+
+    # ID bridge: ovr.PlayerId (FG) -> milb.PlayerId -> milb.MLBAM_ID -> mlb.MLBAMID
+    id_bridge = milb[["PlayerId", "MLBAM_ID", "Name"]].drop_duplicates("PlayerId")
+
+    # Aggregate MiLB per player per level
+    ovr_valid = ovr[ovr["PA"] >= 10].copy()
+    ovr_valid["PA_x_PPPA_Z"] = ovr_valid["PA"] * ovr_valid["PPPA_Z_SL"]
+    ovr_valid["PA_x_Age"]    = ovr_valid["PA"] * ovr_valid["Age"]
+
+    level_agg = (
+        ovr_valid.groupby(["PlayerId", "Level"], observed=True)
+        .agg(
+            PA_total    = ("PA",         "sum"),
+            PA_x_PPPA_Z = ("PA_x_PPPA_Z","sum"),
+            PA_x_Age    = ("PA_x_Age",   "sum"),
+            Name        = ("Name",       "first"),
+        )
+        .reset_index()
+    )
+    level_agg["PPPA_Z_wt"] = level_agg["PA_x_PPPA_Z"] / level_agg["PA_total"]
+    level_agg["Age_wt"]    = level_agg["PA_x_Age"]    / level_agg["PA_total"]
+
+    # Pivot to wide format
+    def pivot_col(col):
+        return (level_agg[level_agg["Level"].isin(LEVELS)]
+                .pivot(index="PlayerId", columns="Level", values=col)
+                .rename(columns={lvl: f"{col.split('_')[0]}_{lvl.replace('+','plus')}" for lvl in LEVELS}))
+
+    pppa_wide = level_agg.pivot(index="PlayerId", columns="Level", values="PPPA_Z_wt")
+    pppa_wide.columns = [f"PPPA_Z_{c.replace('+','plus')}" for c in pppa_wide.columns]
+
+    age_wide  = level_agg.pivot(index="PlayerId", columns="Level", values="Age_wt")
+    age_wide.columns  = [f"Age_{c.replace('+','plus')}"  for c in age_wide.columns]
+
+    pa_wide   = level_agg.pivot(index="PlayerId", columns="Level", values="PA_total")
+    pa_wide.columns   = [f"PA_{c.replace('+','plus')}"   for c in pa_wide.columns]
+
+    name_ser  = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
+
+    wide = pppa_wide.join([age_wide, pa_wide, name_ser]).reset_index()
+
+    # Attach MLBAM_ID
+    wide = wide.merge(id_bridge[["PlayerId", "MLBAM_ID"]], on="PlayerId", how="left")
+
+    # MLB outcomes keyed on MLBAM_ID -> mlb.MLBAMID
+    mlb_valid = mlb[mlb["PA"] >= 50].copy()
+    career_agg = (
+        mlb_valid.groupby("MLBAMID")
+        .apply(lambda g: pd.Series({
+            "Career_PPPA_Z":  (g["PPPA_Z"] * g["PA"]).sum() / g["PA"].sum(),
+            "Career_MLB_PA":  g["PA"].sum(),
+        }))
+        .reset_index()
+        .rename(columns={"MLBAMID": "MLBAM_ID"})
+    )
+
+    first_yr = (
+        mlb[mlb["PA"] >= 100]
+        .sort_values("Season")
+        .groupby("MLBAMID")
+        .first()[["PPPA_Z", "PA", "Season"]]
+        .reset_index()
+        .rename(columns={"MLBAMID": "MLBAM_ID", "PPPA_Z": "FirstYr_PPPA_Z",
+                         "PA": "FirstYr_PA", "Season": "MLB_Season"})
+    )
+
+    wide = wide.merge(career_agg, on="MLBAM_ID", how="left")
+    wide = wide.merge(first_yr,   on="MLBAM_ID", how="left")
+    wide["graduated"] = wide["FirstYr_PPPA_Z"].notna()
+
+    # Ensure all level columns exist
+    for lvl in LEVELS:
+        lvl_key = lvl.replace("+", "plus")
+        for prefix in ["PPPA_Z", "Age", "PA"]:
+            col = f"{prefix}_{lvl_key}"
+            if col not in wide.columns:
+                wide[col] = np.nan
+
+    col_order = (
+        ["PlayerId", "MLBAM_ID", "Name"]
+        + [f"PPPA_Z_{l.replace('+','plus')}" for l in LEVELS]
+        + [f"Age_{l.replace('+','plus')}"    for l in LEVELS]
+        + [f"PA_{l.replace('+','plus')}"     for l in LEVELS]
+        + ["graduated", "MLB_Season", "FirstYr_PPPA_Z", "FirstYr_PA",
+           "Career_PPPA_Z", "Career_MLB_PA"]
+    )
+    wide = wide[[c for c in col_order if c in wide.columns]]
+    return wide
+
+
+# ---------------------------------------------------------------------------
+# Comparator
+# ---------------------------------------------------------------------------
+
+def _prep_pool(df: pd.DataFrame):
+    """Pre-compute level-wise z-score params for PPPA_Z and Age columns."""
+    params = {}
+    for lvl in LEVELS:
+        lk = lvl.replace("+", "plus")
+        for feat in ["PPPA_Z", "Age"]:
+            col = f"{feat}_{lk}"
+            pa_col = f"PA_{lk}"
+            if col not in df.columns:
+                continue
+            mask = df[pa_col].fillna(0) >= MIN_COMP_PA
+            vals = df.loc[mask, col].dropna()
+            params[(lvl, feat)] = (vals.mean(), vals.std()) if len(vals) >= 5 else (0.0, 1.0)
+    return params
+
+
+def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
+               min_shared_levels: int = 1, exclude_self: bool = True):
+    """Return top-N historical comps for a player.
+
+    query_name_or_id: Name string (partial match OK) or numeric PlayerId/MLBAM_ID.
+    """
+    # Resolve query row
+    if isinstance(query_name_or_id, str):
+        mask = pool["Name"].str.contains(query_name_or_id, case=False, na=False)
+        matches = pool[mask]
+        if len(matches) == 0:
+            raise ValueError(f"No player matching '{query_name_or_id}'")
+        if len(matches) > 1:
+            # Pick player with most total career PA — almost always the right
+            # choice when the same name appears for multiple different players
+            # or when a partial string matches unrelated names.
+            pa_cols = [c for c in matches.columns if c.startswith("PA_")]
+            matches = matches.copy()
+            matches["_total_pa"] = matches[pa_cols].sum(axis=1, skipna=True)
+            best = matches.sort_values("_total_pa", ascending=False)
+            if len(best["Name"].unique()) > 1 or best.iloc[0]["_total_pa"] != best.iloc[1]["_total_pa"]:
+                query = best.iloc[0]
+                if best.iloc[0]["Name"] != best.iloc[1]["Name"]:
+                    print(f"  Multiple name matches — selected '{query['Name']}' "
+                          f"(PlayerId={query['PlayerId']}, most career PA)")
+            else:
+                query = best.iloc[0]
+        else:
+            query = matches.iloc[0]
+    else:
+        pid = int(query_name_or_id)
+        row = pool[pool["PlayerId"] == pid]
+        if len(row) == 0:
+            row = pool[pool["MLBAM_ID"] == pid]
+        if len(row) == 0:
+            raise ValueError(f"PlayerId/MLBAM_ID {pid} not found")
+        query = row.iloc[0]
+
+    params = _prep_pool(pool)
+
+    def _z(val, mu, sig):
+        return (val - mu) / sig if sig > 1e-9 else 0.0
+
+    # Build feature vector for query
+    q_feats = {}
+    for lvl in LEVELS:
+        lk = lvl.replace("+", "plus")
+        pa = query.get(f"PA_{lk}", np.nan)
+        if pd.isna(pa) or pa < MIN_COMP_PA:
+            continue
+        pz = query.get(f"PPPA_Z_{lk}", np.nan)
+        ag = query.get(f"Age_{lk}", np.nan)
+        if pd.notna(pz) and pd.notna(ag):
+            mu_z, sig_z = params.get((lvl, "PPPA_Z"), (0.0, 1.0))
+            mu_a, sig_a = params.get((lvl, "Age"),    (0.0, 1.0))
+            q_feats[lvl] = {
+                "pppa_z": _z(pz, mu_z, sig_z),
+                "age_z":  _z(ag, mu_a, sig_a),
+                "pa":     pa,
+            }
+
+    if not q_feats:
+        raise ValueError("Query player has no qualifying level data (PA >= MIN_COMP_PA)")
+
+    results = []
+    for _, cand in pool.iterrows():
+        if exclude_self and cand["PlayerId"] == query["PlayerId"]:
+            continue
+
+        dist_sq   = 0.0
+        weight_sum = 0.0
+        shared    = 0
+
+        for lvl, qf in q_feats.items():
+            lk = lvl.replace("+", "plus")
+            c_pa = cand.get(f"PA_{lk}", np.nan)
+            if pd.isna(c_pa) or c_pa < MIN_COMP_PA:
+                continue
+            c_pz = cand.get(f"PPPA_Z_{lk}", np.nan)
+            c_ag = cand.get(f"Age_{lk}", np.nan)
+            if pd.isna(c_pz) or pd.isna(c_ag):
+                continue
+
+            mu_z, sig_z = params.get((lvl, "PPPA_Z"), (0.0, 1.0))
+            mu_a, sig_a = params.get((lvl, "Age"),    (0.0, 1.0))
+
+            d_pppa = _z(c_pz, mu_z, sig_z) - qf["pppa_z"]
+            d_age  = _z(c_ag, mu_a, sig_a) - qf["age_z"]
+
+            # PA-based credibility weight for this level
+            pa_wt   = min(min(qf["pa"], c_pa) / PA_THRESHOLD, 1.0)
+            lvl_wt  = LEVEL_DISCOUNT[lvl]
+            wt      = pa_wt * lvl_wt
+
+            dist_sq    += wt * (d_pppa**2 + AGE_WEIGHT * d_age**2)
+            weight_sum += wt
+            shared     += 1
+
+        if shared < min_shared_levels or weight_sum == 0:
+            continue
+
+        results.append({
+            "PlayerId":       cand["PlayerId"],
+            "Name":           cand["Name"],
+            "dist":           np.sqrt(dist_sq / weight_sum),
+            "shared_levels":  shared,
+            "graduated":      cand.get("graduated", False),
+            "MLB_Season":     cand.get("MLB_Season", np.nan),
+            "FirstYr_PPPA_Z": cand.get("FirstYr_PPPA_Z", np.nan),
+            "Career_PPPA_Z":  cand.get("Career_PPPA_Z", np.nan),
+            "Career_MLB_PA":  cand.get("Career_MLB_PA", np.nan),
+        })
+
+    if not results:
+        return query, pd.DataFrame()
+    comps = (pd.DataFrame(results)
+             .sort_values("dist")
+             .head(n)
+             .reset_index(drop=True))
+    comps.index += 1
+    return query, comps
+
+
+def print_comps(query, comps, n_shown=10):
+    name   = query["Name"]
+    levels_shown = []
+    for lvl in LEVELS:
+        lk = lvl.replace("+", "plus")
+        pa = query.get(f"PA_{lk}", np.nan)
+        if pd.notna(pa) and pa >= MIN_COMP_PA:
+            pz = query.get(f"PPPA_Z_{lk}", np.nan)
+            ag = query.get(f"Age_{lk}", np.nan)
+            levels_shown.append(f"{lvl}: PPPA_Z={pz:.2f} Age={ag:.1f} PA={pa:.0f}")
+
+    print(f"\n{'='*65}")
+    print(f"Query: {name}")
+    for l in levels_shown:
+        print(f"  {l}")
+    graduated = comps["graduated"].sum()
+    print(f"\nTop {len(comps)} comps  ({graduated}/{len(comps)} graduated to MLB)")
+    grad_z = comps.loc[comps["graduated"], "Career_PPPA_Z"]
+    if len(grad_z):
+        print(f"  Among graduates — Career_PPPA_Z: "
+              f"mean={grad_z.mean():.2f}  median={grad_z.median():.2f}")
+    print()
+    print(f"  {'#':>2}  {'Name':<25} {'Shared':>7}  {'Dist':>5}  "
+          f"{'Grad':>5}  {'1stYr_Z':>8}  {'CareerZ':>8}  {'MLB_PA':>7}")
+    for i, row in comps.iterrows():
+        grad_str = "YES" if row["graduated"] else "no"
+        fyr  = f"{row['FirstYr_PPPA_Z']:+.2f}" if pd.notna(row["FirstYr_PPPA_Z"]) else "  N/A"
+        carz = f"{row['Career_PPPA_Z']:+.2f}"  if pd.notna(row["Career_PPPA_Z"])  else "  N/A"
+        mpa  = f"{row['Career_MLB_PA']:.0f}"   if pd.notna(row["Career_MLB_PA"])  else "  N/A"
+        print(f"  {i:>2}  {row['Name']:<25} {row['shared_levels']:>7}  "
+              f"{row['dist']:>5.3f}  {grad_str:>5}  {fyr:>8}  {carz:>8}  {mpa:>7}")
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--name", type=str, default=None)
+    parser.add_argument("--n",    type=int, default=10)
+    parser.add_argument("--rebuild", action="store_true",
+                        help="Force rebuild even if player_comps.csv exists")
+    args = parser.parse_args()
+
+    if not OUT.exists() or args.rebuild:
+        print("Building player_comps.csv …")
+        df = build_dataset()
+        df.to_csv(OUT, index=False)
+        print(f"Wrote {len(df):,} rows -> {OUT}")
+        print(f"  Graduated: {df['graduated'].sum():,} / {len(df):,}")
+    else:
+        df = pd.read_csv(OUT)
+        print(f"Loaded {len(df):,} rows from {OUT}")
+
+    # Sample comps
+    query_names = (
+        [args.name] if args.name
+        else ["Max Clark", "Josue De Paula", "Eduardo Quintero", "Jesus Made"]
+    )
+
+    for name in query_names:
+        try:
+            query, comps = find_comps(name, df, n=args.n)
+            print_comps(query, comps)
+        except ValueError as e:
+            print(f"\n  Error for '{name}': {e}")
+
+
+if __name__ == "__main__":
+    main()
