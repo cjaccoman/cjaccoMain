@@ -1,0 +1,129 @@
+=== fetch_milb_data.py ===
+
+Step 1: Chadwick register
+  Chadwick (cached): 127,760 players, 21,185 with FanGraphs IDs
+
+Step 2: MLB org abbreviations
+  30 MLB orgs
+
+Step 3: Fetching 105 season×level combinations (2006–2026, 5 levels)
+
+[  1/105] 2006 AAA  hitting: 1048 rows (418 dropped <10 PA)
+[  2/105] 2006 AA   hitting:  724 rows (314 dropped <10 PA)
+[  3/105] 2006 A+   hitting:  655 rows (91 dropped <10 PA)
+[  4/105] 2006 A    hitting:  616 rows (60 dropped <10 PA)
+[  5/105] 2006 R    hitting: 1409 rows (94 dropped <10 PA)
+[  6/105] 2007 AAA  hitting: 1045 rows (431 dropped <10 PA)
+[  7/105] 2007 AA   hitting:  712 rows (285 dropped <10 PA)
+[  8/105] 2007 A+   hitting:  679 rows (79 dropped <10 PA)
+[  9/105] 2007 A    hitting:  604 rows (61 dropped <10 PA)
+[ 10/105] 2007 R    hitting: 1513 rows (126 dropped <10 PA)
+[ 11/105] 2008 AAA  hitting: 1078 rows (404 dropped <10 PA)
+[ 12/105] 2008 AA   hitting:  713 rows (318 dropped <10 PA)
+[ 13/105] 2008 A+   hitting:  678 rows (98 dropped <10 PA)
+[ 14/105] 2008 A    hitting:  650 rows (50 dropped <10 PA)
+[ 15/105] 2008 R    hitting: 1552 rows (126 dropped <10 PA)
+[ 16/105] 2009 AAA  hitting: 1071 rows (440 dropped <10 PA)
+[ 17/105] 2009 AA   hitting:  730 rows (341 dropped <10 PA)
+[ 18/105] 2009 A+   hitting:  656 rows (80 dropped <10 PA)
+[ 19/105] 2009 A    hitting:  659 rows (60 dropped <10 PA)
+[ 20/105] 2009 R    hitting: 1563 rows (113 dropped <10 PA)
+[ 21/105] 2010 AAA  hitting: 1061 rows (471 dropped <10 PA)
+[ 22/105] 2010 AA   hitting:  761 rows (344 dropped <10 PA)
+[ 23/105] 2010 A+   hitting:  729 rows (96 dropped <10 PA)
+[ 24/105] 2010 A    hitting:  633 rows (62 dropped <10 PA)
+[ 25/105] 2010 R    hitting: 1590 rows (114 dropped <10 PA)
+[ 26/105] 2011 AAA  hitting: 1082 rows (415 dropped <10 PA)
+[ 27/105] 2011 AA   hitting:  721 rows (331 dropped <10 PA)
+[ 28/105] 2011 A+   hitting:  677 rows (85 dropped <10 PA)
+[ 29/105] 2011 A    hitting:  623 rows (47 dropped <10 PA)
+[ 30/105] 2011 R    hitting: 1565 rows (112 dropped <10 PA)
+[ 31/105] 2012 AAA  hitting: 1125 rows (435 dropped <10 PA)
+[ 32/105] 2012 AA   hitting:  756 rows (356 dropped <10 PA)
+[ 33/105] 2012 A+   hitting:  690 rows (87 dropped <10 PA)
+[ 34/105] 2012 A    hitting:  646 rows (47 dropped <10 PA)
+[ 35/105] 2012 R    hitting: 1539 rows (108 dropped <10 PA)
+[ 36/105] 2013 AAA  hitting: 1094 rows (394 dropped <10 PA)
+[ 37/105] 2013 AA   hitting:  723 rows (349 dropped <10 PA)
+[ 38/105] 2013 A+   hitting:  683 rows (80 dropped <10 PA)
+[ 39/105] 2013 A    hitting:  646 rows (55 dropped <10 PA)
+[ 40/105] 2013 R    hitting: 1598 rows (105 dropped <10 PA)
+[ 41/105] 2014 AAA  hitting: 1080 rows (430 dropped <10 PA)
+[ 42/105] 2014 AA   hitting:  742 rows (348 dropped <10 PA)
+[ 43/105] 2014 A+   hitting:  690 rows (67 dropped <10 PA)
+[ 44/105] 2014 A    hitting:  650 rows (51 dropped <10 PA)
+[ 45/105] 2014 R    hitting: 1627 rows (94 dropped <10 PA)
+[ 46/105] 2015 AAA  hitting: 1114 rows (448 dropped <10 PA)
+[ 47/105] 2015 AA   hitting:  765 rows (377 dropped <10 PA)
+[ 48/105] 2015 A+   hitting:  693 rows (77 dropped <10 PA)
+[ 49/105] 2015 A    hitting:  683 rows (39 dropped <10 PA)
+[ 50/105] 2015 R    hitting: 1623 rows (94 dropped <10 PA)
+[ 51/105] 2016 AAA  hitting: 1138 rows (489 dropped <10 PA)
+[ 52/105] 2016 AA   hitting:  757 rows (376 dropped <10 PA)
+[ 53/105] 2016 A+   hitting:  701 rows (79 dropped <10 PA)
+[ 54/105] 2016 A    hitting:  677 rows (33 dropped <10 PA)
+[ 55/105] 2016 R    hitting: 1671 rows (96 dropped <10 PA)
+[ 56/105] 2017 AAA  hitting: 1135 rows (457 dropped <10 PA)
+[ 57/105] 2017 AA   hitting:  769 rows (363 dropped <10 PA)
+[ 58/105] 2017 A+   hitting:  731 rows (98 dropped <10 PA)
+[ 59/105] 2017 A    hitting:  680 rows (49 dropped <10 PA)
+[ 60/105] 2017 R    hitting: 1649 rows (105 dropped <10 PA)
+[ 61/105] 2018 AAA  hitting:  836 rows (461 dropped <10 PA)
+[ 62/105] 2018 AA   hitting:  753 rows (394 dropped <10 PA)
+[ 63/105] 2018 A+   hitting:  716 rows (84 dropped <10 PA)
+[ 64/105] 2018 A    hitting:  683 rows (51 dropped <10 PA)
+[ 65/105] 2018 R    hitting: 1790 rows (99 dropped <10 PA)
+[ 66/105] 2019 AAA  hitting: 1159 rows (506 dropped <10 PA)
+[ 67/105] 2019 AA   hitting:  735 rows (407 dropped <10 PA)
+[ 68/105] 2019 A+   hitting:  722 rows (102 dropped <10 PA)
+[ 69/105] 2019 A    hitting:  697 rows (59 dropped <10 PA)
+[ 70/105] 2019 R    hitting: 1571 rows (91 dropped <10 PA)
+[ 71/105] 2020 AAA  hitting: no data
+[ 72/105] 2020 AA   hitting: no data
+[ 73/105] 2020 A+   hitting: no data
+[ 74/105] 2020 A    hitting: no data
+[ 75/105] 2020 R    hitting: no data
+[ 76/105] 2021 AAA  hitting:  911 rows (595 dropped <10 PA)
+[ 77/105] 2021 AA   hitting:  733 rows (183 dropped <10 PA)
+[ 78/105] 2021 A+   hitting:  773 rows (64 dropped <10 PA)
+[ 79/105] 2021 A    hitting:  846 rows (62 dropped <10 PA)
+[ 80/105] 2021 R    hitting: 1759 rows (169 dropped <10 PA)
+[ 81/105] 2022 AAA  hitting:  875 rows (139 dropped <10 PA)
+[ 82/105] 2022 AA   hitting:  710 rows (60 dropped <10 PA)
+[ 83/105] 2022 A+   hitting:  742 rows (53 dropped <10 PA)
+[ 84/105] 2022 A    hitting:  875 rows (70 dropped <10 PA)
+[ 85/105] 2022 R    hitting: 1729 rows (215 dropped <10 PA)
+[ 86/105] 2023 AAA  hitting:  825 rows (106 dropped <10 PA)
+[ 87/105] 2023 AA   hitting:  727 rows (74 dropped <10 PA)
+[ 88/105] 2023 A+   hitting:  743 rows (46 dropped <10 PA)
+[ 89/105] 2023 A    hitting:  864 rows (53 dropped <10 PA)
+[ 90/105] 2023 R    hitting: 1725 rows (186 dropped <10 PA)
+[ 91/105] 2024 AAA  hitting:  799 rows (86 dropped <10 PA)
+[ 92/105] 2024 AA   hitting:  670 rows (72 dropped <10 PA)
+[ 93/105] 2024 A+   hitting:  733 rows (36 dropped <10 PA)
+[ 94/105] 2024 A    hitting:  857 rows (48 dropped <10 PA)
+[ 95/105] 2024 R    hitting: 1480 rows (127 dropped <10 PA)
+[ 96/105] 2025 AAA  hitting:  824 rows (96 dropped <10 PA)
+[ 97/105] 2025 AA   hitting:  715 rows (57 dropped <10 PA)
+[ 98/105] 2025 A+   hitting:  743 rows (46 dropped <10 PA)
+[ 99/105] 2025 A    hitting:  869 rows (53 dropped <10 PA)
+[100/105] 2025 R    hitting: 1459 rows (120 dropped <10 PA)
+[101/105] 2026 AAA  hitting:  612 rows (60 dropped <10 PA)
+[102/105] 2026 AA   hitting:  529 rows (55 dropped <10 PA)
+[103/105] 2026 A+   hitting:  524 rows (41 dropped <10 PA)
+[104/105] 2026 A    hitting:  577 rows (49 dropped <10 PA)
+[105/105] 2026 R    hitting: 1238 rows (141 dropped <10 PA)
+
+Fetched: 94,000 hitting rows, 94,000 advanced rows
+
+Building milb_hitting.csv...
+  Wrote 94,000 rows -> C:\Users\cjacc\PycharmProjects\prospectsMain\data\api\milb_hitting.csv
+Building milb_advanced.csv...
+  Wrote 94,000 rows -> C:\Users\cjacc\PycharmProjects\prospectsMain\data\api\milb_advanced.csv
+
+PlayerId crosswalk summary (22,217 unique players):
+  3,716 mapped to FanGraphs IDs
+  18,501 using MLBAM ID only (no FanGraphs match)
+  -> These 18,501 players likely have minimal MiLB track records
+
+Done.

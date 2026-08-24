@@ -1,0 +1,274 @@
+Existing: 442 unique dates already cached
+Chunks to fetch: 121
+[1/121] 2023-04-10 -> 2023-04-12 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,638 rows
+[2/121] 2023-04-16 -> 2023-04-18 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,802 rows
+[3/121] 2023-04-22 -> 2023-04-24 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,150 rows
+[4/121] 2023-05-01 -> 2023-05-03 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,003 rows
+[5/121] 2023-05-07 -> 2023-05-09 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,925 rows
+[6/121] 2023-05-13 -> 2023-05-15 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,609 rows
+[7/121] 2023-05-22 -> 2023-05-24 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,895 rows
+[8/121] 2023-06-03 -> 2023-06-05 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,488 rows
+[9/121] 2023-06-12 -> 2023-06-14 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,162 rows
+[10/121] 2023-06-18 -> 2023-06-20 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,746 rows
+[11/121] 2023-06-24 -> 2023-06-26 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,417 rows
+[12/121] 2023-06-27 -> 2023-06-29 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,080 rows
+[13/121] 2023-07-09 -> 2023-07-11 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 4,284 rows
+[14/121] 2023-07-12 -> 2023-07-14 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 4,504 rows
+[15/121] 2023-07-15 -> 2023-07-17 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,306 rows
+[16/121] 2023-07-24 -> 2023-07-26 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,565 rows
+[17/121] 2023-07-30 -> 2023-08-01 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,216 rows
+[18/121] 2023-08-05 -> 2023-08-07 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,099 rows
+[19/121] 2023-08-14 -> 2023-08-16 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,241 rows
+[20/121] 2023-08-20 -> 2023-08-22 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,568 rows
+[21/121] 2023-08-26 -> 2023-08-28 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,920 rows
+[22/121] 2023-09-04 -> 2023-09-06 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,741 rows
+[23/121] 2023-09-10 -> 2023-09-12 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,481 rows
+[24/121] 2023-09-16 -> 2023-09-18 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,447 rows
+[25/121] 2024-04-14 -> 2024-04-16 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,736 rows
+[26/121] 2024-04-20 -> 2024-04-22 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,931 rows
+[27/121] 2024-04-29 -> 2024-05-01 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,990 rows
+[28/121] 2024-05-05 -> 2024-05-07 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,630 rows
+[29/121] 2024-05-11 -> 2024-05-13 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,121 rows
+[30/121] 2024-05-20 -> 2024-05-22 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,227 rows
+[31/121] 2024-06-01 -> 2024-06-03 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,003 rows
+[32/121] 2024-06-10 -> 2024-06-12 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,343 rows
+[33/121] 2024-06-16 -> 2024-06-18 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,163 rows
+[34/121] 2024-06-22 -> 2024-06-24 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,070 rows
+[35/121] 2024-07-07 -> 2024-07-09 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 4,580 rows
+[36/121] 2024-07-13 -> 2024-07-15 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,867 rows
+[37/121] 2024-07-16 -> 2024-07-18 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[38/121] 2024-07-22 -> 2024-07-24 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,227 rows
+[39/121] 2024-07-28 -> 2024-07-30 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,960 rows
+[40/121] 2024-08-03 -> 2024-08-05 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,109 rows
+[41/121] 2024-08-12 -> 2024-08-14 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,606 rows
+[42/121] 2024-08-18 -> 2024-08-20 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,176 rows
+[43/121] 2024-08-24 -> 2024-08-26 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,791 rows
+[44/121] 2024-09-08 -> 2024-09-10 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,388 rows
+[45/121] 2024-09-14 -> 2024-09-16 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,631 rows
+[46/121] 2024-09-23 -> 2024-09-25 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[47/121] 2024-09-26 -> 2024-09-28 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[48/121] 2024-09-29 -> 2024-09-29 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[49/121] 2025-04-07 -> 2025-04-09 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,128 rows
+[50/121] 2025-04-13 -> 2025-04-15 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,207 rows
+[51/121] 2025-04-19 -> 2025-04-21 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,465 rows
+[52/121] 2025-04-28 -> 2025-04-30 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,413 rows
+[53/121] 2025-05-04 -> 2025-05-06 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,811 rows
+[54/121] 2025-05-10 -> 2025-05-12 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,346 rows
+[55/121] 2025-05-19 -> 2025-05-21 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 7,460 rows
+[56/121] 2025-05-31 -> 2025-06-02 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,367 rows
+[57/121] 2025-06-09 -> 2025-06-11 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,183 rows
+[58/121] 2025-06-15 -> 2025-06-17 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,187 rows
+[59/121] 2025-06-21 -> 2025-06-23 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,904 rows
+[60/121] 2025-06-30 -> 2025-07-02 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,319 rows
+[61/121] 2025-07-06 -> 2025-07-08 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,334 rows
+[62/121] 2025-07-12 -> 2025-07-14 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,794 rows
+[63/121] 2025-07-15 -> 2025-07-17 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[64/121] 2025-07-21 -> 2025-07-23 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,978 rows
+[65/121] 2025-07-27 -> 2025-07-29 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,707 rows
+[66/121] 2025-08-02 -> 2025-08-04 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,894 rows
+[67/121] 2025-08-11 -> 2025-08-13 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,241 rows
+[68/121] 2025-08-17 -> 2025-08-19 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 8,703 rows
+[69/121] 2025-08-23 -> 2025-08-25 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,474 rows
+[70/121] 2025-09-07 -> 2025-09-09 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,522 rows
+[71/121] 2025-09-13 -> 2025-09-15 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 9,494 rows
+[72/121] 2025-09-22 -> 2025-09-24 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[73/121] 2025-09-25 -> 2025-09-27 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[74/121] 2025-09-28 -> 2025-09-28 Starting Minor Statcast Search
+Minor Statcast Search Completed
+-> 0 rows (cached as done)
+[75/121] 2026-04-04 -> 2026-04-06   ERROR: Invalid season: 2026
+[76/121] 2026-04-07 -> 2026-04-09   ERROR: Invalid season: 2026
+[77/121] 2026-04-10 -> 2026-04-12   ERROR: Invalid season: 2026
+[78/121] 2026-04-13 -> 2026-04-15   ERROR: Invalid season: 2026
+[79/121] 2026-04-16 -> 2026-04-18   ERROR: Invalid season: 2026
+[80/121] 2026-04-19 -> 2026-04-21   ERROR: Invalid season: 2026
+[81/121] 2026-04-22 -> 2026-04-24   ERROR: Invalid season: 2026
+[82/121] 2026-04-25 -> 2026-04-27   ERROR: Invalid season: 2026
+[83/121] 2026-04-28 -> 2026-04-30   ERROR: Invalid season: 2026
+[84/121] 2026-05-01 -> 2026-05-03   ERROR: Invalid season: 2026
+[85/121] 2026-05-04 -> 2026-05-06   ERROR: Invalid season: 2026
+[86/121] 2026-05-07 -> 2026-05-09   ERROR: Invalid season: 2026
+[87/121] 2026-05-10 -> 2026-05-12   ERROR: Invalid season: 2026
+[88/121] 2026-05-13 -> 2026-05-15   ERROR: Invalid season: 2026
+[89/121] 2026-05-16 -> 2026-05-18   ERROR: Invalid season: 2026
+[90/121] 2026-05-19 -> 2026-05-21   ERROR: Invalid season: 2026
+[91/121] 2026-05-22 -> 2026-05-24   ERROR: Invalid season: 2026
+[92/121] 2026-05-25 -> 2026-05-27   ERROR: Invalid season: 2026
+[93/121] 2026-05-28 -> 2026-05-30   ERROR: Invalid season: 2026
+[94/121] 2026-05-31 -> 2026-06-02   ERROR: Invalid season: 2026
+[95/121] 2026-06-03 -> 2026-06-05   ERROR: Invalid season: 2026
+[96/121] 2026-06-06 -> 2026-06-08   ERROR: Invalid season: 2026
+[97/121] 2026-06-09 -> 2026-06-11   ERROR: Invalid season: 2026
+[98/121] 2026-06-12 -> 2026-06-14   ERROR: Invalid season: 2026
+[99/121] 2026-06-15 -> 2026-06-17   ERROR: Invalid season: 2026
+[100/121] 2026-06-18 -> 2026-06-20   ERROR: Invalid season: 2026
+[101/121] 2026-06-21 -> 2026-06-23   ERROR: Invalid season: 2026
+[102/121] 2026-06-24 -> 2026-06-26   ERROR: Invalid season: 2026
+[103/121] 2026-06-27 -> 2026-06-29   ERROR: Invalid season: 2026
+[104/121] 2026-06-30 -> 2026-07-02   ERROR: Invalid season: 2026
+[105/121] 2026-07-03 -> 2026-07-05   ERROR: Invalid season: 2026
+[106/121] 2026-07-06 -> 2026-07-08   ERROR: Invalid season: 2026
+[107/121] 2026-07-09 -> 2026-07-11   ERROR: Invalid season: 2026
+[108/121] 2026-07-12 -> 2026-07-14   ERROR: Invalid season: 2026
+[109/121] 2026-07-15 -> 2026-07-17   ERROR: Invalid season: 2026
+[110/121] 2026-07-18 -> 2026-07-20   ERROR: Invalid season: 2026
+[111/121] 2026-07-21 -> 2026-07-23   ERROR: Invalid season: 2026
+[112/121] 2026-07-24 -> 2026-07-26   ERROR: Invalid season: 2026
+[113/121] 2026-07-27 -> 2026-07-29   ERROR: Invalid season: 2026
+[114/121] 2026-07-30 -> 2026-08-01   ERROR: Invalid season: 2026
+[115/121] 2026-08-02 -> 2026-08-04   ERROR: Invalid season: 2026
+[116/121] 2026-08-05 -> 2026-08-07   ERROR: Invalid season: 2026
+[117/121] 2026-08-08 -> 2026-08-10   ERROR: Invalid season: 2026
+[118/121] 2026-08-11 -> 2026-08-13   ERROR: Invalid season: 2026
+[119/121] 2026-08-14 -> 2026-08-16   ERROR: Invalid season: 2026
+[120/121] 2026-08-17 -> 2026-08-19   ERROR: Invalid season: 2026
+[121/121] 2026-08-20 -> 2026-08-21   ERROR: Invalid season: 2026
+
+Wrote 1,967,015 rows -> milb_statcast_aaa.csv
+Seasons covered: [np.int64(2023), np.int64(2024), np.int64(2025)]

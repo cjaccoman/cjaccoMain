@@ -1,0 +1,174 @@
+[Wed 08/12/2026 23:33:24.45] Starting fetch_milb_data.py
+=== fetch_milb_data.py ===
+
+Step 1: Chadwick register
+  Chadwick (cached): 127,760 players, 21,185 with FanGraphs IDs
+
+Step 2: MLB org abbreviations
+  30 MLB orgs
+
+Existing data found — refreshing 2026 only (PA >= 10, Age <= 26)
+
+Step 3: Fetching 5 season×level combinations
+
+[  1/5] 2026 AAA  hitting:  392 rows (441 dropped <10 PA or >26 Age)
+[  2/5] 2026 AA   hitting:  600 rows (152 dropped <10 PA or >26 Age)
+[  3/5] 2026 A+   hitting:  702 rows (70 dropped <10 PA or >26 Age)
+[  4/5] 2026 A    hitting:  797 rows (111 dropped <10 PA or >26 Age)
+[  5/5] 2026 R    hitting: 1424 rows (175 dropped <10 PA or >26 Age)
+
+Fetched: 3,915 new hitting rows, 3,915 new advanced rows
+
+Building milb_hitting.csv...
+  Wrote 70,762 rows -> C:\Users\cjacc\PycharmProjects\prospectsMain\data\api\milb_hitting.csv (66,847 existing + 3,915 new 2026)
+Building milb_advanced.csv...
+  Wrote 70,762 rows -> C:\Users\cjacc\PycharmProjects\prospectsMain\data\api\milb_advanced.csv (66,847 existing + 3,915 new 2026)
+
+PlayerId crosswalk summary (22,555 unique players):
+  2,702 mapped to FanGraphs IDs
+  19,853 using MLBAM ID only (no FanGraphs match)
+  -> These 19,853 players likely have minimal MiLB track records
+
+Fetching birth dates...
+  Birth dates: fetching 28 new IDs (7548 already cached) ...
+  Birth dates: fetched 28 new, 7576 total cached -> player_birthdays.csv
+
+Fetching positions...
+  Positions: fetching 27 new IDs (22908 already cached) ...
+  Positions: fetched 27 new, 22935 total cached -> player_positions.csv
+
+Done.
+[Wed 08/12/2026 23:33:39.08] fetch_milb_data.py complete, starting run_pipeline.py
+Step 1: compute_stats.py
+Steps 2-5: historical pipeline
+  Building ovr_hist_data.csv...
+    Overrode 2947 2026 rows from ml_updated_data.csv
+    PS AAA fallback: filled 752 missing rate-stat cells for 2026 AAA rows
+    BA_Rank joined: 1390 player-season rows ranked
+    Wrote 70763 rows
+  Building regression_season_league.csv...
+    Ran 286 regressions
+  Building regression_predictive.csv...
+    Ran 17 regressions
+  Building skill_scores.csv...
+    Scored 18122 players
+Step 6: Phase 2 MLB outcomes regression
+  Building regression_mlb_outcomes.csv...
+    N=1672, R²=0.247, predictors=8
+Step 7: Apply Phase 2 to current prospects
+  Building prospect_mlb_proj.csv...
+    Scored 18972 players
+Step 8: Phase 3 unified prospect rankings
+Wrote 2998 players to 2026ProspectPool.csv
+
+105 BW-ranked players not found in 2025/2026 data:
+  AJ Ewing
+  AJ Russell
+  Aaron Watson
+  Alejandro Rosario
+  Alex Clemmey
+  Anderson Brito
+  Anthony Eyanson
+  Argenis Cayama
+  Ben Hess
+  Bishop Letson
+  Boston Bateman
+  Braden Nett
+  Braylon Doughty
+  Briggs McKenzie
+  Brody Hopkins
+  Bryce Cunningham
+  Bryce Mayer
+  Caden Scarborough
+  Cam Caminiti
+  Cam Leiter
+  Cameron Cauley
+  Carlos Lagrange
+  Charlee Soto
+  Chase Shores
+  Christian Oppor
+  Christian Zazueta
+  Colt Emerson
+  Dasan Hill
+  David Davalillo
+  David Hagaman
+  David Shields
+  Ethan Pecko
+  Gabriel Rincones
+  Gage Jump
+  Gage Stanifer
+  Gage Wood
+  George Lombard
+  Hagen Smith
+  Henry Bolte
+  JT Quinn
+  Jack Wenninger
+  James Ellwanger
+  Jamie Arnold
+  Jarlin Susana
+  Jaxon Wiggins
+  Jimmy Crooks
+  Johnny King
+  Jonathan Santucci
+  Jose Corniell
+  Joseph Dzierwa
+  Juan Valera
+  Junior Sanchez
+  Jurrangelo Cijntje
+  Kade Anderson
+  Karson Milbrandt
+  Kash Mayfield
+  Kelvis Salcedo
+  Kendry Chourio
+  Kevin Defrank
+  Khal Stephen
+  Khristian Curtis
+  Kruz Schoolcraft
+  Kyson Witherspoon
+  Landon Harmon
+  Liam Doyle
+  Luis Hernandez
+  Luis Perales
+  Malachi Witherspoon
+  Matt Wilkenson
+  Michael Forret
+  Miguel Mendez
+  Miguel Sime
+  Miguel Ullola
+  Mitch Bratt
+  Nate Payne
+  Nestor German
+  Noble Meyer
+  Owen Murphy
+  Patrick Forbes
+  Ricky Tiedemann
+  Riley Quick
+  Robby Snelling
+  Ryan Sloan
+  Ryan Waldschmidt
+  Santiago Suarez
+  Seth Hernandez
+  Spencer Jones
+  Staryln Caba
+  TJ Nichols
+  Tanner Franklin
+  Tanner McDougal
+  Thomas White
+  Tommy Troy
+  Tony Blanco Jr.
+  Travis Sykora
+  Ty Johnson
+  Tyler Bremner
+  Tyson Hardin
+  Wei-En Lin
+  William Bergolla Jr.
+  Winston Santos
+  Yhoiker Fajardo
+  Yoelin Cespedes
+  Yordanny Monegro
+  Zach Root
+
+tbc_vs_model.csv: 449 players ranked by TBC (51 on national lists, 398 org-only)
+
+Pipeline complete.
+[Wed 08/12/2026 23:34:12.40] run_pipeline.py complete, all done

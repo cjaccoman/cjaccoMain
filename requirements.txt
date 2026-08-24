@@ -1,0 +1,5 @@
+pandas>=2.0
+statsmodels>=0.14
+xgboost>=2.0
+shap>=0.44
+scikit-learn>=1.3

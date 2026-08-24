@@ -1,0 +1,310 @@
+BW_Rank,BW_Name,BW_Team,Pos,BW_Age,In_Pool,Combined_Rank,Delta,Pool_Name,Pool_Team,Level,Skill_Score,MLB_Proj_Score,PPPA_Score,Age_Score,Combined_Score
+1,Jesus Made,MIL,SS,19.0,True,9.0,-8.0,Jesús Made,MIL,AA,64.54,81.55,67.75,78.91,71.03
+2,Leo De Vries,SAC,SS,19.7,True,10.0,-8.0,Leo De Vries,OAK,AA,64.85,83.75,59.36,82.34,70.31
+3,Edward Florentino,PIT,OF/1B,19.6,True,33.0,-30.0,Edward Florentino,PIT,A+,65.19,76.53,61.75,68.21,67.44
+4,Josue De Paula,LAD,OF,20.1,True,19.0,-15.0,Josue De Paula,LAD,AA,61.03,85.19,65.34,70.48,68.51
+5,Walker Jenkins,MIN,OF,21.2,True,13.0,-8.0,Walker Jenkins,MIN,AAA,64.39,82.58,62.28,75.85,69.6
+6,AJ Ewing,NYM,OF,21.9,False,,,,,,,,,,
+7,Franklin Arias,BOS,SS,20.5,True,2.0,5.0,Franklin Arias,BOS,AAA,68.56,91.7,65.82,75.02,74.57
+8,Max Clark,DET,OF,21.5,True,14.0,-6.0,Max Clark,DET,AAA,62.6,83.95,63.16,75.85,69.22
+9,Colt Emerson,SEA,SS,20.1,False,,,,,,,,,,
+10,Rainiel Rodriguez,STL,C,19.4,True,1.0,9.0,Rainiel Rodriguez,STL,AA,73.29,83.65,64.76,82.34,75.74
+11,Seth Hernandez,PIT,RHP,19.1,False,,,,,,,,,,
+12,Thomas White,MIA,LHP,21.7,False,,,,,,,,,,
+13,Kade Anderson,SEA,LHP,21.11,False,,,,,,,,,,
+14,George Lombard,NYY,SS,20.11,False,,,,,,,,,,
+15,Zyhir Hope,LAD,OF,21.3,True,241.0,-226.0,Zyhir Hope,DET,AA,54.49,69.59,60.43,69.09,60.19
+16,Caleb Bonemer,CHW,SS,20.7,True,47.0,-31.0,Caleb Bonemer,CWS,AA,63.85,75.44,62.65,67.24,66.57
+17,Aidan Miller,PHI,SS,21.11,True,117.0,-100.0,Aidan Miller,PHI,AAA,58.73,72.71,63.0,65.66,63.2
+18,Sebastian Walcott,TEX,SS,20.2,True,75.0,-57.0,Sebastian Walcott,TEX,AA,59.11,78.81,56.66,76.41,64.86
+19,Robby Snelling,MIA,LHP,22.4,False,,,,,,,,,,
+20,Charlie Condon,COL,1B,23.1,True,818.0,-798.0,Charlie Condon,COL,AAA,50.77,66.86,52.43,57.14,54.34
+21,Braden Montgomery,CHW,OF,23.1,True,576.0,-555.0,Braden Montgomery,CWS,AAA,53.07,62.81,59.27,58.07,56.15
+22,Ralphy Velazquez,CLE,1B,20.11,True,18.0,4.0,Ralphy Velazquez,CLE,AAA,63.4,81.11,61.51,75.85,68.58
+23,Luis Pena,MIL,SS/2B,19.5,True,8.0,15.0,Luis Peña,MIL,AA,68.21,77.97,72.58,73.82,72.42
+24,Emmanuel Rodriguez,MIN,OF,23.2,True,749.0,-725.0,Emmanuel Rodriguez,MIN,AAA,53.63,57.48,57.62,58.07,54.79
+25,Ryan Waldschmidt,ARI,OF,23.7,False,,,,,,,,,,
+26,Emil Morales,LAD,SS,19.7,True,83.0,-57.0,Emil Morales,LAD,A+,60.55,70.33,64.65,69.11,64.36
+27,Josue Briceno,DET,C/1B,21.8,True,19.0,8.0,Josue Briceño,DET,AAA,62.46,86.23,61.73,69.09,68.51
+28,Justin Gonzales,BOS,1B/OF,19.4,True,54.0,-26.0,Justin Gonzales,BOS,A+,65.17,74.67,57.53,68.21,66.05
+29,Eli Willits,WSH,SS,18.5,True,56.0,-27.0,Eli Willits,WSH,A+,59.29,82.43,63.33,66.06,65.95
+30,Luis Hernandez,SFG,SS,17.5,False,,,,,,,,,,
+31,Luis Lara,MIL,OF,21.5,True,22.0,9.0,Luis Lara,MIL,AAA,62.66,82.41,61.17,75.85,68.44
+32,Pedro Ramirez,CHC,2B/3B,22.1,True,24.0,8.0,Pedro Ramírez,CHC,AAA,63.14,80.94,63.45,69.28,67.97
+33,Kaelen Culpepper,MIN,SS,23.4,True,104.0,-71.0,Kaelen Culpepper,MIN,AAA,60.23,75.12,63.16,58.07,63.59
+34,Joshua Baez,STL,OF,22.1,True,497.0,-463.0,Joshua Báez,STL,AAA,49.91,70.54,61.64,58.07,56.94
+35,Mike Sirota,LAD,OF,22.1,True,94.0,-59.0,Mike Sirota,LAD,AA,62.23,75.74,64.87,49.26,63.98
+36,Eric Hartman,ATL,OF,19.11,True,208.0,-172.0,Eric Hartman,ATL,AA,55.5,70.97,60.95,67.24,60.91
+37,Josuar Gonzalez,SFG,SS,18.6,True,49.0,-12.0,Josuar Gonzalez,SF,A,63.22,71.68,70.26,61.07,66.22
+38,Theo Gillen,TBR,OF,20.8,True,237.0,-199.0,Theo Gillen,TB,AA,54.55,67.06,64.77,67.24,60.33
+39,Braylon Payne,MIL,OF,19.9,True,356.0,-317.0,Braylon Payne,MIL,AA,51.51,66.04,60.24,73.82,58.41
+40,Ethan Holliday,COL,SS,19.2,True,1842.0,-1802.0,Ethan Holliday,COL,A,40.74,61.51,52.05,61.73,48.51
+41,Tyler Bremner,LAA,RHP,22.0,False,,,,,,,,,,
+42,Anthony Eyanson,BOS,RHP,21.7,False,,,,,,,,,,
+43,Eduardo Quintero,LAD,OF,20.8,True,44.0,-1.0,Eduardo Quintero,LAD,A+,62.16,77.67,66.72,64.6,66.81
+44,JoJo Parker,TOR,SS,19.9,True,487.0,-443.0,JoJo Parker,TOR,A+,,66.6,59.85,63.69,57.03
+45,Ronny Cruz,WSH,3B/SS,19.9,True,339.0,-294.0,Ronny Cruz,WSH,A+,58.41,61.81,53.27,68.21,58.61
+46,Tate Southisene,ATL,SS,19.7,True,2009.0,-1963.0,Tate Southisene,ATL,A+,33.21,68.69,57.17,61.89,47.59
+47,Alfredo Duno,CIN,C,20.4,True,46.0,1.0,Alfredo Duno,CIN,AA,62.18,80.29,61.71,67.79,66.76
+48,Ethan Salas,SDP,C,19.11,True,67.0,-19.0,Ethan Salas,SD,AAA,59.23,83.15,54.38,76.41,65.47
+49,Ryan Sloan,SEA,RHP,20.3,False,,,,,,,,,,
+50,Nathan Flewelling,TBR,C,19.6,True,587.0,-537.0,Nathan Flewelling,TB,A+,52.0,67.81,49.9,68.21,56.07
+51,Taitn Gray,TBR,1B,18.9,True,369.0,-318.0,Taitn Gray,TB,A,,74.52,56.71,63.85,58.27
+52,Josh Hammond,KCR,SS,19.8,True,666.0,-614.0,Josh Hammond,KC,A,,66.68,53.92,60.51,55.33
+53,Josiah Hartshorn,CHC,OF,19.3,True,158.0,-105.0,Josiah Hartshorn,CHC,A+,,80.18,64.25,69.11,61.97
+54,Cooper Flemming,TBR,SS,19.9,True,305.0,-251.0,Cooper Flemming,TB,A,,77.19,58.85,60.51,58.95
+55,Jhonny Level,SFG,SS,19.1,True,23.0,32.0,Jhonny Level,SF,A+,64.6,78.32,63.87,68.9,68.12
+56,Elian Pena,NYM,SS,18.6,True,37.0,19.0,Elian Peña,NYM,A+,66.78,74.67,59.03,67.52,67.1
+57,Juneiker Caceres,CLE,OF,18.9,True,7.0,50.0,Juneiker Caceres,CLE,A+,69.32,89.32,63.5,66.06,72.71
+58,Kendry Chourio,KCR,RHP,18.7,False,,,,,,,,,,
+59,Ethan Conrad,CHC,OF,21.1,True,1454.0,-1395.0,Ethan Conrad,CHC,A,,53.16,57.06,44.63,50.7
+60,Dax Kilby,NYY,SS,19.6,True,73.0,-13.0,Dax Kilby,NYY,A,65.55,61.66,69.83,61.96,65.0
+61,Jarlin Susana,WSH,RHP,22.1,False,,,,,,,,,,
+62,Cam Caminiti,ATL,LHP,19.9,False,,,,,,,,,,
+63,Spencer Jones,NYY,OF,25.0,False,,,,,,,,,,
+64,Lazaro Montes,SEA,OF,21.6,True,150.0,-86.0,Lazaro Montes,SEA,AAA,57.67,71.67,58.78,70.48,62.12
+65,Ryan Clifford,NYM,1B/OF,22.9,True,539.0,-474.0,Ryan Clifford,NYM,AAA,56.24,59.45,50.7,69.28,56.51
+66,Xavier Neyens,HOU,SS,19.7,True,879.0,-813.0,Xavier Neyens,HOU,A+,,63.43,50.34,61.89,53.94
+67,Carlos Lagrange,NYY,RHP,22.11,False,,,,,,,,,,
+68,Henry Bolte,SAC,OF,22.9,False,,,,,,,,,,
+69,James Tibbs III,LAD,OF,23.7,True,519.0,-450.0,James Tibbs III,LAD,AAA,54.09,66.25,56.4,57.14,56.74
+70,Charles Davalan,LAD,OF,22.5,True,11.0,59.0,Charles Davalan,LAD,A+,71.25,79.91,69.75,46.37,70.23
+71,Devin Fitz-Gerald,WSH,2B/3B/SS,20.8,True,158.0,-87.0,Devin Fitz-Gerald,WSH,AA,62.84,68.41,51.76,67.24,61.97
+72,Bryce Rainer,DET,SS,20.1,True,567.0,-495.0,Bryce Rainer,DET,A+,58.6,53.34,53.47,64.6,56.24
+73,Liam Doyle,STL,LHP,21.11,False,,,,,,,,,,
+74,Jonny Farmelo,SEA,OF,21.8,True,446.0,-372.0,Jonny Farmelo,SEA,AA,54.96,65.85,54.27,62.79,57.36
+75,Steele Hall,CIN,SS,18.9,True,713.0,-638.0,Steele Hall,CIN,A,,61.6,57.79,61.07,55.03
+76,Gage Jump,SAC,LHP,23.1,False,,,,,,,,,,
+77,Jamie Arnold,SAC,LHP,22.1,False,,,,,,,,,,
+78,Gage Wood,PHI,RHP,22.5,False,,,,,,,,,,
+79,Hagen Smith,CHW,LHP,22.8,False,,,,,,,,,,
+80,Esmerlyn Valdez,PIT,1B/OF,22.7,True,139.0,-59.0,Esmerlyn Valdez,PIT,AAA,56.22,75.83,59.12,69.28,62.3
+81,Hector Rodriguez,CIN,OF,22.2,True,17.0,64.0,Héctor Rodríguez,CIN,AAA,64.92,80.93,63.44,69.28,68.87
+82,Travis Sykora,WSH,RHP,22.0,False,,,,,,,,,,
+83,Jett Williams,MIL,SS/OF,22.6,True,134.0,-51.0,Jett Williams,MIL,AAA,58.69,72.86,57.7,69.28,62.52
+84,Cooper Pratt,MIL,SS,21.9,True,34.0,50.0,Cooper Pratt,MIL,AAA,61.54,80.7,60.63,75.85,67.35
+85,Aiva Arquette,MIA,SS,22.6,True,626.0,-541.0,Aiva Arquette,MIA,AA,50.86,64.41,60.33,58.16,55.67
+86,Angel Genao,CLE,SS,21.11,True,62.0,24.0,Angel Genao,CLE,AAA,62.06,75.27,61.53,69.28,65.64
+87,Caden Scarborough,TEX,RHP,21.1,False,,,,,,,,,,
+88,Jefferson Rojas,CHC,SS/2B,21.0,True,41.0,47.0,Jefferson Rojas,NYM,AA,62.82,80.15,60.32,69.09,66.91
+89,Jacob Reimer,NYM,3B,22.2,True,172.0,-83.0,Jacob Reimer,NYM,AA,60.36,71.36,57.98,58.44,61.66
+90,Michael Arroyo,SEA,2B/OF,21.6,True,31.0,59.0,Michael Arroyo,SEA,AAA,62.63,83.72,58.72,70.48,67.5
+91,Ike Irish,BAL,OF/C,22.5,True,913.0,-822.0,Ike Irish,BAL,A+,51.47,61.89,59.53,46.85,53.73
+92,Arjun Nimmala,TOR,SS,20.7,True,122.0,-30.0,Arjun Nimmala,LAA,AA,59.73,72.01,55.26,73.54,62.86
+93,John Gil,ATL,SS,30.0,True,114.0,-21.0,John Gil,ATL,AA,59.67,73.71,59.15,67.24,63.28
+94,Robert Arias,CLE,OF,19.7,True,21.0,73.0,Robert Arias,CLE,A,64.69,79.15,69.38,60.51,68.49
+95,Chase Harlan,LAD,3B,19.1,True,160.0,-65.0,Chase Harlan,LAD,A+,56.86,78.4,56.74,63.42,61.96
+96,Kevin Alvarez,HOU,OF,18.3,True,26.0,70.0,Kevin Alvarez,HOU,A,67.96,76.43,60.0,63.85,67.86
+97,Wandy Asigen,NYM,SS,16.8,True,1046.0,-949.0,Wandy Asigen,NYM,R,,57.06,52.69,61.75,52.91
+98,Abimelec Ortiz,WSH,1B,24.2,True,381.0,-283.0,Abimelec Ortiz,WSH,AAA,56.75,68.52,59.82,46.85,58.05
+99,Kahlil Watson,CLE,OF,23.0,True,822.0,-723.0,Kahlil Watson,CLE,AAA,51.7,62.84,54.09,58.07,54.33
+100,Eduardo Tait,MIN,C,19.8,True,84.0,16.0,Eduardo Tait,MIN,A+,62.62,73.85,55.51,69.11,64.24
+101,Andrew Fischer,MIL,1B/3B,21.11,True,488.0,-387.0,Andrew Fischer,MIL,AA,50.4,74.63,60.28,51.21,56.99
+102,Kayson Cunningham,ARI,SS,19.1,True,1066.0,-964.0,Kayson Cunningham,AZ,A+,46.45,62.69,55.31,64.87,52.8
+103,Brody Hopkins,TBR,RHP,24.3,False,,,,,,,,,,
+104,Miguel Sime,WSH,RHP,19.0,False,,,,,,,,,,
+105,Joseph Dzierwa,BAL,LHP,22.0,False,,,,,,,,,,
+106,Juan Sanchez,TOR,SS/3B,18.7,True,121.0,-15.0,Juan Sanchez,TOR,A,65.99,65.39,53.33,65.01,62.89
+107,Francisco Renteria,PHI,OF,17.4,True,145.0,-38.0,Francisco Renteria,PHI,R,,67.1,86.36,57.64,62.2
+108,Angeibel Gomez,KCR,OF,17.5,True,193.0,-85.0,Angeibel Gomez,KC,R,,65.53,84.03,57.64,61.31
+109,Cooper Ingle,CLE,C,24.2,True,139.0,-30.0,Cooper Ingle,CLE,AAA,62.53,71.04,63.12,46.85,62.3
+110,Seaver King,WSH,SS,23.0,True,480.0,-370.0,Seaver King,WSH,AAA,54.55,63.32,59.42,58.07,57.06
+111,Karson Milbrandt,MIA,RHP,22.0,False,,,,,,,,,,
+112,Kyson Witherspoon,BOS,RHP,21.9,False,,,,,,,,,,
+113,Jaxon Wiggins,CHC,RHP,24.7,False,,,,,,,,,,
+114,TJ Nichols,TBR,RHP,23.11,False,,,,,,,,,,
+115,Tanner McDougal,CHW,RHP,23.1,False,,,,,,,,,,
+116,Raudi Rodriguez,LAA,OF,22.1,True,328.0,-212.0,Raudi Rodriguez,LAA,AAA,54.18,70.11,57.61,62.79,58.72
+117,Deniel Ortiz,STL,1B/3B,21.8,True,312.0,-195.0,Deniel Ortiz,STL,AA,52.79,69.02,58.21,70.48,58.89
+118,Felnin Celesten,SEA,SS,20.7,True,214.0,-96.0,Felnin Celesten,SEA,AA,57.15,71.35,55.7,68.16,60.8
+119,Nate George,BAL,OF,20.0,True,27.0,92.0,Nate George,BAL,A+,62.16,79.44,69.55,64.18,67.8
+120,Cris Rodriguez,DET,OF,18.3,True,282.0,-162.0,Cris Rodriguez,DET,R,59.77,59.76,61.26,58.79,59.33
+121,Johenssy Colome,SAC,SS,17.7,True,1092.0,-971.0,Johenssy Colome,OAK,R,,49.87,61.86,57.64,52.66
+122,Santiago Solarte,MIA,SS,17.5,True,376.0,-254.0,Santiago Solarte,MIA,R,,55.29,80.75,57.64,58.12
+123,Braylon Doughty,CLE,RHP,20.5,False,,,,,,,,,,
+124,Johnny King,TOR,LHP,19.9,False,,,,,,,,,,
+125,Blake Burke,MIL,1B,22.11,True,563.0,-438.0,Blake Burke,MIL,AAA,51.58,66.43,62.27,52.78,56.25
+126,Bo Davidson,SFG,OF,23.1,True,275.0,-149.0,Bo Davidson,SF,AAA,57.63,66.09,63.37,52.51,59.42
+127,Sean Keys,TOR,3B,22.11,True,220.0,-93.0,Sean Keys,TOR,AAA,58.33,71.9,60.88,52.51,60.63
+128,Aroon Escobar,PHI,2B,21.4,True,112.0,16.0,Aroon Escobar,PHI,AA,61.35,71.17,57.12,69.09,63.31
+129,Devin Taylor,SAC,OF,22.4,True,479.0,-350.0,Devin Taylor,OAK,AA,52.98,68.08,56.78,59.92,57.07
+130,Josh Adamczewski,MIL,2B/OF,21.0,True,48.0,82.0,Josh Adamczewski,MIL,AA,60.95,80.24,65.94,61.86,66.29
+131,Marco Dinges,MIL,C,22.8,True,212.0,-81.0,Marco Dinges,MIL,AA,59.06,73.96,58.79,51.21,60.86
+132,Demetrio Crisantes,ARI,2B,21.8,True,29.0,103.0,Demetrio Crisantes,AZ,AAA,62.79,82.31,60.88,70.48,67.72
+133,William Bergolla Jr.,CHW,SS,21.6,True,4.0,129.0,William Bergolla Jr.,CWS,AAA,67.81,88.89,64.25,75.85,73.28
+134,Kendall George,LAD,OF,21.6,True,118.0,16.0,Kendall George,LAD,AA,56.92,71.22,65.77,70.48,63.17
+135,Wei-En Lin,SAC,LHP,20.6,False,,,,,,,,,,
+136,Edwin Arroyo,CIN,SS,22.9,True,82.0,54.0,Edwin Arroyo,CIN,AAA,58.31,77.94,61.58,69.28,64.4
+137,Jack Wenninger,NYM,RHP,24.2,False,,,,,,,,,,
+138,Ben Hess,NYY,RHP,23.8,False,,,,,,,,,,
+139,Riley Quick,MIN,RHP,22.0,False,,,,,,,,,,
+140,Owen Murphy,ATL,RHP,22.6,False,,,,,,,,,,
+141,Tyson Lewis,CIN,SS,20.4,True,2068.0,-1927.0,Tyson Lewis,CIN,A+,46.42,45.86,51.19,59.87,47.17
+142,Brock Wilken,MIL,3B,23.11,True,1369.0,-1227.0,Brock Wilken,MIL,AAA,54.0,53.95,50.84,46.85,51.18
+143,Kemp Alderman,MIA,OF,23.7,True,507.0,-364.0,Kemp Alderman,MIA,AAA,55.14,64.42,55.88,58.07,56.84
+144,Jonathon Long,CHI,1B,24.3,True,477.0,-333.0,Jonathon Long,MIA,AAA,57.77,64.59,57.38,46.85,57.08
+145,Marek Houston,MIN,SS,22.1,True,363.0,-218.0,Marek Houston,MIN,AA,56.11,67.84,60.68,51.21,58.32
+146,Staryln Caba,MIA,SS,20.5,False,,,,,,,,,,
+147,Asbel Gonzalez,KCR,OF,20.4,True,384.0,-237.0,Asbel Gonzalez,KC,A+,56.98,61.51,56.45,64.6,58.04
+148,Daniel Pierce,TBR,SS,19.9,True,1352.0,-1204.0,Daniel Pierce,TB,A,,53.4,49.81,60.51,51.23
+149,Gavin Fien,WSH,SS,19.2,True,711.0,-562.0,Gavin Fien,WSH,A,56.43,58.54,49.79,60.51,55.05
+150,Enrique Bradfield,BAL,OF,24.5,True,713.0,-563.0,Enrique Bradfield Jr.,BAL,AAA,56.81,53.12,62.81,46.85,55.03
+151,Braden Nett,SAC,RHP,23.11,False,,,,,,,,,,
+152,Cole Carrigg,COL,OF,24.0,True,366.0,-214.0,Cole Carrigg,COL,AAA,56.77,61.92,68.31,46.67,58.31
+153,Blaze Jordan,STL,3B/1B,23.4,True,32.0,121.0,Blaze Jordan,STL,AAA,64.51,82.47,62.9,58.07,67.46
+154,Michael Forret,TBR,RHP,22.1,False,,,,,,,,,,
+155,Luis Perales,WSH,RHP,23.0,False,,,,,,,,,,
+156,Luis De Leon,BAL,LHP,23.0,True,740.0,-584.0,Luis De Leon,SD,R,54.72,67.05,51.8,46.26,54.83
+157,David Shields,KCR,LHP,19.8,False,,,,,,,,,,
+158,Joshua Kuroda-Grauer,SAC,2B,23.3,True,61.0,97.0,Joshua Kuroda-Grauer,OAK,AAA,64.22,77.53,61.96,57.14,65.8
+159,Tommy Troy,ARI,2B,24.3,True,710.0,-551.0,Tommy Troy,AZ,AAA,54.94,63.42,56.07,46.67,55.06
+160,Luke Adams,MIL,1B/3B,22.0,True,44.0,116.0,Luke Adams,MIL,AAA,60.79,82.61,61.71,69.28,66.81
+161,Xavier Isaac,TBR,1B,22.5,True,337.0,-176.0,Xavier Isaac,TB,AA,58.68,60.13,60.51,58.16,58.62
+162,Roldy Brito,COL,2B/OF,19.1,True,108.0,54.0,Roldy Brito,COL,A+,56.92,79.07,62.49,63.42,63.42
+163,Jaison Chourio,CLE,OF,20.11,True,199.0,-36.0,Jaison Chourio,CLE,AA,58.17,68.99,56.92,69.09,61.13
+164,Blake Mitchell,KCR,C,21.9,True,1714.0,-1550.0,Blake Mitchell,KC,A+,49.44,51.72,49.74,55.52,49.23
+165,Billy Carlson,CHW,SS,19.9,True,1275.0,-1110.0,Billy Carlson,CWS,A,,56.17,48.36,60.51,51.58
+166,Nick Becker,SEA,SS,19.5,True,2494.0,-2328.0,Nick Becker,SEA,A,37.48,53.29,49.2,58.45,43.83
+167,Tanner Franklin,STL,RHP,21.11,False,,,,,,,,,,
+168,Gage Stanifer,TOR,RHP,22.5,False,,,,,,,,,,
+169,Jimmy Crooks,STL,C,24.9,True,904.0,-735.0,Jimmy Crooks,STL,AAA,54.84,56.69,57.68,46.85,53.77
+170,Wehiwa Aloy,BAL,SS,22.3,True,937.0,-767.0,Wehiwa Aloy,BAL,AA,53.33,56.87,57.33,51.86,53.62
+171,Kane Kepley,CHC,OF,22.3,True,30.0,141.0,Kane Kepley,CHC,AA,66.07,76.73,70.49,51.21,67.64
+172,Aaron Walton,CLE,OF,22.0,True,1324.0,-1152.0,Aaron Walton,CLE,AA,48.15,58.54,57.46,51.21,51.36
+173,Coy James,WSH,SS,19.2,True,771.0,-598.0,Coy James,WSH,A,,60.18,58.02,60.51,54.67
+174,Blaine Bullard,TOR,OF,19.9,True,1046.0,-872.0,Blaine Bullard,TOR,A,,56.57,53.1,61.96,52.91
+175,Colby Shelton,CHW,2B,23.5,True,1745.0,-1570.0,Colby Shelton,CWS,AA,46.7,56.94,53.93,48.15,49.06
+176,Henry Godbout,BOS,2B,22.6,True,76.0,100.0,Henry Godbout,BOS,AA,69.26,73.37,53.78,51.86,64.85
+177,Ethan Pecko,HOU,RHP,23.7,False,,,,,,,,,,
+178,Charlee Soto,MIN,RHP,20.9,False,,,,,,,,,,
+179,Christian Zazueta,LAD,RHP,21.7,False,,,,,,,,,,
+180,Anderson Brito,TBR,RHP,21.1,False,,,,,,,,,,
+181,Khal Stephen,CLE,RHP,23.4,False,,,,,,,,,,
+182,Kash Mayfield,SDP,LHP,21.3,False,,,,,,,,,,
+183,Cameron Cauley,TEX,OF/SS/2B,23.3,False,,,,,,,,,,
+184,Joseph Sullivan,HOU,OF,23.1,True,1173.0,-989.0,Joseph Sullivan,HOU,AA,54.86,52.74,53.08,49.26,52.12
+185,David Davalillo,TEX,RHP,23.7,False,,,,,,,,,,
+186,Termarr Johnson,PIT,2B,21.11,True,281.0,-95.0,Termarr Johnson,PIT,AAA,58.16,64.03,54.15,69.28,59.34
+187,Dante Nori,PHI,OF,21.7,True,102.0,85.0,Dante Nori,PHI,AA,61.88,70.98,57.49,69.09,63.61
+188,Ethan Petry,WSH,OF,21.1,True,1466.0,-1278.0,Ethan Petry,WSH,AA,48.62,55.25,52.55,58.44,50.66
+189,Marconi German,WSH,2B/SS,18.8,True,133.0,56.0,Marconi German,WSH,R,60.41,69.23,63.95,58.79,62.53
+190,Dillon Lewis,MIA,OF,22.11,True,539.0,-349.0,Dillon Lewis,MIA,AA,57.57,58.62,61.03,48.15,56.51
+191,Luke Dickerson,WSH,SS,20.9,True,940.0,-749.0,Luke Dickerson,WSH,A+,54.3,57.54,50.82,57.79,53.61
+192,Dorian Soto,BOS,SS,18.3,True,625.0,-433.0,Dorian Soto,BOS,R,59.2,58.29,47.59,58.79,55.68
+193,Ching-Hsien Ko,LAD,OF,19.9,True,270.0,-77.0,Ching-Hsien Ko,LAD,A,58.12,70.38,52.31,61.73,59.47
+194,Slater de Brun,TBR,OF,18.11,True,915.0,-721.0,Slater de Brun,TB,A,,,60.68,60.51,53.72
+195,Diego Tornes,ATL,OF,17.1,True,622.0,-427.0,Diego Tornes,ATL,R,54.84,60.58,54.05,60.68,55.7
+196,Caden Bodine,TBR,C,22.5,True,110.0,86.0,Caden Bodine,TB,AA,54.92,81.71,67.2,58.16,63.4
+198,Tommy White,SAC,3B,23.2,True,152.0,46.0,Tommy White,OAK,AAA,60.73,72.4,58.77,57.14,62.1
+199,Miguel Ullola,HOU,RHP,23.1,False,,,,,,,,,,
+200,Jonathan Santucci,NYM,LHP,23.4,False,,,,,,,,,,
+201,Ty Johnson,TBR,RHP,24.8,False,,,,,,,,,,
+202,Kruz Schoolcraft,SDP,LHP,19.0,False,,,,,,,,,,
+203,Nelson Rada,LAA,OF,20.9,True,78.0,125.0,Nelson Rada,LAA,AAA,60.15,76.92,53.54,79.47,64.64
+204,Jace LaViolette,CLE,OF,21.8,True,2172.0,-1968.0,Jace LaViolette,CLE,AA,,38.78,49.81,51.21,46.5
+205,Luke Stevenson,SEA,C,21.9,True,454.0,-249.0,Luke Stevenson,SEA,A+,58.27,62.12,54.57,56.21,57.33
+206,Ramon Ramirez,KCR,C,20.1,True,299.0,-93.0,Ramon Ramirez,KC,A+,54.14,69.71,64.01,55.52,59.07
+207,Axiel Plaz,PIT,C,20.9,True,167.0,40.0,Axiel Plaz,PIT,A+,58.57,74.98,55.41,64.18,61.8
+208,Cam Cannarella,MIA,OF,22.8,True,98.0,110.0,Cam Cannarella,MIA,AAA,55.79,83.71,61.76,62.79,63.72
+209,Sean Gamble,KCR,OF,19.1,True,1518.0,-1309.0,Sean Gamble,KC,A,,51.74,47.76,60.51,50.38
+210,Bruin Agbayani,MIN,SS/2B,19.1,True,326.0,-116.0,Bruin Agbayani,MIN,A,57.9,58.29,62.52,61.96,58.73
+211,Ricky Tiedemann,TOR,LHP,23.9,False,,,,,,,,,,
+212,Santiago Suarez,TBR,RHP,21.4,False,,,,,,,,,,
+213,Christian Oppor,CHW,LHP,21.9,False,,,,,,,,,,
+214,Nate Payne,MIA,LHP,20.9,False,,,,,,,,,,
+215,Winston Santos,TEX,RHP,24.0,False,,,,,,,,,,
+216,Bishop Letson,MIL,RHP,21.7,False,,,,,,,,,,
+217,JT Quinn,BAL,RHP,22.0,False,,,,,,,,,,
+218,AJ Russell,TEX,RHP,21.1,False,,,,,,,,,,
+219,Jared Thomas,COL,OF,22.1,True,579.0,-360.0,Jared Thomas,COL,AA,52.21,63.71,59.92,58.44,56.13
+220,Dasan Hill,MIN,LHP,20.4,False,,,,,,,,,,
+221,David Hagaman,ARI,RHP,23.1,False,,,,,,,,,,
+222,Jose Corniell,TEX,RHP,22.11,False,,,,,,,,,,
+223,Kevin Defrank,MIA,RHP,17.9,False,,,,,,,,,,
+224,Gavin Kilen,SFG,SS,22.1,True,129.0,95.0,Gavin Kilen,SF,AA,61.79,74.06,59.27,52.88,62.59
+225,Ryan Wideman,SDP,OF,22.6,True,2469.0,-2244.0,Ryan Wideman,SD,A+,39.16,52.43,56.67,42.55,44.05
+226,Landon Harmon,WSH,RHP,19.7,False,,,,,,,,,,
+227,Argenis Cayama,SFG,RHP,19.8,False,,,,,,,,,,
+228,Jeral Perez,CHW,2B,21.5,True,205.0,23.0,Jeral Perez,CWS,AA,60.9,65.53,54.43,68.16,61.01
+230,Samuel Zavala,CHW,OF,21.1,True,241.0,-11.0,Samuel Zavala,CWS,AA,59.16,65.67,54.57,68.16,60.19
+231,Jaden Fauske,CHW,OF,19.5,True,988.0,-757.0,Jaden Fauske,CWS,A,,58.65,53.37,60.51,53.28
+232,Cam Collier,CIN,1B,21.5,True,416.0,-184.0,Cam Collier,CIN,AA,56.82,62.59,51.74,68.16,57.65
+233,Aidan Smith,TBR,OF,21.1,True,783.0,-550.0,Aidan Smith,NYM,A+,55.48,52.37,59.51,55.52,54.58
+234,Brendan Tunink,LAD,OF,20.7,True,2290.0,-2056.0,Brendan Tunink,LAD,A,51.08,43.35,40.11,53.99,45.72
+235,Murf Gray,PIT,3B,22.4,True,373.0,-138.0,Murf Gray,PIT,AA,,76.84,60.85,51.86,58.18
+236,Wyatt Sanford,PIT,SS,20.5,True,235.0,1.0,Wyatt Sanford,PIT,A+,58.58,66.56,58.05,64.18,60.36
+237,Aidan West,LAD,SS,19.0,True,1391.0,-1154.0,Aidan West,LAD,A,,53.6,50.23,58.45,51.1
+238,Owen Carey,ATL,OF,19.8,True,65.0,173.0,Owen Carey,ATL,AA,62.74,75.56,56.96,72.61,65.48
+239,Yeremy Cabrera,WSH,OF,20.1,True,187.0,52.0,Yeremy Cabrera,WSH,A+,60.73,65.13,59.36,64.18,61.39
+239,Cole Mathis,CHC,1B,22.8,True,351.0,-112.0,Cole Mathis,NYM,A+,58.6,68.05,57.83,46.85,58.43
+240,Enddy Azocar,BOS,OF,19.2,True,261.0,-21.0,Enddy Azocar,BAL,A+,56.68,65.97,57.96,68.21,59.77
+241,Ryan Mitchell,STL,SS,19.3,True,1504.0,-1263.0,Ryan Mitchell,STL,A,,50.01,49.26,61.96,50.48
+242,Yairo Padilla,STL,SS,18.1,True,81.0,161.0,Yairo Padilla,STL,A,59.75,76.37,64.61,61.96,64.47
+243,Edgar Montero,SAC,SS,19.5,True,968.0,-725.0,Edgar Montero,OAK,A,57.91,47.58,50.29,61.73,53.43
+244,Luis Cova,MIA,OF,19.3,True,70.0,174.0,Luis Cova,MIA,A,66.36,65.05,65.15,61.96,65.2
+245,Patrick Forbes,ARI,RHP,21.1,False,,,,,,,,,,
+246,Briggs McKenzie,ATL,LHP,19.7,False,,,,,,,,,,
+247,Michael Oliveto,DET,C,19.3,True,1413.0,-1166.0,Michael Oliveto,DET,A,,52.71,50.95,57.79,50.96
+248,Emanuel Luna,STL,OF,17.3,True,381.0,-133.0,Emanuel Luna,STL,R,,53.26,82.66,57.64,58.05
+249,Angel Nunez Jr.,CIN,OF,17.1,True,317.0,-68.0,Angel Nuñez,CIN,R,,67.5,70.62,57.64,58.83
+250,Elian Rosario,TEX,3B/OF,17.7,True,555.0,-305.0,Elian Rosario,TEX,R,,65.72,61.17,57.64,56.32
+251,Tyson Hardin,MIL,RHP,24.5,False,,,,,,,,,,
+252,Bryce Mayer,HOU,RHP,24.3,False,,,,,,,,,,
+253,Yhoiker Fajardo,STL,RHP,19.7,False,,,,,,,,,,
+254,Matt Wilkenson,CLE,LHP,23.5,False,,,,,,,,,,
+255,Alejandro Rosario,TEX,RHP,24.4,False,,,,,,,,,,
+256,Aaron Watson,CIN,RHP,19.4,False,,,,,,,,,,
+257,Jose Mejia,ARI,2B/3B,20.7,True,57.0,200.0,José Mejía,AZ,A+,65.9,72.64,59.3,64.87,65.88
+258,Tai Peete,STL,OF,20.9,True,674.0,-416.0,Tai Peete,STL,AA,51.75,59.99,55.71,67.79,55.29
+259,Slade Caldwell,ARI,OF,19.11,True,843.0,-584.0,Slade Caldwell,AZ,A+,54.53,59.84,46.16,64.87,54.18
+260,Khristian Curtis,PIT,RHP,23.11,False,,,,,,,,,,
+261,Chase Shores,LAA,RHP,21.11,False,,,,,,,,,,
+262,Bryce Cunningham,NYY,RHP,23.4,False,,,,,,,,,,
+263,Zach Root,LAD,LHP,22.3,False,,,,,,,,,,
+264,Cam Leiter,LAD,RHP,22.3,False,,,,,,,,,,
+265,Kelvis Salcedo,DET,RHP,20.3,False,,,,,,,,,,
+266,Yordanny Monegro,BOS,RHP,23.5,False,,,,,,,,,,
+267,Juan Valera,BOS,RHP,19.11,False,,,,,,,,,,
+268,LuJames Groover,ARI,3B,24.1,True,226.0,42.0,LuJames Groover,AZ,AAA,62.25,70.03,56.97,46.67,60.53
+269,Max Anderson,DET,2B,24.2,True,162.0,107.0,Max Anderson,DET,AAA,59.94,75.46,62.48,46.85,61.92
+270,Gabriel Gonzalez,MIN,OF,22.4,True,39.0,231.0,Gabriel Gonzalez,MIN,AAA,64.21,78.59,59.16,69.28,67.01
+271,Roc Riggio,COL,2B,23.11,True,585.0,-314.0,Roc Riggio,COL,AAA,57.16,61.77,60.27,41.85,56.08
+272,Brandon Compton,MIA,OF,22.6,True,1710.0,-1438.0,Brandon Compton,MIA,AA,41.8,60.48,60.38,51.21,49.26
+273,Alex Clemmey,WSH,LHP,20.9,False,,,,,,,,,,
+274,Esteban Mejia,BAL,RHP,19.2,True,857.0,-583.0,Esteban Mejia,TEX,A+,54.77,58.56,52.19,55.52,54.1
+275,Jurrangelo Cijntje,STL,RHP/LHP,22.11,False,,,,,,,,,,
+276,Ethan Frey,HOU,OF,22.1,True,740.0,-464.0,Ethan Frey,HOU,A+,59.34,51.62,57.76,46.85,54.83
+277,Jake Munroe,LAA,3B,22.8,True,328.0,-51.0,Jake Munroe,LAA,AA,55.22,72.13,58.85,52.88,58.72
+278,Mitch Bratt,ARI,LHP,22.1,False,,,,,,,,,,
+279,Jadher Areinamo,TBR,SS/2B,22.5,True,35.0,244.0,Jadher Areinamo,TB,AA,65.46,78.71,63.92,58.16,67.27
+280,Aron Estrada,BAL,2B/OF,21.3,True,16.0,264.0,Aron Estrada,BAL,AA,65.14,79.16,65.25,69.09,68.93
+281,Yophery Rodriguez,BOS,OF,20.5,True,131.0,150.0,Yophery Rodriguez,BOS,A+,60.44,75.13,54.28,64.18,62.54
+282,Yoelin Cespedes,BOS,2B,20.8,False,,,,,,,,,,
+283,Malachi Witherspoon,DET,RHP,21.9,False,,,,,,,,,,
+284,Kellon Lindsey,LAD,SS,20.7,True,1689.0,-1405.0,Kellon Lindsey,LAD,A,47.29,54.41,53.41,53.99,49.4
+285,JD Dix,ARI,2B,20.7,True,414.0,-129.0,JD Dix,AZ,A+,55.78,67.9,53.55,59.52,57.68
+286,Hayden Alvarez,LAA,OF,19.1,True,93.0,193.0,Hayden Alvarez,LAA,A+,59.7,73.23,65.1,63.42,63.99
+287,Dean Moss,TBR,OF,20.0,True,784.0,-497.0,Dean Moss,TB,A,,69.13,52.43,52.6,54.57
+288,Jordan Yost,DET,SS,19.4,True,374.0,-86.0,Jordan Yost,DET,A,,77.4,54.06,61.96,58.13
+289,Brendan Summerhill,TBR,OF,22.6,True,264.0,25.0,Brendan Summerhill,TB,A+,64.84,61.58,60.04,40.18,59.64
+290,Nestor German,BAL,RHP,24.2,False,,,,,,,,,,
+291,Jose Urbina,TBR,RHP,20.6,True,1799.0,-1508.0,Jose Urbina,AZ,R,52.52,49.94,47.83,46.26,48.72
+292,Miguel Mendez,SDP,RHP,23.1,False,,,,,,,,,,
+293,Noble Meyer,MIA,RHP,21.4,False,,,,,,,,,,
+294,Boston Bateman,BAL,LHP,20.7,False,,,,,,,,,,
+295,Thayron Liranzo,DET,C,22.1,True,668.0,-373.0,Thayron Liranzo,DET,AA,56.41,58.03,52.83,58.44,55.32
+296,Carson Roccaforte,KCR,OF,24.1,True,1702.0,-1406.0,Carson Roccaforte,KC,AAA,48.84,53.45,56.8,43.33,49.31
+297,Dakota Jordan,SFG,OF,23.0,True,733.0,-436.0,Dakota Jordan,SF,AA,54.23,58.8,64.13,42.87,54.87
+298,Tony Blanco Jr.,PIT,1B/DH,20.11,False,,,,,,,,,,
+299,CJ Hughes,MIL,SS,18.8,True,2333.0,-2034.0,CJ Hughes,MIL,R,,40.26,38.45,59.05,45.38
+300,Junior Sanchez,ARI,RHP,20.7,False,,,,,,,,,,
+301,Brady Ebel,MIL,SS/3B,18.9,True,576.0,-275.0,Brady Ebel,MIL,A+,50.02,67.71,56.15,66.06,56.15
+302,Darell Morel,PIT,SS,18.7,True,970.0,-668.0,Darell Morel,PIT,R,52.26,57.33,54.27,58.79,53.42
+303,Kyle Lodise,CHW,SS,22.6,True,349.0,-46.0,Kyle Lodise,CWS,A+,63.58,60.19,55.06,46.85,58.44
+304,Gabriel Rincones,PHI,OF,25.2,False,,,,,,,,,,
+305,Anderson De Los Santos,BAL,3B,22.4,True,816.0,-511.0,Anderson De Los Santos,BAL,AA,53.61,62.37,50.14,58.44,54.36
+306,Handelfry Encarnacion,MIL,OF,18.11,True,208.0,98.0,Handelfry Encarnacion,MIL,A,60.58,70.15,54.21,60.51,60.91
+307,James Ellwanger,MIN,RHP,22.0,False,,,,,,,,,,
+308,Tim Piasentin,TOR,3B,19.1,True,2088.0,-1780.0,Tim Piasentin,TOR,R,,49.75,39.55,52.23,47.02
+309,Miguel Hernandez,STL,SS,17.11,True,273.0,36.0,Miguel Hernández,STL,A,58.1,64.41,59.41,60.68,59.45
+310,Ronny Munoz,MIA,SS,17.7,True,2510.0,-2200.0,Ronny Muñoz,MIA,R,,38.47,33.52,57.64,43.68

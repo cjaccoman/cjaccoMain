@@ -1,0 +1,164 @@
+[Wed 08/12/2026 15:47:06.09] Starting 2025 fetch
+=== fetch_milb_pitches.py ===
+
+Cache: 11,349 games already processed
+Single-season mode — fetching 2025 only
+
+  2025 AAA: 2347 completed games,    0 new
+  2025 AA : 2190 completed games, 1673 new
+      [100/1673] flushed to disk
+      [200/1673] flushed to disk
+      [300/1673] flushed to disk
+      [400/1673] flushed to disk
+      [500/1673] flushed to disk
+      [600/1673] flushed to disk
+      [700/1673] flushed to disk
+      [800/1673] flushed to disk
+      [900/1673] flushed to disk
+      [1000/1673] flushed to disk
+      [1100/1673] flushed to disk
+      [1200/1673] flushed to disk
+      [1300/1673] flushed to disk
+      [1400/1673] flushed to disk
+      [1500/1673] flushed to disk
+      [1600/1673] flushed to disk
+  2025 A+ : 2069 completed games, 2069 new
+      [100/2069] flushed to disk
+      [200/2069] flushed to disk
+      [300/2069] flushed to disk
+      [400/2069] flushed to disk
+      [500/2069] flushed to disk
+      [600/2069] flushed to disk
+      [700/2069] flushed to disk
+      [800/2069] flushed to disk
+      [900/2069] flushed to disk
+      [1000/2069] flushed to disk
+      [1100/2069] flushed to disk
+      [1200/2069] flushed to disk
+      [1300/2069] flushed to disk
+      [1400/2069] flushed to disk
+      [1500/2069] flushed to disk
+      [1600/2069] flushed to disk
+      [1700/2069] flushed to disk
+      [1800/2069] flushed to disk
+      [1900/2069] flushed to disk
+      [2000/2069] flushed to disk
+  2025 A  : 2074 completed games, 2074 new
+      [100/2074] flushed to disk
+      [200/2074] flushed to disk
+      [300/2074] flushed to disk
+      [400/2074] flushed to disk
+      [500/2074] flushed to disk
+      [600/2074] flushed to disk
+      [700/2074] flushed to disk
+      [800/2074] flushed to disk
+      [900/2074] flushed to disk
+      [1000/2074] flushed to disk
+      [1100/2074] flushed to disk
+      [1200/2074] flushed to disk
+      [1300/2074] flushed to disk
+      [1400/2074] flushed to disk
+      [1500/2074] flushed to disk
+      [1600/2074] flushed to disk
+      [1700/2074] flushed to disk
+      [1800/2074] flushed to disk
+      [1900/2074] flushed to disk
+      [2000/2074] flushed to disk
+  2025 R  : 2452 completed games, 2452 new
+      [100/2452] flushed to disk
+      [200/2452] flushed to disk
+      [300/2452] flushed to disk
+      [400/2452] flushed to disk
+      [500/2452] flushed to disk
+      [600/2452] flushed to disk
+      [700/2452] flushed to disk
+      [800/2452] flushed to disk
+      [900/2452] flushed to disk
+      [1000/2452] flushed to disk
+      [1100/2452] flushed to disk
+      [1200/2452] flushed to disk
+      [1300/2452] flushed to disk
+      [1400/2452] flushed to disk
+      [1500/2452] flushed to disk
+      [1600/2452] flushed to disk
+      [1700/2452] flushed to disk
+      [1800/2452] flushed to disk
+      [1900/2452] flushed to disk
+      [2000/2452] flushed to disk
+      [2100/2452] flushed to disk
+      [2200/2452] flushed to disk
+      [2300/2452] flushed to disk
+      [2400/2452] flushed to disk
+
+Processed 8,268 new games
+
+Rebuilding milb_pitches_agg.csv...
+  Wrote 11,891 player-season-level rows -> milb_pitches_agg.csv
+  Seasons: 2024-2026
+  Levels: ['A', 'A+', 'AA', 'AAA', 'R']
+  Unique players: 4,775
+
+Done.
+[Wed 08/12/2026 18:14:17.35] 2025 complete, starting 2024
+=== fetch_milb_pitches.py ===
+
+Cache: 19,074 games already processed
+Single-season mode — fetching 2024 only
+
+  2024 AAA: 2345 completed games,    0 new
+  2024 AA : 2162 completed games,    0 new
+  2024 A+ : 2074 completed games,  273 new
+      [100/273] flushed to disk
+      [200/273] flushed to disk
+  2024 A  : 2092 completed games, 2092 new
+      [100/2092] flushed to disk
+      [200/2092] flushed to disk
+      [300/2092] flushed to disk
+      [400/2092] flushed to disk
+      [500/2092] flushed to disk
+      [600/2092] flushed to disk
+      [700/2092] flushed to disk
+      [800/2092] flushed to disk
+      [900/2092] flushed to disk
+      [1000/2092] flushed to disk
+      [1100/2092] flushed to disk
+      [1200/2092] flushed to disk
+      [1300/2092] flushed to disk
+      [1400/2092] flushed to disk
+      [1500/2092] flushed to disk
+      [1600/2092] flushed to disk
+      [1700/2092] flushed to disk
+      [1800/2092] flushed to disk
+      [1900/2092] flushed to disk
+      [2000/2092] flushed to disk
+  2024 R  : 2506 completed games, 2506 new
+      [100/2506] flushed to disk
+      [200/2506] flushed to disk
+      [300/2506] flushed to disk
+      [400/2506] flushed to disk
+      [500/2506] flushed to disk
+      [600/2506] flushed to disk
+      [700/2506] flushed to disk
+      [800/2506] flushed to disk
+      [900/2506] flushed to disk
+      [1000/2506] flushed to disk
+      [1100/2506] flushed to disk
+      [1200/2506] flushed to disk
+      [1300/2506] flushed to disk
+      [1400/2506] flushed to disk
+      [1500/2506] flushed to disk
+      [1600/2506] flushed to disk
+      [1700/2506] flushed to disk
+      [1800/2506] flushed to disk
+      [1900/2506] flushed to disk
+      [2000/2506] flushed to disk
+      [2100/2506] flushed to disk
+      [2200/2506] flushed to disk
+      [2300/2506] flushed to disk
+      [2400/2506] flushed to disk
+      [2500/2506] flushed to disk
+
+Processed 4,871 new games
+
+Rebuilding milb_pitches_agg.csv...
+[Wed 08/12/2026 19:32:10.92] 2024 complete, all done

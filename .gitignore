@@ -1,0 +1,33 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# PyCharm
+.idea/
+*.iml
+
+# Large data files (>10 MB — re-fetchable via fetch/ scripts)
+data/api/milb_pitches_games.csv
+data/api/milb_statcast_aaa.csv
+data/api/milb_advanced.csv
+data/rankings/prospect_features.csv
+data/rankings/tools_scores.csv
+data/historical/historical_ml_advanced.csv
+data/historical/historical_ml_batted.csv
+data/fangraphs/missing_milb_data.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Scratch / temp outputs
+*.tmp
+scratchpad/

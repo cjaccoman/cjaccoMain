@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "pandas/_libs/parsers.pyx", line 1116, in pandas._libs.parsers.TextReader._convert_tokens
+TypeError: Cannot cast array data from dtype('O') to dtype('int64') according to the rule 'safe'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\cjacc\PycharmProjects\prospectsMain\fetch_milb_pitches.py", line 401, in <module>
+    main()
+  File "C:\Users\cjacc\PycharmProjects\prospectsMain\fetch_milb_pitches.py", line 381, in main
+    games_df = pd.read_csv(
+               ^^^^^^^^^^^^
+  File "C:\Users\cjacc\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cjacc\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 306, in _read
+    return parser.read(nrows)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cjacc\venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1947, in read
+    ) = self._engine.read(  # type: ignore[attr-defined]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cjacc\venv\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 215, in read
+    chunks = self._reader.read_low_memory(nrows)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pandas/_libs/parsers.pyx", line 832, in pandas._libs.parsers.TextReader.read_low_memory
+  File "pandas/_libs/parsers.pyx", line 911, in pandas._libs.parsers.TextReader._read_rows
+  File "pandas/_libs/parsers.pyx", line 1009, in pandas._libs.parsers.TextReader._convert_column_data
+  File "pandas/_libs/parsers.pyx", line 1122, in pandas._libs.parsers.TextReader._convert_tokens
+ValueError: cannot convert float NaN to integer

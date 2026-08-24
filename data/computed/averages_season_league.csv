@@ -1,0 +1,316 @@
+Season,League,Avg_Age,Std_Age,Avg_PPG,Avg_PPPA,Std_PPG,Std_PPPA
+2006,Appalachian League,20.51,1.58,2.54,0.65,1.67,0.4
+2006,Arizona League,20.45,1.87,2.98,0.75,1.9,0.44
+2006,California League,22.65,1.27,3.1,0.75,1.54,0.36
+2006,Carolina League,22.85,1.09,2.92,0.73,1.49,0.34
+2006,Dominican Summer League,18.59,1.25,1.8,0.48,1.46,0.38
+2006,Eastern League,23.06,1.1,2.33,0.57,1.75,0.49
+2006,Florida State League,22.44,1.46,2.54,0.64,1.52,0.37
+2006,Gulf Coast League,20.14,1.71,2.27,0.61,1.68,0.42
+2006,International League,22.88,1.1,2.84,0.68,1.88,0.48
+2006,Mexican League,21.8,1.52,1.49,0.55,1.53,0.45
+2006,Midwest League,21.69,1.51,2.36,0.59,1.45,0.34
+2006,Pacific Coast League,22.96,1.11,2.25,0.56,2.11,0.56
+2006,Pioneer League,21.04,1.55,2.89,0.71,1.77,0.4
+2006,South Atlantic League,21.77,1.54,2.42,0.6,1.59,0.38
+2006,Southern League,22.71,1.14,1.65,0.39,1.75,0.53
+2006,Texas League,22.88,1.06,3.03,0.71,1.57,0.47
+2006,Venezuelan Summer League,18.52,1.25,2.45,0.67,1.29,0.31
+2007,Appalachian League,20.39,1.44,2.55,0.65,1.62,0.38
+2007,Arizona League,20.17,1.93,2.99,0.74,2.31,0.48
+2007,California League,22.52,1.41,3.16,0.75,1.85,0.42
+2007,Carolina League,22.63,1.28,2.87,0.71,1.57,0.37
+2007,Dominican Summer League,18.61,1.34,1.99,0.53,1.55,0.4
+2007,Eastern League,22.94,1.23,2.82,0.68,2.23,0.58
+2007,Florida State League,22.38,1.3,2.64,0.67,1.66,0.41
+2007,Gulf Coast League,19.91,1.84,2.31,0.62,1.6,0.41
+2007,International League,23.15,1.04,2.81,0.65,1.76,0.52
+2007,Mexican League,22.18,1.54,1.78,0.62,1.39,0.39
+2007,Midwest League,21.57,1.45,2.42,0.61,1.38,0.33
+2007,Pacific Coast League,23.28,0.93,2.72,0.66,2.1,0.54
+2007,Pioneer League,21.13,1.55,2.93,0.74,1.67,0.38
+2007,South Atlantic League,21.79,1.48,2.88,0.71,1.62,0.38
+2007,Southern League,22.87,1.17,2.18,0.54,1.88,0.55
+2007,Texas League,22.98,1.13,2.68,0.64,1.84,0.53
+2007,Venezuelan Summer League,18.39,1.28,2.43,0.66,1.59,0.41
+2008,Appalachian League,20.51,1.52,2.62,0.66,1.55,0.36
+2008,Arizona League,20.23,1.85,2.94,0.76,2.03,0.48
+2008,California League,22.25,1.36,3.05,0.74,1.76,0.41
+2008,Carolina League,22.51,1.26,2.88,0.73,1.4,0.32
+2008,Dominican Summer League,18.43,1.29,2.1,0.55,1.57,0.39
+2008,Eastern League,22.98,1.16,2.74,0.64,1.78,0.48
+2008,Florida State League,22.53,1.24,2.5,0.63,1.44,0.34
+2008,Gulf Coast League,19.88,1.73,2.45,0.67,1.76,0.46
+2008,International League,23.41,0.9,2.41,0.59,1.92,0.48
+2008,Mexican League,22.38,1.62,1.5,0.53,1.19,0.29
+2008,Midwest League,21.64,1.45,2.41,0.6,1.39,0.33
+2008,Pacific Coast League,23.18,0.93,2.64,0.63,2.11,0.56
+2008,Pioneer League,20.84,1.38,3.36,0.81,1.81,0.4
+2008,South Atlantic League,21.7,1.61,2.55,0.63,1.48,0.34
+2008,Southern League,22.97,1.15,2.14,0.52,1.92,0.57
+2008,Texas League,22.73,1.24,2.86,0.68,1.78,0.46
+2008,Venezuelan Summer League,18.2,1.13,2.16,0.57,1.54,0.38
+2009,Appalachian League,20.8,1.48,2.81,0.71,1.69,0.38
+2009,Arizona League,20.32,1.94,2.92,0.72,2.03,0.46
+2009,California League,22.61,1.24,2.94,0.72,1.57,0.35
+2009,Carolina League,22.38,1.41,2.67,0.66,1.54,0.36
+2009,Dominican Summer League,18.36,1.24,2.26,0.59,1.6,0.38
+2009,Eastern League,22.69,1.25,2.28,0.53,1.76,0.51
+2009,Florida State League,22.12,1.4,2.36,0.6,1.53,0.38
+2009,Gulf Coast League,19.78,1.79,2.07,0.57,1.56,0.42
+2009,International League,22.86,1.2,2.68,0.62,1.92,0.5
+2009,Mexican League,22.08,1.78,1.79,0.61,1.45,0.39
+2009,Midwest League,21.57,1.44,2.55,0.63,1.54,0.36
+2009,Pacific Coast League,23.23,1.0,2.52,0.63,1.97,0.52
+2009,Pioneer League,20.81,1.57,3.05,0.75,1.79,0.4
+2009,South Atlantic League,21.65,1.55,2.33,0.59,1.45,0.35
+2009,Southern League,22.63,1.32,2.07,0.52,1.8,0.52
+2009,Texas League,22.88,1.03,2.73,0.66,1.78,0.47
+2009,Venezuelan Summer League,18.31,1.17,2.48,0.68,1.58,0.38
+2010,Appalachian League,20.8,1.49,2.59,0.65,1.72,0.41
+2010,Arizona League,20.29,1.92,2.46,0.62,1.74,0.41
+2010,California League,22.43,1.36,3.05,0.75,1.82,0.42
+2010,Carolina League,22.29,1.3,2.57,0.63,1.47,0.35
+2010,Dominican Summer League,18.39,1.24,1.9,0.53,1.34,0.35
+2010,Eastern League,22.82,1.08,2.76,0.64,1.93,0.52
+2010,Florida State League,22.22,1.47,2.27,0.57,1.44,0.34
+2010,Gulf Coast League,19.81,1.79,2.31,0.62,1.68,0.41
+2010,International League,23.04,1.03,3.02,0.73,1.97,0.5
+2010,Mexican League,21.7,1.75,1.51,0.56,1.35,0.38
+2010,Midwest League,21.54,1.43,2.61,0.64,1.48,0.35
+2010,Pacific Coast League,23.32,0.91,2.67,0.65,2.06,0.55
+2010,Pioneer League,20.96,1.48,3.04,0.73,1.64,0.36
+2010,South Atlantic League,21.65,1.62,2.47,0.61,1.46,0.34
+2010,Southern League,22.9,1.16,2.11,0.53,1.9,0.56
+2010,Texas League,22.9,1.15,2.27,0.57,1.74,0.47
+2010,Venezuelan Summer League,18.22,1.12,2.54,0.7,1.32,0.32
+2011,Appalachian League,20.65,1.53,2.85,0.72,1.61,0.37
+2011,Arizona League,20.09,1.82,3.21,0.81,2.16,0.52
+2011,California League,22.33,1.34,3.23,0.77,1.77,0.38
+2011,Carolina League,22.48,1.26,2.44,0.62,1.66,0.43
+2011,Dominican Summer League,18.5,1.31,2.03,0.56,1.38,0.36
+2011,Eastern League,23.01,1.09,2.53,0.59,1.5,0.46
+2011,Florida State League,22.4,1.21,2.61,0.66,1.35,0.33
+2011,Gulf Coast League,20.17,1.78,2.51,0.67,1.89,0.48
+2011,International League,23.12,1.02,2.74,0.66,1.62,0.44
+2011,Mexican League,21.81,1.72,1.82,0.67,1.47,0.39
+2011,Midwest League,21.65,1.44,2.39,0.6,1.38,0.33
+2011,Pacific Coast League,23.1,1.06,3.14,0.75,2.22,0.54
+2011,Pioneer League,21.15,1.52,3.59,0.86,1.65,0.35
+2011,South Atlantic League,21.51,1.62,2.81,0.69,1.43,0.33
+2011,Southern League,22.75,1.22,2.33,0.56,1.91,0.57
+2011,Texas League,22.89,1.11,2.46,0.6,1.83,0.49
+2011,Venezuelan Summer League,18.35,1.28,2.66,0.7,1.59,0.36
+2012,Appalachian League,20.36,1.64,2.7,0.7,1.49,0.35
+2012,Arizona League,19.74,1.79,3.17,0.79,2.21,0.52
+2012,California League,22.39,1.34,3.26,0.78,1.83,0.42
+2012,Carolina League,22.33,1.44,2.62,0.66,1.55,0.38
+2012,Dominican Summer League,18.47,1.23,2.22,0.59,1.42,0.35
+2012,Eastern League,22.8,1.21,2.37,0.58,1.55,0.44
+2012,Florida State League,22.53,1.31,2.57,0.64,1.47,0.35
+2012,Gulf Coast League,20.02,1.85,2.02,0.55,1.73,0.44
+2012,International League,23.01,1.12,2.5,0.62,1.65,0.41
+2012,Mexican League,21.54,1.76,1.34,0.49,1.33,0.45
+2012,Midwest League,21.66,1.45,2.64,0.64,1.54,0.36
+2012,Pacific Coast League,23.29,0.95,2.69,0.63,2.18,0.56
+2012,Pioneer League,20.93,1.55,3.58,0.85,1.91,0.4
+2012,South Atlantic League,21.74,1.52,2.67,0.65,1.65,0.38
+2012,Southern League,22.78,1.14,1.98,0.48,1.77,0.52
+2012,Texas League,22.75,1.26,2.18,0.54,1.69,0.48
+2012,Venezuelan Summer League,18.06,1.28,2.93,0.78,1.4,0.32
+2013,Appalachian League,20.61,1.57,2.28,0.58,1.53,0.36
+2013,Arizona League,19.88,1.9,2.49,0.64,1.81,0.45
+2013,California League,22.49,1.28,3.03,0.72,1.78,0.4
+2013,Carolina League,22.44,1.31,2.6,0.64,1.51,0.36
+2013,Dominican Summer League,18.38,1.31,2.1,0.55,1.47,0.37
+2013,Eastern League,22.83,1.19,2.52,0.61,1.55,0.41
+2013,Florida State League,22.39,1.27,2.76,0.68,1.63,0.37
+2013,Gulf Coast League,19.99,1.98,2.13,0.57,1.64,0.44
+2013,International League,23.16,0.98,2.77,0.65,1.59,0.4
+2013,Mexican League,21.71,1.65,1.58,0.54,1.4,0.39
+2013,Midwest League,21.44,1.5,2.58,0.63,1.4,0.33
+2013,Pacific Coast League,23.08,1.04,2.64,0.61,2.35,0.63
+2013,Pioneer League,20.77,1.54,3.48,0.83,1.83,0.42
+2013,South Atlantic League,21.82,1.54,2.37,0.59,1.53,0.36
+2013,Southern League,22.93,1.07,1.87,0.42,1.86,0.57
+2013,Texas League,22.78,1.27,2.41,0.58,1.58,0.41
+2013,Venezuelan Summer League,18.21,1.27,2.43,0.67,1.53,0.4
+2014,Appalachian League,20.42,1.5,2.44,0.62,1.66,0.39
+2014,Arizona League,19.87,1.85,2.55,0.66,2.1,0.52
+2014,California League,22.56,1.19,3.22,0.76,1.71,0.38
+2014,Carolina League,22.34,1.46,2.71,0.67,1.8,0.44
+2014,Dominican Summer League,18.29,1.32,2.31,0.59,1.58,0.38
+2014,Eastern League,22.86,1.07,2.83,0.69,2.02,0.55
+2014,Florida State League,22.38,1.33,2.6,0.64,1.59,0.35
+2014,Gulf Coast League,19.92,1.8,2.48,0.67,1.78,0.45
+2014,International League,23.1,0.93,2.83,0.67,1.58,0.4
+2014,Mexican League,21.73,1.68,1.77,0.64,1.37,0.37
+2014,Midwest League,21.56,1.45,2.5,0.61,1.4,0.34
+2014,Pacific Coast League,23.08,1.05,2.76,0.65,2.13,0.6
+2014,Pioneer League,20.65,1.66,3.48,0.86,1.56,0.35
+2014,South Atlantic League,21.54,1.61,2.71,0.67,1.56,0.38
+2014,Southern League,22.94,1.11,2.13,0.52,1.83,0.53
+2014,Texas League,22.85,1.25,2.63,0.63,1.26,0.34
+2014,Venezuelan Summer League,18.13,1.19,2.2,0.59,1.42,0.36
+2015,Appalachian League,20.69,1.46,2.72,0.67,1.66,0.37
+2015,Arizona League,20.14,1.89,2.42,0.64,1.81,0.47
+2015,California League,22.26,1.43,2.92,0.7,1.79,0.41
+2015,Carolina League,22.28,1.32,2.43,0.61,1.38,0.32
+2015,Dominican Summer League,18.28,1.3,2.4,0.61,1.59,0.38
+2015,Eastern League,22.82,1.16,2.34,0.55,1.71,0.47
+2015,Florida State League,22.3,1.34,2.13,0.53,1.41,0.34
+2015,Gulf Coast League,19.69,1.86,2.11,0.58,1.61,0.41
+2015,International League,23.17,0.9,2.8,0.66,1.51,0.39
+2015,Mexican League,22.01,1.7,1.42,0.49,1.4,0.42
+2015,Midwest League,21.5,1.46,2.43,0.59,1.44,0.35
+2015,Pacific Coast League,23.08,1.15,3.06,0.75,2.06,0.49
+2015,Pioneer League,20.88,1.57,3.67,0.88,1.78,0.39
+2015,South Atlantic League,21.57,1.51,2.63,0.65,1.48,0.35
+2015,Southern League,22.76,1.16,2.23,0.51,1.8,0.54
+2015,Texas League,22.84,1.16,2.73,0.66,1.75,0.42
+2015,Venezuelan Summer League,18.2,1.17,2.65,0.67,1.52,0.36
+2016,Appalachian League,20.68,1.72,2.83,0.7,1.52,0.36
+2016,Arizona League,19.96,1.73,2.38,0.61,1.84,0.45
+2016,California League,22.18,1.39,2.85,0.67,1.69,0.39
+2016,Carolina League,22.46,1.31,2.84,0.69,1.49,0.34
+2016,Dominican Summer League,18.22,1.31,2.08,0.55,1.39,0.34
+2016,Eastern League,22.72,1.14,2.42,0.57,1.85,0.52
+2016,Florida State League,22.4,1.26,2.36,0.59,1.41,0.34
+2016,Gulf Coast League,19.75,1.68,2.04,0.55,1.66,0.44
+2016,International League,23.16,0.98,2.47,0.55,1.78,0.52
+2016,Mexican League,22.0,1.81,1.29,0.45,1.39,0.42
+2016,Midwest League,21.63,1.37,2.08,0.51,1.49,0.36
+2016,Pacific Coast League,23.0,1.13,2.79,0.67,2.66,0.67
+2016,Pioneer League,20.69,1.49,3.7,0.89,1.75,0.37
+2016,South Atlantic League,21.56,1.51,2.37,0.59,1.43,0.34
+2016,Southern League,22.87,1.1,1.89,0.43,1.75,0.54
+2016,Texas League,22.78,1.12,2.36,0.58,1.72,0.43
+2017,Appalachian League,20.42,1.46,2.98,0.71,1.64,0.38
+2017,Arizona League,20.03,1.91,2.82,0.71,2.19,0.53
+2017,California League,22.38,1.27,2.79,0.67,1.62,0.37
+2017,Carolina League,22.42,1.22,2.41,0.6,1.45,0.35
+2017,Dominican Summer League,18.09,1.19,2.16,0.57,1.43,0.36
+2017,Eastern League,22.92,1.09,2.47,0.61,1.73,0.45
+2017,Florida State League,22.33,1.28,2.32,0.57,1.61,0.4
+2017,Gulf Coast League,19.93,1.89,2.52,0.67,1.89,0.48
+2017,International League,23.12,1.07,2.79,0.65,1.81,0.49
+2017,Mexican League,21.85,1.58,1.37,0.52,1.21,0.4
+2017,Midwest League,21.48,1.49,2.43,0.59,1.42,0.33
+2017,Pacific Coast League,23.13,1.01,2.97,0.68,2.39,0.68
+2017,Pioneer League,20.8,1.53,4.12,0.95,2.07,0.43
+2017,South Atlantic League,21.59,1.5,2.3,0.57,1.38,0.34
+2017,Southern League,22.89,1.17,1.83,0.41,1.6,0.52
+2017,Texas League,22.6,1.26,2.44,0.6,1.47,0.38
+2018,Appalachian League,20.46,1.49,3.09,0.75,1.8,0.41
+2018,Arizona League,19.77,1.81,2.36,0.62,1.99,0.51
+2018,California League,22.36,1.28,2.59,0.63,1.61,0.37
+2018,Carolina League,22.29,1.28,2.35,0.59,1.47,0.33
+2018,Dominican Summer League,17.78,1.11,2.2,0.57,1.57,0.39
+2018,Eastern League,22.93,1.15,2.23,0.54,1.68,0.48
+2018,Florida State League,22.19,1.36,2.36,0.59,1.47,0.36
+2018,Gulf Coast League,19.92,1.77,2.51,0.65,2.28,0.53
+2018,International League,23.12,1.1,2.46,0.58,1.62,0.5
+2018,Midwest League,21.45,1.43,2.41,0.59,1.59,0.38
+2018,Pacific Coast League,22.98,1.08,2.43,0.57,2.06,0.58
+2018,Pioneer League,20.57,1.66,3.45,0.83,1.96,0.43
+2018,South Atlantic League,21.49,1.53,2.23,0.56,1.46,0.36
+2018,Southern League,22.87,1.11,2.0,0.47,1.7,0.52
+2018,Texas League,22.78,1.25,2.64,0.63,1.61,0.45
+2019,Arizona League,19.79,1.88,2.97,0.72,2.39,0.55
+2019,California League,22.25,1.52,2.27,0.54,1.68,0.4
+2019,Carolina League,22.34,1.21,2.05,0.52,1.54,0.37
+2019,Dominican Summer League,17.75,1.08,2.49,0.63,1.5,0.36
+2019,Eastern League,22.98,1.11,1.71,0.42,1.52,0.44
+2019,Florida State League,22.13,1.28,1.96,0.51,1.49,0.39
+2019,Gulf Coast League,19.7,1.82,2.37,0.63,1.81,0.46
+2019,International League,23.17,1.03,2.98,0.72,2.05,0.51
+2019,Mexican League,22.35,1.47,1.65,0.6,1.56,0.56
+2019,Midwest League,21.36,1.47,2.17,0.53,1.45,0.35
+2019,Pacific Coast League,23.2,1.1,2.98,0.71,2.34,0.65
+2019,South Atlantic League,21.66,1.39,2.13,0.52,1.53,0.38
+2019,Southern League,22.82,1.13,1.76,0.4,1.63,0.52
+2019,Texas League,22.7,1.3,2.34,0.58,1.63,0.45
+2021,Arizona Complex League,20.27,1.78,2.48,0.7,2.06,0.55
+2021,Dominican Summer League,17.86,0.96,2.03,0.58,1.44,0.39
+2021,Double-A Central,22.82,1.2,2.51,0.61,1.71,0.4
+2021,Double-A Northeast,22.97,1.06,2.29,0.56,1.82,0.46
+2021,Double-A South,23.04,1.08,1.94,0.49,1.73,0.43
+2021,Florida Complex League,20.32,1.66,2.5,0.72,2.06,0.56
+2021,High-A Central,22.24,1.37,2.51,0.61,1.78,0.43
+2021,High-A East,22.54,1.27,2.6,0.63,1.96,0.46
+2021,High-A West,22.47,1.34,2.32,0.54,2.21,0.52
+2021,Low-A East,21.4,1.57,2.56,0.61,1.84,0.43
+2021,Low-A Southeast,21.48,1.48,2.36,0.58,1.97,0.48
+2021,Low-A West,21.18,1.56,2.84,0.66,1.92,0.43
+2021,Triple-A East,22.97,1.06,2.73,0.64,2.34,0.63
+2021,Triple-A West,22.94,1.2,3.15,0.75,2.44,0.57
+2022,Arizona Complex League,20.28,1.86,2.2,0.6,2.0,0.54
+2022,California League,21.28,1.73,2.95,0.68,2.08,0.47
+2022,Carolina League,20.86,1.59,2.6,0.62,1.87,0.42
+2022,Dominican Summer League,17.81,0.99,2.35,0.65,1.5,0.4
+2022,Eastern League,22.8,1.27,2.55,0.62,1.91,0.46
+2022,Florida Complex League,20.09,1.65,2.14,0.59,2.12,0.56
+2022,Florida State League,21.26,1.52,1.94,0.49,1.9,0.48
+2022,International League,23.05,1.0,3.29,0.78,2.16,0.55
+2022,Midwest League,22.13,1.39,2.39,0.59,1.62,0.39
+2022,Northwest League,22.36,1.41,2.5,0.62,1.51,0.35
+2022,Pacific Coast League,22.97,1.1,3.63,0.85,1.96,0.42
+2022,South Atlantic League,22.16,1.37,2.55,0.62,1.71,0.4
+2022,Southern League,22.61,1.35,2.82,0.68,1.7,0.39
+2022,Texas League,22.83,1.28,3.39,0.8,2.0,0.44
+2023,Arizona Complex League,20.28,1.75,3.25,0.85,2.43,0.6
+2023,California League,21.06,1.77,2.66,0.63,1.67,0.38
+2023,Carolina League,20.99,1.57,2.39,0.58,1.9,0.45
+2023,Dominican Summer League,17.76,1.02,2.54,0.67,1.64,0.4
+2023,Eastern League,22.62,1.35,2.63,0.62,1.7,0.4
+2023,Florida Complex League,19.99,1.75,2.84,0.76,2.21,0.56
+2023,Florida State League,21.19,1.62,2.54,0.62,1.82,0.44
+2023,International League,23.04,1.11,3.68,0.86,1.83,0.42
+2023,Midwest League,22.07,1.43,2.47,0.6,1.65,0.39
+2023,Northwest League,22.15,1.44,2.66,0.64,1.8,0.4
+2023,Pacific Coast League,22.92,1.19,4.6,1.05,2.57,0.56
+2023,South Atlantic League,22.08,1.44,2.69,0.65,1.96,0.45
+2023,Southern League,22.55,1.39,2.88,0.69,1.9,0.43
+2023,Texas League,22.62,1.36,3.1,0.74,1.61,0.35
+2024,Arizona Complex League,19.97,1.69,3.05,0.79,2.1,0.5
+2024,California League,21.19,1.63,3.02,0.68,2.13,0.42
+2024,Carolina League,20.77,1.64,2.39,0.59,1.81,0.43
+2024,Dominican Summer League,17.71,0.98,2.45,0.66,1.57,0.39
+2024,Eastern League,22.62,1.25,2.44,0.61,1.59,0.39
+2024,Florida Complex League,19.76,1.62,2.56,0.7,2.08,0.54
+2024,Florida State League,21.14,1.56,2.28,0.56,1.85,0.44
+2024,International League,22.89,1.19,3.26,0.76,1.92,0.43
+2024,Midwest League,22.02,1.42,2.35,0.58,1.59,0.37
+2024,Northwest League,22.11,1.4,2.54,0.62,1.48,0.34
+2024,Pacific Coast League,22.81,1.13,3.21,0.74,1.96,0.42
+2024,South Atlantic League,21.82,1.43,2.2,0.54,1.88,0.45
+2024,Southern League,22.62,1.28,2.32,0.56,1.49,0.35
+2024,Texas League,22.59,1.3,2.64,0.64,1.52,0.36
+2025,Arizona Complex League,20.08,1.82,2.93,0.76,2.07,0.51
+2025,California League,21.08,1.61,2.7,0.63,1.9,0.44
+2025,Carolina League,20.53,1.63,2.37,0.58,1.65,0.39
+2025,Dominican Summer League,17.66,0.91,2.87,0.76,1.61,0.39
+2025,Eastern League,22.47,1.28,2.3,0.56,1.63,0.38
+2025,Florida Complex League,19.84,1.54,2.4,0.66,1.86,0.47
+2025,Florida State League,21.11,1.56,2.57,0.63,1.82,0.43
+2025,International League,23.03,1.05,3.26,0.79,1.85,0.43
+2025,Midwest League,21.97,1.39,2.61,0.63,1.53,0.35
+2025,Northwest League,22.05,1.38,2.47,0.59,1.66,0.38
+2025,Pacific Coast League,22.88,1.19,3.58,0.83,2.05,0.48
+2025,South Atlantic League,21.9,1.44,2.16,0.54,1.58,0.38
+2025,Southern League,22.63,1.34,2.23,0.55,1.55,0.38
+2025,Texas League,22.7,1.33,2.75,0.66,1.88,0.44
+2026,Arizona Complex League,20.3,2.11,3.28,0.89,2.08,0.52
+2026,California League,21.17,1.79,3.53,0.82,1.96,0.43
+2026,Carolina League,20.66,1.67,3.0,0.72,2.01,0.47
+2026,Dominican Summer League,17.64,0.9,3.28,0.87,1.78,0.42
+2026,Eastern League,23.35,1.55,3.0,0.74,1.77,0.43
+2026,Florida Complex League,19.96,1.93,3.36,0.92,2.3,0.6
+2026,Florida State League,21.29,1.83,2.95,0.71,2.07,0.49
+2026,International League,24.17,1.41,3.14,0.76,1.77,0.41
+2026,Midwest League,22.14,1.55,3.1,0.74,1.88,0.44
+2026,Northwest League,22.46,1.73,3.39,0.8,1.85,0.43
+2026,Pacific Coast League,24.15,1.57,3.91,0.9,1.77,0.39
+2026,South Atlantic League,22.27,1.72,3.38,0.79,2.43,0.51
+2026,Southern League,23.44,1.72,2.84,0.69,1.87,0.45
+2026,Texas League,23.6,1.56,3.34,0.8,1.93,0.43
