@@ -22,7 +22,7 @@ Methodology:
     ABILITY: 175
 
 Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
-  Current_Score  = 0.40 × TOOLS_Score + 0.40 × ABILITY_Score + 0.20 × Age_Score
+  Current_Score  = 0.30 × TOOLS_Score + 0.50 × ABILITY_Score + 0.20 × Age_Score
     (all three standardized to 50±10 within current pool)
   Age_Score = −Age_Z_SL standardized to 50±10 (younger than peers = higher score).
     Uses most-recent season Age_Z_SL. Age enters the model twice: here as a
@@ -81,8 +81,8 @@ TOOLS_PA_THRESH    = 250
 ABILITY_PA_THRESH  = 175
 ARCHETYPE_PATH     = DATA_DIR / "rankings" / "archetype_labels.csv"
 
-W_TOOLS   = 0.40
-W_ABILITY = 0.40
+W_TOOLS   = 0.30
+W_ABILITY = 0.50
 W_AGE     = 0.20
 
 
