@@ -59,7 +59,7 @@ Unified ranking: `Combined_Score = 0.40×Skill_Score + 0.25×MLB_Proj_Score + 0.
 Added best-season K% and peer-relative PPPA (PPPA_Z_SL_best) as arc features to Phase 2, plus K%_slope and K%_arc_sd for players with 3+ qualifying pre-debut seasons. Post-ablation: only PPPA_Z_SL_best retained (K%_best, K%_slope, K%_arc_sd non-significant when fixed predictors controlled for). SB_rate_best removed — not statistically significant and already captured through PPPA_Z_SL_best.
 
 ### v0.6 — AAA Rankings & SB Translation Analysis
-Added `build_aaa_rankings.py` (ProspectSavant-based AAA power rankings) and `sb_translation_analysis.py` (chained level-to-level SB discount factors). 2023+ era chained factors (normalized AAA=1.0): AA=0.84, A+=0.71, A=0.57, R=0.39. These became the PPPA_Score level weights in Phase 3. Also added `build_rk_rankings.py` for Rookie ball.
+Added `build_aaa_rankings.py` (ProspectSavant-based AAA power rankings) and `sb_translation_analysis.py` (chained level-to-level SB discount factors). 2023+ era chained factors (normalized AAA=1.0): AA=0.84, A+=0.71, A=0.57, R=0.39. These became the PPPA_Score level weights in Phase 3. Also added `build_rk_rankings.py` for Rookie ball. **Superseded in v1.0**: level discounts rederived from Skill_PPPA full-population study (`analysis/skill_pppa_translation.py`); see current values below.
 
 ### v1.0 — Overhaul: TOOLS_Score + ABILITY_Score (August 2026)
 **Complete replacement of Phase 1–4 scoring.** The old Skill_Score, MLB_Proj_Score, PPPA_Score, and Age_Score are all retired. New model is two complementary composites — TOOLS (physical skills, era+level normalized) and ABILITY (demonstrated production) — blended with a PA-weighted OVR trajectory score. Era analysis derived empirically from MLB outcome data (2006–2026). Full details below.
@@ -142,10 +142,12 @@ Measures what a player *has done* — demonstrated production, adjusted for era 
 
 | Component | Metric | Normalization |
 |-----------|--------|---------------|
-| Fantasy Output | PPPA_Z_SL × level_discount | Level discounts: AAA=1.00, AA=0.84, A+=0.71, A=0.57, R=0.39 |
+| Fantasy Output | PPPA_Z_SL × level_discount | Level discounts: AAA=1.00, AA=0.59, A+=0.34, A=0.23, R=0.10 |
 | Discipline | BB% − 2×K% (BB_2K) | z-scored within Season+Level |
 | SB Talent | SB_pct × (SB/PA) | z-scored within Season+Level |
 | Game Power | 0.5×PullAir% + 0.5×HR_AB | z-scored within Season+Level; HR_AB = HR / AB |
+
+**Level discount methodology:** Derived from `analysis/skill_pppa_translation.py` using a full-population approach: all non-prospect MiLB players (PA ≥ 50 per level), with non-graduates assigned MLB_Skill = 0. Metric: Skill_PPPA = −2×K% + 4×HR/PA + 3×SB/PA − 1.5×CS/PA (the three components with highest PPPA formula weights and strongest MiLB→MLB signal). Ratios normalized to AAA=1.0. Values reflect both translation quality AND probability of reaching MLB (graduation rates: AAA≈51%, AA≈33%, A+≈20%, A≈14%, R≈6%). Prior SB-only chain (AA=0.84, A+=0.71, A=0.57, R=0.39) superseded — it answered the wrong question and used a selection-biased sample.
 
 **Age adjustment:** Each component × (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
 
@@ -161,7 +163,7 @@ TOOLS_Score and ABILITY_Score are built at the player-season-level. `pipeline/bu
 
 - For each player, compute PA × level_weight career average per level.
 - **Per-level shrinkage**: `shrink = min(PA_eff / threshold, 1.0)`; `shrunk = 50 + shrink × (level_avg − 50)`. Thresholds (in AAA-equivalent PA): TOOLS=250, ABILITY=175. Small-sample levels contribute near-neutral; full-season data contributes at face value.
-- Level weights (discount factors, normalized to AAA=1.0): AAA=1.00, AA=0.84, A+=0.71, A=0.57, R=0.39.
+- Level weights (discount factors, normalized to AAA=1.0): AAA=1.00, AA=0.59, A+=0.34, A=0.23, R=0.10.
 - Eligibility (current pool): most recent season ≥ 2025, age ≤ 24, career MLB PA < 50.
 
 ### Post-Blend Discipline Gate
@@ -340,6 +342,7 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `minorLeagueData.csv` | Output of `pipeline/compute_stats.py` — counting stats + TB, TP, PPG, PPPA, z-scores |
 | `averages_season_league.csv` | Season+League baseline averages |
 | `averages_season_league_age.csv` | Season+League+Age baseline averages |
+| `player_comps.csv` | One row per player (20,367 total); PA-weighted PPPA_Z_SL and age at each MiLB level, plus first-year and career MLB PPPA_Z outcomes. Used by `analysis/build_player_comps.py` comparator. |
 
 ### `data/rankings/` — Scores & Rankings
 
@@ -426,7 +429,10 @@ fetch/refresh_milb_advanced.py         # Refresh milb_advanced.csv rate stats
 
 ```
 analysis/milb_impact_analysis.py       # XGBoost + SHAP feature importance (first-year + career outcomes)
-analysis/sb_translation_analysis.py    # Chained SB level-to-level translation analysis
+analysis/sb_translation_analysis.py    # Chained SB level-to-level translation analysis (legacy; superseded)
+analysis/sb_speed_analysis.py          # SB/PA + Sprint Speed MiLB->MLB translation study
+analysis/skill_pppa_translation.py     # Skill_PPPA full-population level discount study (current basis)
+analysis/build_player_comps.py         # Build player_comps.csv + prospect comparator tool
 pipeline/build_tbc_rankings.py         # Build tbc_rankings.csv from tbc_prospect_rankings.csv
 pipeline/build_situational_splits.py   # Build situational_splits.csv (RISP, platoon, count splits)
 ```
