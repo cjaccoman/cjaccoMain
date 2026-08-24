@@ -17,7 +17,7 @@ Age adjustment (AGE_ALPHA = 0.20):
   also added in build_prospect_scores.py for a compounding effect.
 
 PPPA level discount factors (empirical SB translation chain, normalized to AAA=1.0):
-  AAA=1.00, AA=0.84, A+=0.71, A=0.57, R=0.39
+  AAA=1.00, AA=0.87, A+=0.80, A=0.80, R=0.75
 
 Z-scoring approach (peer-relative, era-robust by construction):
   PPPA_Z_SL  -- already z-scored within Season+League; apply level discount only.
@@ -56,7 +56,7 @@ W = dict(fantasy=0.45, discipline=0.25, sb=0.15, power=0.15)
 AGE_ALPHA = 0.20
 
 # PPPA level discount factors (empirical SB translation, CLAUDE.md)
-LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.84, "A+": 0.71, "A": 0.57, "R": 0.39}
+LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.87, "A+": 0.80, "A": 0.80, "R": 0.75}
 
 
 
@@ -123,7 +123,7 @@ def to_50_10(s: pd.Series) -> pd.Series:
 
 def build_fantasy_output(df: pd.DataFrame) -> pd.Series:
     """PPPA_Z_SL multiplied by the empirical level discount factor."""
-    discount = df["Level"].map(LEVEL_DISCOUNT).fillna(0.39)   # unknown level → R rate
+    discount = df["Level"].map(LEVEL_DISCOUNT).fillna(0.75)   # unknown level → R rate
     return (df["PPPA_Z_SL"] * discount).round(4)
 
 
@@ -230,7 +230,7 @@ def main() -> None:
     out["Game_Power"]    = gp.round(3)
     # Key raw inputs for transparency
     out["PPPA_Z_SL_disc"] = (
-        df["PPPA_Z_SL"] * df["Level"].map(LEVEL_DISCOUNT).fillna(0.39)
+        df["PPPA_Z_SL"] * df["Level"].map(LEVEL_DISCOUNT).fillna(0.75)
     ).round(4)
     out["BB_2K"]  = df["BB_2K"]
     out["SB"]     = df["SB"]
