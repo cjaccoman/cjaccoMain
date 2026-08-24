@@ -18,9 +18,11 @@ for c in ["Total_Weighted_PA", "TOOLS_Score", "ABILITY_Score",
           "Current_Score", "OVR_Score", "Combined_Score"]:
     ps[c] = ps[c].round(1)
 
-cols = ["Combined_Rank", "Name", "Pos", "Team", "Level", "Age", "Last_Season",
+ps["Pos_Adj_Score"] = ps["Pos_Adj_Score"].round(1)
+cols = ["Combined_Rank", "Pos_Adj_Rank", "Name", "Pos", "Team", "Level", "Age", "Last_Season",
         "Career_PA", "TOOLS_Score", "ABILITY_Score", "Age_Score", "Current_Score",
-        "OVR_Score", "Combined_Score", "Discipline_Flag", "Career_Disc_Flag"]
+        "OVR_Score", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
+        "Discipline_Flag", "Career_Disc_Flag"]
 raw = json.dumps(ps[cols].to_dict(orient="records"), separators=(",", ":"))
 covered = (ps["Pos"] != "").sum()
 print(f"Position coverage: {covered:,} / {len(ps):,} ({covered/len(ps)*100:.1f}%)")
@@ -160,6 +162,7 @@ tbody tr:hover{background:var(--row-hover)}
   padding:1px 5px;letter-spacing:.02em;text-transform:uppercase}
 .flag-soft,.flag-softwhiff{background:var(--flag-soft-bg);color:var(--flag-soft-text)}
 .flag-hard,.flag-hardwhiff{background:var(--flag-hard-bg);color:var(--flag-hard-text)}
+.pos-bonus{font-size:0.7em;opacity:0.7;margin-left:4px;font-variant-numeric:tabular-nums}
 .flag-whiff{background:var(--flag-whiff-bg);color:var(--flag-whiff-text)}
 .score-bar-wrap{display:flex;align-items:center;gap:5px;justify-content:flex-end}
 .score-val{min-width:34px;text-align:right;font-weight:600}
@@ -226,6 +229,7 @@ tbody tr:hover{background:var(--row-hover)}
       <option value="clean">Fully clean (no flags)</option>
     </select>
     <div class="spacer"></div>
+    <button class="clear-btn" id="pos-adj-btn" title="Toggle positional scarcity adjustment">Pos Adj: OFF</button>
     <button class="clear-btn" id="clear-btn">Clear</button>
   </div>
   <div class="table-wrap">
@@ -307,6 +311,7 @@ tbody tr:hover{background:var(--row-hover)}
 const RAW = PROSPECTS_DATA_PLACEHOLDER;
 const LVL = {R:1,A:2,'A+':3,AA:4,AAA:5};
 let sortCol='Combined_Rank', sortDir=1, filtered=RAW.slice();
+let posAdj=false;
 
 const tf=document.getElementById('team-filter');
 [...new Set(RAW.map(r=>r.Team))].sort().forEach(t=>{
@@ -349,8 +354,13 @@ function render(){
     tbody.innerHTML='<tr><td colspan="16" class="no-results">No players match.</td></tr>';
     return;
   }
-  tbody.innerHTML=filtered.map(r=>`<tr>
-    <td class="rank">${r.Combined_Rank}</td>
+  tbody.innerHTML=filtered.map(r=>{
+    const rankVal=posAdj?r.Pos_Adj_Rank:r.Combined_Rank;
+    const scoreCell=posAdj
+      ?`${bar(r.Pos_Adj_Score)}<span class="pos-bonus" title="Pos bonus">${r.Pos_Bonus>=0?'+':''}${r.Pos_Bonus}</span>`
+      :bar(r.Combined_Score);
+    return `<tr>
+    <td class="rank">${rankVal}</td>
     <td class="name">${r.Name}</td>
     <td>${r.Pos||''}</td>
     <td>${r.Team}</td>
@@ -363,10 +373,11 @@ function render(){
     <td class="num">${bar(r.Age_Score)}</td>
     <td class="num">${bar(r.Current_Score)}</td>
     <td class="num">${bar(r.OVR_Score)}</td>
-    <td class="num">${bar(r.Combined_Score)}</td>
+    <td class="num">${scoreCell}</td>
     ${fcell(r.Discipline_Flag)}
     ${fcell(r.Career_Disc_Flag)}
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
 }
 
 function applyFilters(){
@@ -421,6 +432,17 @@ document.querySelectorAll('th[data-col]').forEach(th=>{
 
 ['search','team-filter','level-filter','pos-filter','flag-filter'].forEach(id=>{
   document.getElementById(id).addEventListener(id==='search'?'input':'change',applyFilters);
+});
+document.getElementById('pos-adj-btn').addEventListener('click',()=>{
+  posAdj=!posAdj;
+  document.getElementById('pos-adj-btn').textContent='Pos Adj: '+(posAdj?'ON':'OFF');
+  document.getElementById('pos-adj-btn').style.opacity=posAdj?'1':'0.7';
+  const rankCol=posAdj?'Pos_Adj_Rank':'Combined_Rank';
+  sortCol=rankCol;sortDir=1;
+  document.querySelectorAll('th[data-col]').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+  const rankTh=document.querySelector('th[data-col="Combined_Rank"]');
+  if(rankTh)rankTh.classList.add('sort-asc');
+  sort();
 });
 document.getElementById('clear-btn').addEventListener('click',()=>{
   document.getElementById('search').value='';

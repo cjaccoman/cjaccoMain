@@ -363,11 +363,53 @@ def main() -> None:
     pos_covered = (pool["Pos"] != "").sum()
     print(f"Position coverage: {pos_covered:,} / {len(pool):,} ({pos_covered/len(pool)*100:.1f}%)")
 
+    # -------------------------------------------------------------------------
+    # Positional scarcity adjustment (dynasty, 12-team league)
+    # Replacement level = Nth-ranked player at each position, where N reflects
+    # active roster slots (22 active, 12 reserve, 5 MiLB) per the league rules.
+    # IF (generic infield) treated as SS — most unpositioned young infielders.
+    # Pos_Bonus = avg_replacement_score - position_replacement_score:
+    #   scarce positions (low replacement score) get a positive bonus;
+    #   deep positions (high replacement score) get a slight negative offset.
+    # Pos_Adj_Score = Combined_Score + Pos_Bonus.
+    # Players with no mapped fantasy position receive Pos_Bonus = 0 (neutral).
+    # -------------------------------------------------------------------------
+    POS_MAP = {
+        "C": "C",
+        "1B": "1B", "2B": "2B", "3B": "3B",
+        "SS": "SS", "IF": "2B",   # generic infield → 2B tier (not all will stay SS)
+        "CF": "OF", "OF": "OF", "LF": "OF", "RF": "OF",
+    }
+    # Fixed dynasty scarcity tiers (12-team, 2C/1B/2B/3B/SS/INF/4OF/3UT slots).
+    # Empirical replacement levels from the prospect pool are distorted because
+    # MiLB position ≠ projected MLB position (nearly all young prospects listed SS).
+    # Fixed tiers reflect well-established dynasty positional scarcity hierarchy.
+    POS_BONUS = {
+        "C":  5.0,   # 2 slots, genuine MLB talent shortage
+        "SS": 3.0,   # 1 slot, premium athleticism required
+        "2B": 1.5,   # 1 slot, moderate scarcity
+        "3B": 0.5,   # 1 slot, deeper talent pool
+        "1B": -1.0,  # 1 slot, most abundant hitting position
+        "OF": -2.0,  # 4 slots, deepest talent pool
+    }
+
+    pool["FantasyPos"] = pool["Pos"].map(POS_MAP).fillna("")
+
+    print("\nPositional scarcity tiers (fixed, dynasty 12-team):")
+    for fp, bonus in sorted(POS_BONUS.items(), key=lambda x: -x[1]):
+        n = (pool["FantasyPos"] == fp).sum()
+        print(f"  {fp:3s}  bonus={bonus:+.1f}  prospects in pool={n:,}")
+
+    pool["Pos_Bonus"]     = pool["FantasyPos"].map(POS_BONUS).fillna(0.0).round(2)
+    pool["Pos_Adj_Score"] = (pool["Combined_Score"] + pool["Pos_Bonus"]).round(2)
+    pool["Pos_Adj_Rank"]  = pool["Pos_Adj_Score"].rank(ascending=False, method="min").astype(int)
+
     out_cols = [
-        "Combined_Rank", "PlayerId", "Name", "Pos", "Team", "Level", "Age",
+        "Combined_Rank", "Pos_Adj_Rank", "PlayerId", "Name", "Pos", "FantasyPos",
+        "Team", "Level", "Age",
         "Last_Season", "Career_PA", "Total_Weighted_PA",
         "TOOLS_Score", "ABILITY_Score", "Age_Score", "Current_Score", "OVR_Score",
-        "Archetype", "Archetype_Adj", "Combined_Score",
+        "Archetype", "Archetype_Adj", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag",
         "Disc_Composite_Z", "Disc_Slope",
     ]
