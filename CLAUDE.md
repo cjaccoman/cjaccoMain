@@ -78,7 +78,7 @@ Added `build_aaa_rankings.py` (ProspectSavant-based AAA power rankings) and `sb_
 ```
 Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
 
-Current_Score  = 0.40 × TOOLS_Score + 0.40 × ABILITY_Score + 0.20 × Age_Score
+Current_Score  = 0.30 × TOOLS_Score + 0.50 × ABILITY_Score + 0.20 × Age_Score
 OVR_Score      = 0.40 × TOOLS_Score + 0.40 × ABILITY_Score + 0.20 × Slope_Score
 ```
 
@@ -182,6 +182,33 @@ Applied in `pipeline/build_prospect_scores.py` after `Combined_Score` is compute
 - `Disc_Slope ≤ −0.02/yr` (worsening): penalty × 1.25
 
 **Output columns:** `Career_Disc_Flag` (label: hard/soft + improving/worsening suffix), `Disc_Composite_Z`, `Disc_Slope`.
+
+---
+
+### Dynasty Positional Scarcity Adjustment
+
+Applied in `pipeline/build_prospect_scores.py` after the discipline gate. Optional layer for dynasty fantasy leagues where lineup slots create positional scarcity independent of raw production. Does **not** modify `Combined_Score` — it is a separate column so the unadjusted ranking is always preserved.
+
+**Why fixed tiers, not empirical replacement levels:** The prospect pool has ~30% listed as SS (young players migrate to SS in the minors before positional assignment stabilizes) and only ~3% listed as 1B. Using pool distribution to set replacement levels inverts the true MLB scarcity ordering. Fixed tiers anchored to MLB starting-lineup scarcity avoid this.
+
+**Position mapping:** Generic infield (`IF`) maps to the 2B tier. DH/unknown positions receive no bonus (0).
+
+**Tiers (added to `Combined_Score` to produce `Pos_Adj_Score`):**
+
+| Position | Bonus |
+|----------|-------|
+| C | +5.0 |
+| SS | +3.0 |
+| 2B | +1.5 |
+| 3B | +0.5 |
+| 1B | −1.0 |
+| OF | −2.0 |
+
+**Output columns:** `FantasyPos` (normalized position for tier lookup), `Pos_Bonus`, `Pos_Adj_Score`, `Pos_Adj_Rank`.
+
+**HTML toggle:** The artifact's "Pos Adj: OFF/ON" button switches the rank column between `Combined_Rank` and `Pos_Adj_Rank` and annotates the Combined score cell with the position bonus when ON.
+
+**League context:** Designed for a 12-team dynasty league with slots C(2), 1B(1), 2B(1), 3B(1), SS(1), INF(1), OF(4), UT(3), plus IL and MiLB reserve spots. MiLB eligibility = Career+Current AB ≤ 130.
 
 ---
 
@@ -323,7 +350,7 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `ability_scores.csv` | Per-player-season ABILITY_Score (standardized to 50±10) |
 | `archetype_labels.csv` | Prospect archetype assignments |
 | `prospect_scores_ovr.csv` | All-time OVR scores (2006+, all prospects including graduates) |
-| `prospect_scores.csv` | Current 2026 prospect pool scores + Combined_Score |
+| `prospect_scores.csv` | Current 2026 prospect pool scores + Combined_Score + dynasty positional adjustment columns (`FantasyPos`, `Pos_Bonus`, `Pos_Adj_Score`, `Pos_Adj_Rank`) |
 | `prospect_scores_web.json` | JSON export for HTML artifact |
 | `aaa_2026.csv` | 2026 AAA power rankings (303 players, sorted by Overall) |
 | `rk_2026.csv` | 2026 Rookie ball rankings |
@@ -466,6 +493,6 @@ Currently has `LAST_SEASON = 2025`. Update to 2026 when Baseball Savant MiLB end
 
 **ABILITY_Score** captures what a player *has done*: fantasy output (PPPA_Z_SL with level discounts), contact/discipline (BB%−2×K%), stolen base talent (SB_success × SB_rate), and game power (PullAir% + HR/AB). Same age-boost applied to all components. Weight: Output 45% / Discipline 25% / Speed 15% / Power 15%.
 
-**Final ranking:** `Combined_Score = 0.50×Current_Score + 0.50×OVR_Score`, then a post-blend discipline gate (−1.5 to −4.0 pts) fires for prospects in the bottom 16–25% of career BB_2K, with a PA-weighted OLS slope modifier that softens the penalty for improving trajectories and hardens it for worsening ones. Current_Score weights today's pool (season ≥ 2025) equally between TOOLS, ABILITY, and Age (40/40/20). OVR_Score weights historical all-time performance equally between TOOLS, ABILITY, and PPPA trajectory slope (40/40/20). The 50/50 blend ensures that a player's career arc (OVR) is as important as their current standing — rewarding players who have been consistently excellent and penalizing players who looked good recently but have a weaker historical profile.
+**Final ranking:** `Combined_Score = 0.50×Current_Score + 0.50×OVR_Score`, then a post-blend discipline gate (−1.5 to −4.0 pts) fires for prospects in the bottom 16–25% of career BB_2K, with a PA-weighted OLS slope modifier that softens the penalty for improving trajectories and hardens it for worsening ones. Current_Score weights today's pool (season ≥ 2025) with ABILITY outweighing TOOLS (50/30/20 ABILITY/TOOLS/Age) — reflecting that demonstrated PPPA-relevant production is more predictive than physical proxies, consistent with the MiLB→MLB ablation (R²≈0.13). OVR_Score weights historical all-time performance equally between TOOLS, ABILITY, and PPPA trajectory slope (40/40/20). The 50/50 blend ensures that a player's career arc (OVR) is as important as their current standing — rewarding players who have been consistently excellent and penalizing players who looked good recently but have a weaker historical profile.
 
 **What the model prioritizes, in order:** (1) Strikeout avoidance — K% is the single largest negative lever and appears in both TOOLS (Discipline) and ABILITY (BB_2K). (2) Stolen base talent — SB=+3 per stolen base with no wRC+ analog; both SB_talent (ABILITY) and Sprint Speed (TOOLS) capture it. (3) Real power production — HR/AB and PullAir% (ABILITY Game Power) + MaxEV/HR/FB (TOOLS Raw Power). (4) Age relative to peers — baked into every component via the per-component age multiplier, plus a standalone Age_Score at 20% in Current_Score.
