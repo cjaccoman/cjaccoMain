@@ -20,8 +20,11 @@ Comparator:
 
   For each candidate in the historical pool, compute a weighted Euclidean
   distance over shared MiLB levels:
-    - Features per level: PPPA_Z (z-scored within level across the pool),
-      and Age (z-scored within level)
+    - Primary features: PPPA_Z (weight 1.0) and Age (weight 0.5), both
+      z-scored within level across the pool
+    - Secondary skill signals (see SKILL_WEIGHTS): BB_2K, Whiff%, HRFB,
+      PullAir%, SBTalent — each z-scored within level; only included when
+      both players have data at that level. Combined weight ≈ 0.53.
     - Level weight: LEVEL_DISCOUNT (AAA=1.00 → R=0.10) — higher levels
       count more toward similarity
     - PA weight: min(PA_query, PA_candidate) / PA_THRESHOLD, capped at 1.
@@ -50,6 +53,16 @@ LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 MIN_COMP_PA    = 80    # minimum PA at a level to count in distance calculation
 PA_THRESHOLD   = 300   # PA at which level gets full weight in distance
 AGE_WEIGHT     = 0.5   # relative weight of age vs. PPPA_Z in distance per level
+
+# Secondary skill signals added to distance. Weights are relative to PPPA_Z=1.0.
+# Combined skill contribution ≈ 0.53 vs. PPPA_Z=1.0, Age=0.5 → skills ≈ 26% of signal.
+SKILL_WEIGHTS = {
+    "BB2K":     0.15,  # BB% − 2×K% — single strongest discipline signal
+    "Whiff":    0.10,  # Whiff% — contact quality complement to BB2K
+    "HRFB":     0.10,  # HR/FB — raw power production
+    "PullAir":  0.08,  # pull-air batted ball profile — power shape
+    "SBTalent": 0.10,  # SB_pct × SB/PA — speed/baserunning talent
+}
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +113,7 @@ def build_dataset() -> pd.DataFrame:
     # SB_talent raw = SB_pct × SB/PA (matches build_ability_score.py)
     pf_valid["SB_pct"] = pf_valid["SB_pct"].fillna(0)
     pf_valid["SB_talent"] = pf_valid["SB_pct"] * (pf_valid["SB"] / pf_valid["PA"])
-    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%"]
+    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%", "ISO"]
     pf_agg = pa_weighted_agg(pf_valid, pf_skill_cols)
     # Bridge pf PlayerId → MLBAM_ID for later join; also keep for merge with ovr
     pf_bridge = pf[["PlayerId", "MLBAM_ID"]].drop_duplicates("PlayerId")
@@ -119,11 +132,15 @@ def build_dataset() -> pd.DataFrame:
     sbt_wide      = make_wide(pf_agg, "SB_talent_wt",  "SBTalent")
     hrfb_wide     = make_wide(pf_agg, "HR/FB_wt",      "HRFB")
     pullair_wide  = make_wide(pf_agg, "PullAir%_wt",   "PullAir")
+    kpct_wide     = make_wide(pf_agg, "K%_wt",         "Kpct")
+    bbpct_wide    = make_wide(pf_agg, "BB%_wt",        "BBpct")
+    iso_wide      = make_wide(pf_agg, "ISO_wt",        "ISO")
 
     name_ser = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
 
     wide = pppa_wide.join([age_wide, pa_wide,
                            bb2k_wide, whiff_wide, sbt_wide, hrfb_wide, pullair_wide,
+                           kpct_wide, bbpct_wide, iso_wide,
                            name_ser]).reset_index()
 
     # Attach MLBAM_ID — prefer pf_bridge (has MLBAM_ID for all pf players),
@@ -174,7 +191,7 @@ def build_dataset() -> pd.DataFrame:
     # Ensure all level columns exist
     for lvl in LEVELS:
         lvl_key = lvl.replace("+", "plus")
-        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir"]:
+        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct", "ISO"]:
             col = f"{prefix}_{lvl_key}"
             if col not in wide.columns:
                 wide[col] = np.nan
@@ -189,6 +206,9 @@ def build_dataset() -> pd.DataFrame:
         + [f"SBTalent_{l.replace('+','plus')}"  for l in LEVELS]
         + [f"HRFB_{l.replace('+','plus')}"      for l in LEVELS]
         + [f"PullAir_{l.replace('+','plus')}"   for l in LEVELS]
+        + [f"Kpct_{l.replace('+','plus')}"      for l in LEVELS]
+        + [f"BBpct_{l.replace('+','plus')}"     for l in LEVELS]
+        + [f"ISO_{l.replace('+','plus')}"       for l in LEVELS]
         + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
            "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
@@ -204,7 +224,8 @@ def build_dataset() -> pd.DataFrame:
             wide[f"Age_{lk}"] = wide[f"Age_{lk}"].round(2)
         if f"PA_{lk}" in wide.columns:
             wide[f"PA_{lk}"] = wide[f"PA_{lk}"].round(0).astype("Int64")
-        for col in [f"BB2K_{lk}", f"Whiff_{lk}", f"HRFB_{lk}", f"PullAir_{lk}"]:
+        for col in [f"BB2K_{lk}", f"Whiff_{lk}", f"HRFB_{lk}", f"PullAir_{lk}",
+                    f"Kpct_{lk}", f"BBpct_{lk}", f"ISO_{lk}"]:
             if col in wide.columns:
                 wide[col] = wide[col].round(3)
         if f"SBTalent_{lk}" in wide.columns:
@@ -225,16 +246,17 @@ def build_dataset() -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def _prep_pool(df: pd.DataFrame):
-    """Pre-compute level-wise z-score params for PPPA_Z and Age columns."""
+    """Pre-compute level-wise z-score params for all distance features."""
     params = {}
+    all_feats = ["PPPA_Z", "Age"] + list(SKILL_WEIGHTS.keys())
     for lvl in LEVELS:
         lk = lvl.replace("+", "plus")
-        for feat in ["PPPA_Z", "Age"]:
+        pa_col = f"PA_{lk}"
+        mask = df[pa_col].fillna(0) >= MIN_COMP_PA
+        for feat in all_feats:
             col = f"{feat}_{lk}"
-            pa_col = f"PA_{lk}"
             if col not in df.columns:
                 continue
-            mask = df[pa_col].fillna(0) >= MIN_COMP_PA
             vals = df.loc[mask, col].dropna()
             params[(lvl, feat)] = (vals.mean(), vals.std()) if len(vals) >= 5 else (0.0, 1.0)
     return params
@@ -295,10 +317,17 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
         if pd.notna(pz) and pd.notna(ag):
             mu_z, sig_z = params.get((lvl, "PPPA_Z"), (0.0, 1.0))
             mu_a, sig_a = params.get((lvl, "Age"),    (0.0, 1.0))
+            skills_z = {}
+            for sk in SKILL_WEIGHTS:
+                sv = query.get(f"{sk}_{lk}", np.nan)
+                if pd.notna(sv):
+                    mu_s, sig_s = params.get((lvl, sk), (0.0, 1.0))
+                    skills_z[sk] = _z(sv, mu_s, sig_s)
             q_feats[lvl] = {
-                "pppa_z": _z(pz, mu_z, sig_z),
-                "age_z":  _z(ag, mu_a, sig_a),
-                "pa":     pa,
+                "pppa_z":   _z(pz, mu_z, sig_z),
+                "age_z":    _z(ag, mu_a, sig_a),
+                "skills_z": skills_z,
+                "pa":       pa,
             }
 
     if not q_feats:
@@ -329,12 +358,20 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
             d_pppa = _z(c_pz, mu_z, sig_z) - qf["pppa_z"]
             d_age  = _z(c_ag, mu_a, sig_a) - qf["age_z"]
 
+            skill_term = 0.0
+            for sk, sw in SKILL_WEIGHTS.items():
+                q_sk = qf["skills_z"].get(sk)
+                c_sv = cand.get(f"{sk}_{lk}", np.nan)
+                if q_sk is not None and pd.notna(c_sv):
+                    mu_s, sig_s = params.get((lvl, sk), (0.0, 1.0))
+                    skill_term += sw * (_z(c_sv, mu_s, sig_s) - q_sk) ** 2
+
             # PA-based credibility weight for this level
             pa_wt   = min(min(qf["pa"], c_pa) / PA_THRESHOLD, 1.0)
             lvl_wt  = LEVEL_DISCOUNT[lvl]
             wt      = pa_wt * lvl_wt
 
-            dist_sq    += wt * (d_pppa**2 + AGE_WEIGHT * d_age**2)
+            dist_sq    += wt * (d_pppa**2 + AGE_WEIGHT * d_age**2 + skill_term)
             weight_sum += wt
             shared     += 1
 
