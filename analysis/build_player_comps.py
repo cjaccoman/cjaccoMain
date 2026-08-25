@@ -392,10 +392,8 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
                     mu_s, sig_s = params.get((lvl, sk), (0.0, 1.0))
                     skill_term += sw * (_z(c_sv, mu_s, sig_s) - q_sk) ** 2
 
-            # PA-based credibility weight for this level
-            pa_wt   = min(min(qf["pa"], c_pa) / PA_THRESHOLD, 1.0)
-            lvl_wt  = LEVEL_DISCOUNT[lvl]
-            wt      = pa_wt * lvl_wt
+            # Level discount only — a level either qualifies (both ≥ MIN_COMP_PA) or not
+            wt = LEVEL_DISCOUNT[lvl]
 
             dist_sq    += wt * (d_pppa**2 + AGE_WEIGHT * d_age**2 + skill_term)
             weight_sum += wt
