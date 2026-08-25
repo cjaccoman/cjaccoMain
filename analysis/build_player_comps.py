@@ -62,6 +62,8 @@ SKILL_WEIGHTS = {
     "HRFB":     0.10,  # HR/FB — raw power production
     "PullAir":  0.08,  # pull-air batted ball profile — power shape
     "SBTalent": 0.10,  # SB_pct × SB/PA — speed/baserunning talent
+    "MaxEV":    0.08,  # max exit velocity — raw power ceiling (sparse: AAA/A 2023+, R 2026)
+    "EV90":     0.08,  # 90th-pct EV — consistent hard contact (same coverage as MaxEV)
 }
 
 
@@ -87,13 +89,19 @@ def build_dataset() -> pd.DataFrame:
     def pa_weighted_agg(src, extra_cols):
         src = src[src["PA"] >= 10].copy()
         for col in extra_cols:
-            src[f"PA_x_{col}"] = src["PA"] * src[col]
+            src[f"PA_x_{col}"] = src["PA"] * src[col]           # NaN where col is NaN
+            src[f"PAn_{col}"]  = src["PA"].where(src[col].notna(), 0)  # 0 where col is NaN
         agg_dict = {"PA": "sum", "Name": "first"}
-        agg_dict.update({f"PA_x_{c}": "sum" for c in extra_cols})
+        for c in extra_cols:
+            agg_dict[f"PA_x_{c}"] = "sum"
+            agg_dict[f"PAn_{c}"]  = "sum"
         grp = src.groupby(["PlayerId", "Level"], observed=True).agg(agg_dict).reset_index()
         grp.rename(columns={"PA": "PA_total"}, inplace=True)
         for col in extra_cols:
-            grp[f"{col}_wt"] = grp[f"PA_x_{col}"] / grp["PA_total"]
+            valid_pa = grp[f"PAn_{col}"]
+            # NaN when no non-null values exist in this group; otherwise weighted avg
+            grp[f"{col}_wt"] = (grp[f"PA_x_{col}"] / valid_pa).where(valid_pa > 0)
+            grp.drop(columns=[f"PAn_{col}"], inplace=True)
         return grp
 
     ovr_valid = ovr[ovr["PA"] >= 10].copy()
@@ -113,7 +121,7 @@ def build_dataset() -> pd.DataFrame:
     # SB_talent raw = SB_pct × SB/PA (matches build_ability_score.py)
     pf_valid["SB_pct"] = pf_valid["SB_pct"].fillna(0)
     pf_valid["SB_talent"] = pf_valid["SB_pct"] * (pf_valid["SB"] / pf_valid["PA"])
-    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%"]
+    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%", "MaxEV", "EV90"]
     pf_agg = pa_weighted_agg(pf_valid, pf_skill_cols)
     # Bridge pf PlayerId → MLBAM_ID for later join; also keep for merge with ovr
     pf_bridge = pf[["PlayerId", "MLBAM_ID"]].drop_duplicates("PlayerId")
@@ -134,6 +142,8 @@ def build_dataset() -> pd.DataFrame:
     pullair_wide  = make_wide(pf_agg, "PullAir%_wt",   "PullAir")
     kpct_wide     = make_wide(pf_agg, "K%_wt",         "Kpct")
     bbpct_wide    = make_wide(pf_agg, "BB%_wt",        "BBpct")
+    maxev_wide    = make_wide(pf_agg, "MaxEV_wt",      "MaxEV")
+    ev90_wide     = make_wide(pf_agg, "EV90_wt",       "EV90")
 
     name_ser = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
 
@@ -142,9 +152,11 @@ def build_dataset() -> pd.DataFrame:
         tmp = src_agg.copy()
         tmp["disc"] = tmp["Level"].map(LEVEL_DISCOUNT)
         tmp["wt"]   = tmp["PA_total"] * tmp["disc"]
-        tmp["wtv"]  = tmp["wt"] * tmp[val_col]
-        g = tmp.groupby("PlayerId")[["wt", "wtv"]].sum()
-        return (g["wtv"] / g["wt"]).rename(out_name)
+        tmp["wtv"]  = tmp["wt"] * tmp[val_col]          # NaN where val_col is NaN
+        # Only count weight for rows where val_col is non-null
+        tmp["wt_valid"] = tmp["wt"].where(tmp[val_col].notna(), 0)
+        g = tmp.groupby("PlayerId")[["wt_valid", "wtv"]].sum()
+        return (g["wtv"] / g["wt_valid"]).where(g["wt_valid"] > 0).rename(out_name)
 
     ca_pppa    = career_avg_ser(level_agg, "PPPA_Z_wt",    "PPPA_Z_career")
     ca_bb2k    = career_avg_ser(pf_agg,    "BB_2K_wt",     "BB2K_career")
@@ -154,12 +166,15 @@ def build_dataset() -> pd.DataFrame:
     ca_pullair = career_avg_ser(pf_agg,    "PullAir%_wt",  "PullAir_career")
     ca_kpct    = career_avg_ser(pf_agg,    "K%_wt",        "Kpct_career")
     ca_bbpct   = career_avg_ser(pf_agg,    "BB%_wt",       "BBpct_career")
+    ca_maxev   = career_avg_ser(pf_agg,    "MaxEV_wt",     "MaxEV_career")
+    ca_ev90    = career_avg_ser(pf_agg,    "EV90_wt",      "EV90_career")
 
     wide = pppa_wide.join([age_wide, pa_wide,
                            bb2k_wide, whiff_wide, sbt_wide, hrfb_wide, pullair_wide,
-                           kpct_wide, bbpct_wide,
+                           kpct_wide, bbpct_wide, maxev_wide, ev90_wide,
                            ca_pppa, ca_bb2k, ca_whiff, ca_sbt,
                            ca_hrfb, ca_pullair, ca_kpct, ca_bbpct,
+                           ca_maxev, ca_ev90,
                            name_ser]).reset_index()
 
     # Attach MLBAM_ID — prefer pf_bridge (has MLBAM_ID for all pf players),
@@ -210,7 +225,7 @@ def build_dataset() -> pd.DataFrame:
     # Ensure all level columns exist
     for lvl in LEVELS:
         lvl_key = lvl.replace("+", "plus")
-        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct"]:
+        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct", "MaxEV", "EV90"]:
             col = f"{prefix}_{lvl_key}"
             if col not in wide.columns:
                 wide[col] = np.nan
@@ -227,8 +242,11 @@ def build_dataset() -> pd.DataFrame:
         + [f"PullAir_{l.replace('+','plus')}"   for l in LEVELS]
         + [f"Kpct_{l.replace('+','plus')}"      for l in LEVELS]
         + [f"BBpct_{l.replace('+','plus')}"     for l in LEVELS]
+        + [f"MaxEV_{l.replace('+','plus')}"     for l in LEVELS]
+        + [f"EV90_{l.replace('+','plus')}"      for l in LEVELS]
         + ["PPPA_Z_career", "BB2K_career", "Whiff_career", "SBTalent_career",
-           "HRFB_career", "PullAir_career", "Kpct_career", "BBpct_career"]
+           "HRFB_career", "PullAir_career", "Kpct_career", "BBpct_career",
+           "MaxEV_career", "EV90_career"]
         + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
            "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
@@ -248,6 +266,9 @@ def build_dataset() -> pd.DataFrame:
                     f"Kpct_{lk}", f"BBpct_{lk}"]:
             if col in wide.columns:
                 wide[col] = wide[col].round(3)
+        for col in [f"MaxEV_{lk}", f"EV90_{lk}"]:
+            if col in wide.columns:
+                wide[col] = wide[col].round(1)
         if f"SBTalent_{lk}" in wide.columns:
             wide[f"SBTalent_{lk}"] = wide[f"SBTalent_{lk}"].round(4)
     for col in ["FirstYr_PPPA_Z", "Career_PPPA_Z", "PPPA_Z_career"]:
@@ -257,6 +278,9 @@ def build_dataset() -> pd.DataFrame:
                 "Kpct_career", "BBpct_career"]:
         if col in wide.columns:
             wide[col] = wide[col].round(3)
+    for col in ["MaxEV_career", "EV90_career"]:
+        if col in wide.columns:
+            wide[col] = wide[col].round(1)
     if "SBTalent_career" in wide.columns:
         wide["SBTalent_career"] = wide["SBTalent_career"].round(4)
     if "Career_MLB_PA" in wide.columns:
@@ -434,6 +458,8 @@ CAREER_FEATURES = {
     "SBTalent_career":0.10,
     "Kpct_career":   0.10,
     "BBpct_career":  0.08,
+    "MaxEV_career":  0.08,
+    "EV90_career":   0.08,
 }
 
 
@@ -466,30 +492,42 @@ def find_career_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
             raise ValueError(f"PlayerId/MLBAM_ID {pid} not found")
         query = row.iloc[0]
 
-    # Z-score params from eligible rows (career cols all non-null)
+    # Required features — must be non-null for both query and candidate
+    # Optional features (sparse coverage) — included only when both have data
+    REQUIRED_CAREER = [f for f in CAREER_FEATURES if f not in ("MaxEV_career", "EV90_career")]
+    OPTIONAL_CAREER = ["MaxEV_career", "EV90_career"]
+
     feat_cols = list(CAREER_FEATURES.keys())
-    eligible = pool.dropna(subset=feat_cols)
-    params = {f: (eligible[f].mean(), eligible[f].std()) for f in feat_cols}
+    eligible = pool.dropna(subset=REQUIRED_CAREER)
+    params = {f: (eligible[f].mean(), eligible[f].std()) for f in feat_cols if f in eligible.columns}
 
     def _z(val, f):
         mu, sig = params[f]
         return (val - mu) / sig if sig > 1e-9 else 0.0
 
-    q_missing = [f for f in feat_cols if pd.isna(query.get(f))]
+    q_missing = [f for f in REQUIRED_CAREER if pd.isna(query.get(f))]
     if q_missing:
         raise ValueError(f"Query player missing career features: {q_missing}")
 
-    q_vec = {f: _z(query[f], f) for f in feat_cols}
+    q_vec = {f: _z(query[f], f) for f in REQUIRED_CAREER if pd.notna(query.get(f))}
 
     results = []
     for _, cand in eligible.iterrows():
         if exclude_self and cand["PlayerId"] == query["PlayerId"]:
             continue
-        dist_sq = sum(
-            w * (_z(cand[f], f) - q_vec[f]) ** 2
-            for f, w in CAREER_FEATURES.items()
-        )
-        weight_sum = sum(CAREER_FEATURES.values())
+        dist_sq = 0.0
+        weight_sum = 0.0
+        for f, w in CAREER_FEATURES.items():
+            q_val = query.get(f)
+            c_val = cand.get(f)
+            if pd.isna(q_val) or pd.isna(c_val):
+                continue  # skip optional features when either side is missing
+            if f not in params:
+                continue
+            dist_sq    += w * (_z(c_val, f) - _z(q_val, f)) ** 2
+            weight_sum += w
+        if weight_sum == 0:
+            continue
         results.append({
             "PlayerId":       cand["PlayerId"],
             "Name":           cand["Name"],
