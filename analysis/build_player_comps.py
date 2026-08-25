@@ -222,6 +222,15 @@ def build_dataset() -> pd.DataFrame:
     wide = wide.merge(span,       on="PlayerId",  how="left")
     wide["graduated"] = wide["FirstYr_PPPA_Z"].notna()
 
+    # MLB EV fallback: for graduated players with no MiLB EV, use career MLB MaxEV
+    mlb_ev_path = DATA / "api" / "mlb_statcast_ev.csv"
+    if mlb_ev_path.exists():
+        mlb_ev = pd.read_csv(mlb_ev_path)[["MLBAM_ID", "MaxEV_mlb"]]
+        wide = wide.merge(mlb_ev, on="MLBAM_ID", how="left")
+        missing_ev = wide["MaxEV_career"].isna() & wide["graduated"]
+        wide.loc[missing_ev, "MaxEV_career"] = wide.loc[missing_ev, "MaxEV_mlb"]
+        wide.drop(columns=["MaxEV_mlb"], inplace=True)
+
     # Ensure all level columns exist
     for lvl in LEVELS:
         lvl_key = lvl.replace("+", "plus")
