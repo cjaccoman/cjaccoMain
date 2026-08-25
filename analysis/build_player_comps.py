@@ -424,6 +424,93 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
     return query, comps
 
 
+# Career-average features and weights (mirrors SKILL_WEIGHTS + PPPA_Z primary)
+CAREER_FEATURES = {
+    "PPPA_Z_career": 1.00,
+    "BB2K_career":   0.15,
+    "Whiff_career":  0.10,
+    "HRFB_career":   0.10,
+    "PullAir_career":0.08,
+    "SBTalent_career":0.10,
+    "Kpct_career":   0.10,
+    "BBpct_career":  0.08,
+}
+
+
+def find_career_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
+                      exclude_self: bool = True):
+    """Return top-N comps based on career-average skill profile.
+
+    No shared-level requirement — every player with career averages is eligible.
+    Distance is weighted Euclidean in z-score space over CAREER_FEATURES.
+    """
+    # Resolve query (reuse same name/ID logic as find_comps)
+    if isinstance(query_name_or_id, str):
+        mask = pool["Name"].str.contains(query_name_or_id, case=False, na=False)
+        matches = pool[mask]
+        if len(matches) == 0:
+            raise ValueError(f"No player matching '{query_name_or_id}'")
+        if len(matches) > 1:
+            pa_cols = [c for c in matches.columns if c.startswith("PA_")]
+            matches = matches.copy()
+            matches["_total_pa"] = matches[pa_cols].sum(axis=1, skipna=True)
+            query = matches.sort_values("_total_pa", ascending=False).iloc[0]
+        else:
+            query = matches.iloc[0]
+    else:
+        pid = int(query_name_or_id)
+        row = pool[pool["PlayerId"] == pid]
+        if len(row) == 0:
+            row = pool[pool["MLBAM_ID"] == pid]
+        if len(row) == 0:
+            raise ValueError(f"PlayerId/MLBAM_ID {pid} not found")
+        query = row.iloc[0]
+
+    # Z-score params from eligible rows (career cols all non-null)
+    feat_cols = list(CAREER_FEATURES.keys())
+    eligible = pool.dropna(subset=feat_cols)
+    params = {f: (eligible[f].mean(), eligible[f].std()) for f in feat_cols}
+
+    def _z(val, f):
+        mu, sig = params[f]
+        return (val - mu) / sig if sig > 1e-9 else 0.0
+
+    q_missing = [f for f in feat_cols if pd.isna(query.get(f))]
+    if q_missing:
+        raise ValueError(f"Query player missing career features: {q_missing}")
+
+    q_vec = {f: _z(query[f], f) for f in feat_cols}
+
+    results = []
+    for _, cand in eligible.iterrows():
+        if exclude_self and cand["PlayerId"] == query["PlayerId"]:
+            continue
+        dist_sq = sum(
+            w * (_z(cand[f], f) - q_vec[f]) ** 2
+            for f, w in CAREER_FEATURES.items()
+        )
+        weight_sum = sum(CAREER_FEATURES.values())
+        results.append({
+            "PlayerId":       cand["PlayerId"],
+            "Name":           cand["Name"],
+            "dist":           np.sqrt(dist_sq / weight_sum),
+            "graduated":      cand.get("graduated", False),
+            "MLB_Season":     cand.get("MLB_Season", np.nan),
+            "FirstYr_PPPA_Z": cand.get("FirstYr_PPPA_Z", np.nan),
+            "Career_PPPA_Z":  cand.get("Career_PPPA_Z", np.nan),
+            "Career_MLB_PA":  cand.get("Career_MLB_PA", np.nan),
+        })
+
+    if not results:
+        return query, pd.DataFrame()
+    comps = (pd.DataFrame(results)
+             .sort_values("dist")
+             .head(n)
+             .reset_index(drop=True))
+    comps.index += 1
+    return query, comps
+
+
 def print_comps(query, comps, n_shown=10):
     name   = query["Name"]
     levels_shown = []
