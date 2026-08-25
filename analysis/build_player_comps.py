@@ -64,45 +64,77 @@ def build_dataset() -> pd.DataFrame:
     # ID bridge: ovr.PlayerId (FG) -> milb.PlayerId -> milb.MLBAM_ID -> mlb.MLBAMID
     id_bridge = milb[["PlayerId", "MLBAM_ID", "Name"]].drop_duplicates("PlayerId")
 
-    # Aggregate MiLB per player per level
+    # Aggregate MiLB per player per level — PPPA_Z and Age from ovr_hist_data;
+    # BB_2K, Whiff%, SB_talent, HR/FB from prospect_features (has MLBAM_ID directly)
+    pf = pd.read_csv(DATA / "rankings" / "prospect_features.csv")
+
+    # PA-weighted aggregator helper
+    SKILL_COLS = ["BB_2K", "Whiff%", "SB_pct", "HR/FB"]
+
+    def pa_weighted_agg(src, extra_cols):
+        src = src[src["PA"] >= 10].copy()
+        for col in extra_cols:
+            src[f"PA_x_{col}"] = src["PA"] * src[col]
+        agg_dict = {"PA": "sum", "Name": "first"}
+        agg_dict.update({f"PA_x_{c}": "sum" for c in extra_cols})
+        grp = src.groupby(["PlayerId", "Level"], observed=True).agg(agg_dict).reset_index()
+        grp.rename(columns={"PA": "PA_total"}, inplace=True)
+        for col in extra_cols:
+            grp[f"{col}_wt"] = grp[f"PA_x_{col}"] / grp["PA_total"]
+        return grp
+
     ovr_valid = ovr[ovr["PA"] >= 10].copy()
     ovr_valid["PA_x_PPPA_Z"] = ovr_valid["PA"] * ovr_valid["PPPA_Z_SL"]
     ovr_valid["PA_x_Age"]    = ovr_valid["PA"] * ovr_valid["Age"]
-
     level_agg = (
         ovr_valid.groupby(["PlayerId", "Level"], observed=True)
-        .agg(
-            PA_total    = ("PA",         "sum"),
-            PA_x_PPPA_Z = ("PA_x_PPPA_Z","sum"),
-            PA_x_Age    = ("PA_x_Age",   "sum"),
-            Name        = ("Name",       "first"),
-        )
+        .agg(PA_total=("PA","sum"), PA_x_PPPA_Z=("PA_x_PPPA_Z","sum"),
+             PA_x_Age=("PA_x_Age","sum"), Name=("Name","first"))
         .reset_index()
     )
     level_agg["PPPA_Z_wt"] = level_agg["PA_x_PPPA_Z"] / level_agg["PA_total"]
     level_agg["Age_wt"]    = level_agg["PA_x_Age"]    / level_agg["PA_total"]
 
-    # Pivot to wide format
-    def pivot_col(col):
-        return (level_agg[level_agg["Level"].isin(LEVELS)]
-                .pivot(index="PlayerId", columns="Level", values=col)
-                .rename(columns={lvl: f"{col.split('_')[0]}_{lvl.replace('+','plus')}" for lvl in LEVELS}))
+    # Skill metrics from prospect_features (keyed on MLBAM_ID)
+    pf_valid = pf[pf["PA"] >= 10].copy()
+    # SB_talent raw = SB_pct × SB/PA (matches build_ability_score.py)
+    pf_valid["SB_pct"] = pf_valid["SB_pct"].fillna(0)
+    pf_valid["SB_talent"] = pf_valid["SB_pct"] * (pf_valid["SB"] / pf_valid["PA"])
+    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%"]
+    pf_agg = pa_weighted_agg(pf_valid, pf_skill_cols)
+    # Bridge pf PlayerId → MLBAM_ID for later join; also keep for merge with ovr
+    pf_bridge = pf[["PlayerId", "MLBAM_ID"]].drop_duplicates("PlayerId")
 
-    pppa_wide = level_agg.pivot(index="PlayerId", columns="Level", values="PPPA_Z_wt")
-    pppa_wide.columns = [f"PPPA_Z_{c.replace('+','plus')}" for c in pppa_wide.columns]
+    def make_wide(src_agg, val_col, prefix):
+        w = (src_agg[src_agg["Level"].isin(LEVELS)]
+             .pivot(index="PlayerId", columns="Level", values=val_col))
+        w.columns = [f"{prefix}_{c.replace('+','plus')}" for c in w.columns]
+        return w
 
-    age_wide  = level_agg.pivot(index="PlayerId", columns="Level", values="Age_wt")
-    age_wide.columns  = [f"Age_{c.replace('+','plus')}"  for c in age_wide.columns]
+    pppa_wide = make_wide(level_agg, "PPPA_Z_wt", "PPPA_Z")
+    age_wide  = make_wide(level_agg, "Age_wt",    "Age")
+    pa_wide   = make_wide(level_agg, "PA_total",  "PA")
+    bb2k_wide     = make_wide(pf_agg, "BB_2K_wt",      "BB2K")
+    whiff_wide    = make_wide(pf_agg, "Whiff%_wt",     "Whiff")
+    sbt_wide      = make_wide(pf_agg, "SB_talent_wt",  "SBTalent")
+    hrfb_wide     = make_wide(pf_agg, "HR/FB_wt",      "HRFB")
+    pullair_wide  = make_wide(pf_agg, "PullAir%_wt",   "PullAir")
 
-    pa_wide   = level_agg.pivot(index="PlayerId", columns="Level", values="PA_total")
-    pa_wide.columns   = [f"PA_{c.replace('+','plus')}"   for c in pa_wide.columns]
+    name_ser = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
 
-    name_ser  = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
+    wide = pppa_wide.join([age_wide, pa_wide,
+                           bb2k_wide, whiff_wide, sbt_wide, hrfb_wide, pullair_wide,
+                           name_ser]).reset_index()
 
-    wide = pppa_wide.join([age_wide, pa_wide, name_ser]).reset_index()
-
-    # Attach MLBAM_ID
-    wide = wide.merge(id_bridge[["PlayerId", "MLBAM_ID"]], on="PlayerId", how="left")
+    # Attach MLBAM_ID — prefer pf_bridge (has MLBAM_ID for all pf players),
+    # fall back to id_bridge from milb_hitting
+    wide = wide.merge(pf_bridge, on="PlayerId", how="left")
+    missing_mlbam = wide["MLBAM_ID"].isna()
+    if missing_mlbam.any():
+        wide.loc[missing_mlbam, "MLBAM_ID"] = (
+            wide.loc[missing_mlbam, "PlayerId"]
+            .map(id_bridge.set_index("PlayerId")["MLBAM_ID"])
+        )
 
     # MLB outcomes keyed on MLBAM_ID -> mlb.MLBAMID
     mlb_valid = mlb[mlb["PA"] >= 50].copy()
@@ -126,27 +158,65 @@ def build_dataset() -> pd.DataFrame:
                          "PA": "FirstYr_PA", "Season": "MLB_Season"})
     )
 
+    # Career MiLB span — min/max Season with PA >= 10
+    span = (
+        ovr[ovr["PA"] >= 10]
+        .groupby("PlayerId")["Season"]
+        .agg(MiLB_First="min", MiLB_Last="max")
+        .reset_index()
+    )
+
     wide = wide.merge(career_agg, on="MLBAM_ID", how="left")
     wide = wide.merge(first_yr,   on="MLBAM_ID", how="left")
+    wide = wide.merge(span,       on="PlayerId",  how="left")
     wide["graduated"] = wide["FirstYr_PPPA_Z"].notna()
 
     # Ensure all level columns exist
     for lvl in LEVELS:
         lvl_key = lvl.replace("+", "plus")
-        for prefix in ["PPPA_Z", "Age", "PA"]:
+        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir"]:
             col = f"{prefix}_{lvl_key}"
             if col not in wide.columns:
                 wide[col] = np.nan
 
     col_order = (
         ["PlayerId", "MLBAM_ID", "Name"]
-        + [f"PPPA_Z_{l.replace('+','plus')}" for l in LEVELS]
-        + [f"Age_{l.replace('+','plus')}"    for l in LEVELS]
-        + [f"PA_{l.replace('+','plus')}"     for l in LEVELS]
-        + ["graduated", "MLB_Season", "FirstYr_PPPA_Z", "FirstYr_PA",
-           "Career_PPPA_Z", "Career_MLB_PA"]
+        + [f"PPPA_Z_{l.replace('+','plus')}"   for l in LEVELS]
+        + [f"Age_{l.replace('+','plus')}"       for l in LEVELS]
+        + [f"PA_{l.replace('+','plus')}"        for l in LEVELS]
+        + [f"BB2K_{l.replace('+','plus')}"      for l in LEVELS]
+        + [f"Whiff_{l.replace('+','plus')}"     for l in LEVELS]
+        + [f"SBTalent_{l.replace('+','plus')}"  for l in LEVELS]
+        + [f"HRFB_{l.replace('+','plus')}"      for l in LEVELS]
+        + [f"PullAir_{l.replace('+','plus')}"   for l in LEVELS]
+        + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
+           "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
     wide = wide[[c for c in col_order if c in wide.columns]]
+
+    # Round to readable precision
+    lk_list = [l.replace("+", "plus") for l in LEVELS]
+    for lk in lk_list:
+        for col in [f"PPPA_Z_{lk}", f"FirstYr_PPPA_Z", f"Career_PPPA_Z"]:
+            if col in wide.columns:
+                wide[col] = wide[col].round(2)
+        if f"Age_{lk}" in wide.columns:
+            wide[f"Age_{lk}"] = wide[f"Age_{lk}"].round(2)
+        if f"PA_{lk}" in wide.columns:
+            wide[f"PA_{lk}"] = wide[f"PA_{lk}"].round(0).astype("Int64")
+        for col in [f"BB2K_{lk}", f"Whiff_{lk}", f"HRFB_{lk}", f"PullAir_{lk}"]:
+            if col in wide.columns:
+                wide[col] = wide[col].round(3)
+        if f"SBTalent_{lk}" in wide.columns:
+            wide[f"SBTalent_{lk}"] = wide[f"SBTalent_{lk}"].round(4)
+    for col in ["FirstYr_PPPA_Z", "Career_PPPA_Z"]:
+        if col in wide.columns:
+            wide[col] = wide[col].round(2)
+    if "Career_MLB_PA" in wide.columns:
+        wide["Career_MLB_PA"] = wide["Career_MLB_PA"].round(0)
+    if "FirstYr_PA" in wide.columns:
+        wide["FirstYr_PA"] = wide["FirstYr_PA"].round(0)
+
     return wide
 
 
