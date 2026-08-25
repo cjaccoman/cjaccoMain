@@ -137,9 +137,29 @@ def build_dataset() -> pd.DataFrame:
 
     name_ser = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
 
+    # Career averages — PA × level-discount weighted across all levels
+    def career_avg_ser(src_agg, val_col, out_name):
+        tmp = src_agg.copy()
+        tmp["disc"] = tmp["Level"].map(LEVEL_DISCOUNT)
+        tmp["wt"]   = tmp["PA_total"] * tmp["disc"]
+        tmp["wtv"]  = tmp["wt"] * tmp[val_col]
+        g = tmp.groupby("PlayerId")[["wt", "wtv"]].sum()
+        return (g["wtv"] / g["wt"]).rename(out_name)
+
+    ca_pppa    = career_avg_ser(level_agg, "PPPA_Z_wt",    "PPPA_Z_career")
+    ca_bb2k    = career_avg_ser(pf_agg,    "BB_2K_wt",     "BB2K_career")
+    ca_whiff   = career_avg_ser(pf_agg,    "Whiff%_wt",    "Whiff_career")
+    ca_sbt     = career_avg_ser(pf_agg,    "SB_talent_wt", "SBTalent_career")
+    ca_hrfb    = career_avg_ser(pf_agg,    "HR/FB_wt",     "HRFB_career")
+    ca_pullair = career_avg_ser(pf_agg,    "PullAir%_wt",  "PullAir_career")
+    ca_kpct    = career_avg_ser(pf_agg,    "K%_wt",        "Kpct_career")
+    ca_bbpct   = career_avg_ser(pf_agg,    "BB%_wt",       "BBpct_career")
+
     wide = pppa_wide.join([age_wide, pa_wide,
                            bb2k_wide, whiff_wide, sbt_wide, hrfb_wide, pullair_wide,
                            kpct_wide, bbpct_wide,
+                           ca_pppa, ca_bb2k, ca_whiff, ca_sbt,
+                           ca_hrfb, ca_pullair, ca_kpct, ca_bbpct,
                            name_ser]).reset_index()
 
     # Attach MLBAM_ID — prefer pf_bridge (has MLBAM_ID for all pf players),
@@ -207,6 +227,8 @@ def build_dataset() -> pd.DataFrame:
         + [f"PullAir_{l.replace('+','plus')}"   for l in LEVELS]
         + [f"Kpct_{l.replace('+','plus')}"      for l in LEVELS]
         + [f"BBpct_{l.replace('+','plus')}"     for l in LEVELS]
+        + ["PPPA_Z_career", "BB2K_career", "Whiff_career", "SBTalent_career",
+           "HRFB_career", "PullAir_career", "Kpct_career", "BBpct_career"]
         + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
            "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
@@ -228,9 +250,15 @@ def build_dataset() -> pd.DataFrame:
                 wide[col] = wide[col].round(3)
         if f"SBTalent_{lk}" in wide.columns:
             wide[f"SBTalent_{lk}"] = wide[f"SBTalent_{lk}"].round(4)
-    for col in ["FirstYr_PPPA_Z", "Career_PPPA_Z"]:
+    for col in ["FirstYr_PPPA_Z", "Career_PPPA_Z", "PPPA_Z_career"]:
         if col in wide.columns:
             wide[col] = wide[col].round(2)
+    for col in ["BB2K_career", "Whiff_career", "HRFB_career", "PullAir_career",
+                "Kpct_career", "BBpct_career"]:
+        if col in wide.columns:
+            wide[col] = wide[col].round(3)
+    if "SBTalent_career" in wide.columns:
+        wide["SBTalent_career"] = wide["SBTalent_career"].round(4)
     if "Career_MLB_PA" in wide.columns:
         wide["Career_MLB_PA"] = wide["Career_MLB_PA"].round(0)
     if "FirstYr_PA" in wide.columns:
