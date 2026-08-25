@@ -5,16 +5,15 @@ For each player, computes a single career-weighted score per skill dimension
 6 independent skill axes:
   - Kpct      : strikeout rate (negative — higher = worse discipline)
   - BBpct     : walk rate
-  - ISO       : isolated power (SLG - AVG)
   - HRFB      : HR/FB rate (power quality)
   - PullAir   : pull-air batted ball profile (power shape)
   - SBTalent  : SB_pct × SB/PA (speed/baserunning)
 
-Whiff% and BB2K are intentionally excluded: Whiff% is highly collinear with
-K%, and BB2K = BB% − 2×K% is derived from axes already included.
+Whiff% and BB2K are excluded: Whiff% is collinear with K%; BB2K is derived
+from K% and BB% which are already included. ISO removed — it conflates HR
+power, gap power, and triples into one number with no clean signal.
 
-Output: adds 'Profile' and 'Profile_K', 'Profile_BB', 'Profile_ISO',
-'Profile_Speed', 'Profile_Power' subscores to player_comps.csv.
+Output: adds 'Profile' column to player_comps.csv.
 
 Usage:
   python analysis/build_comp_profiles.py            # cluster + print summary
@@ -43,7 +42,6 @@ RANDOM_STATE   = 42
 PROFILE_FEATURES = [
     ("Kpct",    -1),   # strikeout rate — high K% = free swinger
     ("BBpct",   +1),   # walk rate — patience/discipline
-    ("ISO",     +1),   # isolated power
     ("HRFB",    +1),   # HR/FB — power quality
     ("PullAir", +1),   # pull-air profile
     ("SBTalent",+1),   # speed/baserunning
@@ -81,34 +79,37 @@ def career_composite(df: pd.DataFrame) -> pd.DataFrame:
 
 def label_cluster(centroid: pd.Series, feat_names: list[str]) -> str:
     """Derive a descriptive label from a cluster centroid (z-scored values)."""
-    k_z   = centroid["Kpct"]
-    bb_z  = centroid["BBpct"]
-    iso_z = centroid["ISO"]
-    hr_z  = centroid["HRFB"]
-    sb_z  = centroid["SBTalent"]
+    k_z  = centroid["Kpct"]
+    bb_z = centroid["BBpct"]
+    hr_z = centroid["HRFB"]
+    pa_z = centroid["PullAir"]
+    sb_z = centroid["SBTalent"]
+
+    power_z = (hr_z + pa_z) / 2  # combined power signal
 
     # Speed is the clearest separator — SBTalent distribution is right-skewed
     if sb_z > 1.5:
         return "Speed / Athleticism"
 
-    # Pure power: both ISO and HRFB strongly elevated
-    if iso_z > 1.0 and hr_z > 1.0:
+    # Strong power signal — HRFB is the primary gate; PullAir only needs to
+    # be non-negative (not actively pull-weak) when HRFB is very high
+    if hr_z > 1.0 and pa_z > -0.3:
         return "Power / Free Swinger" if k_z > 0.5 else "Power"
 
-    # Moderate power with decent contact (ISO elevated, K below avg)
-    if iso_z > 0.3 and k_z < 0.3:
+    # Moderate power, below-avg K → gap hitters
+    if power_z > 0.2 and k_z < 0.3:
         return "Gap Power"
 
-    # High BB, low-to-moderate power → patient hitters
+    # High BB, below-avg power → patient / OBP-first hitters
     if bb_z > 1.0:
         return "Disciplined"
 
     # High K, low power, low BB → swing and miss without the upside
-    if k_z > 0.8 and iso_z < -0.3 and hr_z < -0.2:
+    if k_z > 0.8 and hr_z < -0.2:
         return "Swing & Miss"
 
     # Low K, low power → contact/slap profile
-    if k_z < -0.5 and iso_z < -0.5:
+    if k_z < -0.5 and hr_z < -0.5:
         return "Contact / Slap"
 
     return "All-Around"
@@ -158,8 +159,8 @@ def run(k: int = N_CLUSTERS, show: bool = False) -> pd.DataFrame:
         r = centers_raw.iloc[ci]
         print(f"\n  [{ci}] {lbl}  (n={n}, {grad} graduates)")
         print(f"       K%={r['Kpct']:.1%}  BB%={r['BBpct']:.1%}  "
-              f"ISO={r['ISO']:.3f}  HR/FB={r['HRFB']:.1%}  "
-              f"PullAir={r['PullAir']:.1%}  SBTalent={r['SBTalent']:.4f}")
+              f"HR/FB={r['HRFB']:.1%}  PullAir={r['PullAir']:.1%}  "
+              f"SBTalent={r['SBTalent']:.4f}")
     print()
 
     if show:

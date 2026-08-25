@@ -113,7 +113,7 @@ def build_dataset() -> pd.DataFrame:
     # SB_talent raw = SB_pct × SB/PA (matches build_ability_score.py)
     pf_valid["SB_pct"] = pf_valid["SB_pct"].fillna(0)
     pf_valid["SB_talent"] = pf_valid["SB_pct"] * (pf_valid["SB"] / pf_valid["PA"])
-    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%", "ISO"]
+    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%"]
     pf_agg = pa_weighted_agg(pf_valid, pf_skill_cols)
     # Bridge pf PlayerId → MLBAM_ID for later join; also keep for merge with ovr
     pf_bridge = pf[["PlayerId", "MLBAM_ID"]].drop_duplicates("PlayerId")
@@ -134,13 +134,12 @@ def build_dataset() -> pd.DataFrame:
     pullair_wide  = make_wide(pf_agg, "PullAir%_wt",   "PullAir")
     kpct_wide     = make_wide(pf_agg, "K%_wt",         "Kpct")
     bbpct_wide    = make_wide(pf_agg, "BB%_wt",        "BBpct")
-    iso_wide      = make_wide(pf_agg, "ISO_wt",        "ISO")
 
     name_ser = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
 
     wide = pppa_wide.join([age_wide, pa_wide,
                            bb2k_wide, whiff_wide, sbt_wide, hrfb_wide, pullair_wide,
-                           kpct_wide, bbpct_wide, iso_wide,
+                           kpct_wide, bbpct_wide,
                            name_ser]).reset_index()
 
     # Attach MLBAM_ID — prefer pf_bridge (has MLBAM_ID for all pf players),
@@ -191,7 +190,7 @@ def build_dataset() -> pd.DataFrame:
     # Ensure all level columns exist
     for lvl in LEVELS:
         lvl_key = lvl.replace("+", "plus")
-        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct", "ISO"]:
+        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct"]:
             col = f"{prefix}_{lvl_key}"
             if col not in wide.columns:
                 wide[col] = np.nan
@@ -208,7 +207,6 @@ def build_dataset() -> pd.DataFrame:
         + [f"PullAir_{l.replace('+','plus')}"   for l in LEVELS]
         + [f"Kpct_{l.replace('+','plus')}"      for l in LEVELS]
         + [f"BBpct_{l.replace('+','plus')}"     for l in LEVELS]
-        + [f"ISO_{l.replace('+','plus')}"       for l in LEVELS]
         + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
            "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
@@ -225,7 +223,7 @@ def build_dataset() -> pd.DataFrame:
         if f"PA_{lk}" in wide.columns:
             wide[f"PA_{lk}"] = wide[f"PA_{lk}"].round(0).astype("Int64")
         for col in [f"BB2K_{lk}", f"Whiff_{lk}", f"HRFB_{lk}", f"PullAir_{lk}",
-                    f"Kpct_{lk}", f"BBpct_{lk}", f"ISO_{lk}"]:
+                    f"Kpct_{lk}", f"BBpct_{lk}"]:
             if col in wide.columns:
                 wide[col] = wide[col].round(3)
         if f"SBTalent_{lk}" in wide.columns:
