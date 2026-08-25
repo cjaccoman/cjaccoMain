@@ -64,6 +64,8 @@ SKILL_WEIGHTS = {
     "SBTalent": 0.10,  # SB_pct × SB/PA — speed/baserunning talent
     "MaxEV":    0.08,  # max exit velocity — raw power ceiling (sparse: AAA/A 2023+, R 2026)
     "EV90":     0.08,  # 90th-pct EV — consistent hard contact (same coverage as MaxEV)
+    "Chase":    0.08,  # Chase% — zone discipline (sparse: AAA 2023+ only)
+    "ZContact": 0.08,  # Z-Contact% — in-zone contact quality (sparse: AAA 2023+ only)
 }
 
 
@@ -121,7 +123,24 @@ def build_dataset() -> pd.DataFrame:
     # SB_talent raw = SB_pct × SB/PA (matches build_ability_score.py)
     pf_valid["SB_pct"] = pf_valid["SB_pct"].fillna(0)
     pf_valid["SB_talent"] = pf_valid["SB_pct"] * (pf_valid["SB"] / pf_valid["PA"])
-    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%", "MaxEV", "EV90"]
+
+    # Chase%/Z-Contact% in prospect_features mixes percentile ranks (PS) and raw
+    # game-feed decimals — replace with clean game-feed values (AAA 2023+ only).
+    pitches_agg = pd.read_csv(DATA / "api" / "milb_pitches_agg.csv")
+    pitches_clean = (
+        pitches_agg[(pitches_agg["Level"] == "AAA") & (pitches_agg["Season"] >= 2023)]
+        [["PlayerId", "Season", "Level", "Chase%", "Z-Contact%"]]
+        .copy()
+        .rename(columns={"Chase%": "_Chase", "Z-Contact%": "_ZContact"})
+    )
+    pf_valid["Chase%"]     = np.nan
+    pf_valid["Z-Contact%"] = np.nan
+    pf_valid = pf_valid.merge(pitches_clean, on=["PlayerId", "Season", "Level"], how="left")
+    pf_valid["Chase%"]     = pf_valid["_Chase"]
+    pf_valid["Z-Contact%"] = pf_valid["_ZContact"]
+    pf_valid.drop(columns=["_Chase", "_ZContact"], inplace=True)
+
+    pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%", "MaxEV", "EV90", "Chase%", "Z-Contact%"]
     pf_agg = pa_weighted_agg(pf_valid, pf_skill_cols)
     # Bridge pf PlayerId → MLBAM_ID for later join; also keep for merge with ovr
     pf_bridge = pf[["PlayerId", "MLBAM_ID"]].drop_duplicates("PlayerId")
@@ -142,8 +161,10 @@ def build_dataset() -> pd.DataFrame:
     pullair_wide  = make_wide(pf_agg, "PullAir%_wt",   "PullAir")
     kpct_wide     = make_wide(pf_agg, "K%_wt",         "Kpct")
     bbpct_wide    = make_wide(pf_agg, "BB%_wt",        "BBpct")
-    maxev_wide    = make_wide(pf_agg, "MaxEV_wt",      "MaxEV")
-    ev90_wide     = make_wide(pf_agg, "EV90_wt",       "EV90")
+    maxev_wide    = make_wide(pf_agg, "MaxEV_wt",       "MaxEV")
+    ev90_wide     = make_wide(pf_agg, "EV90_wt",        "EV90")
+    chase_wide    = make_wide(pf_agg, "Chase%_wt",      "Chase")
+    zcontact_wide = make_wide(pf_agg, "Z-Contact%_wt",  "ZContact")
 
     name_ser = level_agg.drop_duplicates("PlayerId").set_index("PlayerId")["Name"]
 
@@ -166,15 +187,18 @@ def build_dataset() -> pd.DataFrame:
     ca_pullair = career_avg_ser(pf_agg,    "PullAir%_wt",  "PullAir_career")
     ca_kpct    = career_avg_ser(pf_agg,    "K%_wt",        "Kpct_career")
     ca_bbpct   = career_avg_ser(pf_agg,    "BB%_wt",       "BBpct_career")
-    ca_maxev   = career_avg_ser(pf_agg,    "MaxEV_wt",     "MaxEV_career")
-    ca_ev90    = career_avg_ser(pf_agg,    "EV90_wt",      "EV90_career")
+    ca_maxev    = career_avg_ser(pf_agg,    "MaxEV_wt",       "MaxEV_career")
+    ca_ev90     = career_avg_ser(pf_agg,    "EV90_wt",        "EV90_career")
+    ca_chase    = career_avg_ser(pf_agg,    "Chase%_wt",      "Chase_career")
+    ca_zcontact = career_avg_ser(pf_agg,    "Z-Contact%_wt",  "ZContact_career")
 
     wide = pppa_wide.join([age_wide, pa_wide,
                            bb2k_wide, whiff_wide, sbt_wide, hrfb_wide, pullair_wide,
                            kpct_wide, bbpct_wide, maxev_wide, ev90_wide,
+                           chase_wide, zcontact_wide,
                            ca_pppa, ca_bb2k, ca_whiff, ca_sbt,
                            ca_hrfb, ca_pullair, ca_kpct, ca_bbpct,
-                           ca_maxev, ca_ev90,
+                           ca_maxev, ca_ev90, ca_chase, ca_zcontact,
                            name_ser]).reset_index()
 
     # Attach MLBAM_ID — prefer pf_bridge (has MLBAM_ID for all pf players),
@@ -234,7 +258,7 @@ def build_dataset() -> pd.DataFrame:
     # Ensure all level columns exist
     for lvl in LEVELS:
         lvl_key = lvl.replace("+", "plus")
-        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct", "MaxEV", "EV90"]:
+        for prefix in ["PPPA_Z", "Age", "PA", "BB2K", "Whiff", "SBTalent", "HRFB", "PullAir", "Kpct", "BBpct", "MaxEV", "EV90", "Chase", "ZContact"]:
             col = f"{prefix}_{lvl_key}"
             if col not in wide.columns:
                 wide[col] = np.nan
@@ -251,11 +275,13 @@ def build_dataset() -> pd.DataFrame:
         + [f"PullAir_{l.replace('+','plus')}"   for l in LEVELS]
         + [f"Kpct_{l.replace('+','plus')}"      for l in LEVELS]
         + [f"BBpct_{l.replace('+','plus')}"     for l in LEVELS]
-        + [f"MaxEV_{l.replace('+','plus')}"     for l in LEVELS]
-        + [f"EV90_{l.replace('+','plus')}"      for l in LEVELS]
+        + [f"MaxEV_{l.replace('+','plus')}"      for l in LEVELS]
+        + [f"EV90_{l.replace('+','plus')}"       for l in LEVELS]
+        + [f"Chase_{l.replace('+','plus')}"      for l in LEVELS]
+        + [f"ZContact_{l.replace('+','plus')}"   for l in LEVELS]
         + ["PPPA_Z_career", "BB2K_career", "Whiff_career", "SBTalent_career",
            "HRFB_career", "PullAir_career", "Kpct_career", "BBpct_career",
-           "MaxEV_career", "EV90_career"]
+           "MaxEV_career", "EV90_career", "Chase_career", "ZContact_career"]
         + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
            "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
@@ -278,6 +304,9 @@ def build_dataset() -> pd.DataFrame:
         for col in [f"MaxEV_{lk}", f"EV90_{lk}"]:
             if col in wide.columns:
                 wide[col] = wide[col].round(1)
+        for col in [f"Chase_{lk}", f"ZContact_{lk}"]:
+            if col in wide.columns:
+                wide[col] = wide[col].round(1)
         if f"SBTalent_{lk}" in wide.columns:
             wide[f"SBTalent_{lk}"] = wide[f"SBTalent_{lk}"].round(4)
     for col in ["FirstYr_PPPA_Z", "Career_PPPA_Z", "PPPA_Z_career"]:
@@ -287,7 +316,7 @@ def build_dataset() -> pd.DataFrame:
                 "Kpct_career", "BBpct_career"]:
         if col in wide.columns:
             wide[col] = wide[col].round(3)
-    for col in ["MaxEV_career", "EV90_career"]:
+    for col in ["MaxEV_career", "EV90_career", "Chase_career", "ZContact_career"]:
         if col in wide.columns:
             wide[col] = wide[col].round(1)
     if "SBTalent_career" in wide.columns:
@@ -478,8 +507,10 @@ CAREER_FEATURES = {
     "SBTalent_career":0.10,
     "Kpct_career":   0.10,
     "BBpct_career":  0.08,
-    "MaxEV_career":  0.08,
-    "EV90_career":   0.08,
+    "MaxEV_career":     0.08,
+    "EV90_career":      0.08,
+    "Chase_career":     0.08,  # Chase% — AAA 2023+ only
+    "ZContact_career":  0.08,  # Z-Contact% — AAA 2023+ only
 }
 
 
@@ -514,8 +545,8 @@ def find_career_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
 
     # Required features — must be non-null for both query and candidate
     # Optional features (sparse coverage) — included only when both have data
-    REQUIRED_CAREER = [f for f in CAREER_FEATURES if f not in ("MaxEV_career", "EV90_career")]
-    OPTIONAL_CAREER = ["MaxEV_career", "EV90_career"]
+    REQUIRED_CAREER = [f for f in CAREER_FEATURES if f not in ("MaxEV_career", "EV90_career", "Chase_career", "ZContact_career")]
+    OPTIONAL_CAREER = ["MaxEV_career", "EV90_career", "Chase_career", "ZContact_career"]
 
     feat_cols = list(CAREER_FEATURES.keys())
     eligible = pool.dropna(subset=REQUIRED_CAREER)
