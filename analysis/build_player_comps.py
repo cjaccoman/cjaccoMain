@@ -124,21 +124,37 @@ def build_dataset() -> pd.DataFrame:
     pf_valid["SB_pct"] = pf_valid["SB_pct"].fillna(0)
     pf_valid["SB_talent"] = pf_valid["SB_pct"] * (pf_valid["SB"] / pf_valid["PA"])
 
-    # Chase%/Z-Contact% in prospect_features mixes percentile ranks (PS) and raw
-    # game-feed decimals — replace with clean game-feed values (AAA 2023+ only).
-    pitches_agg = pd.read_csv(DATA / "api" / "milb_pitches_agg.csv")
-    pitches_clean = (
-        pitches_agg[(pitches_agg["Level"] == "AAA") & (pitches_agg["Season"] >= 2023)]
-        [["PlayerId", "Season", "Level", "Chase%", "Z-Contact%"]]
-        .copy()
-        .rename(columns={"Chase%": "_Chase", "Z-Contact%": "_ZContact"})
-    )
+    # Chase%/Z-Contact% — load from ProspectSavant (raw percent scale, e.g. 25.0 = 25%).
+    # Coverage: AAA/A 2023-2026, AA/A+/R 2026 only.
+    # Avoids prospect_features which mixes PS percentile ranks with game-feed decimals.
+    _PS_CHASE_SRC = [
+        ("AAA", 2023), ("AAA", 2024), ("AAA", 2025), ("AAA", 2026),
+        ("A",   2023), ("A",   2024), ("A",   2025), ("A",   2026),
+        ("AA",  2026), ("A+",  2026), ("R",   2026),
+    ]
+    _FNAME_MAP = {"AAA": "AAA", "AA": "AA", "A+": "Ap", "A": "A", "R": "Rk"}
+    ps_frames = []
+    for _lvl, _yr in _PS_CHASE_SRC:
+        _path = DATA / "prospectSavant" / f"ps_{_FNAME_MAP[_lvl]}_{_yr}.csv"
+        if not _path.exists():
+            continue
+        _df = pd.read_csv(_path)
+        if "MLBAMId" not in _df.columns or "Chase%" not in _df.columns:
+            continue
+        _df = _df[_df["MLBAMId"].notna()][["MLBAMId", "Chase%", "ZContact%"]].copy()
+        _df["MLBAM_ID"] = _df["MLBAMId"].astype(int)
+        _df["Season"] = _yr
+        _df["Level"]  = _lvl
+        ps_frames.append(_df[["MLBAM_ID", "Season", "Level", "Chase%", "ZContact%"]])
     pf_valid["Chase%"]     = np.nan
     pf_valid["Z-Contact%"] = np.nan
-    pf_valid = pf_valid.merge(pitches_clean, on=["PlayerId", "Season", "Level"], how="left")
-    pf_valid["Chase%"]     = pf_valid["_Chase"]
-    pf_valid["Z-Contact%"] = pf_valid["_ZContact"]
-    pf_valid.drop(columns=["_Chase", "_ZContact"], inplace=True)
+    if ps_frames:
+        ps_chase = pd.concat(ps_frames, ignore_index=True).drop_duplicates(["MLBAM_ID", "Season", "Level"])
+        ps_chase = ps_chase.rename(columns={"Chase%": "_Chase", "ZContact%": "_ZContact"})
+        pf_valid = pf_valid.merge(ps_chase, on=["MLBAM_ID", "Season", "Level"], how="left")
+        pf_valid["Chase%"]     = pf_valid["_Chase"]
+        pf_valid["Z-Contact%"] = pf_valid["_ZContact"]
+        pf_valid.drop(columns=["_Chase", "_ZContact"], inplace=True)
 
     pf_skill_cols = ["BB_2K", "Whiff%", "SB_talent", "HR/FB", "PullAir%", "K%", "BB%", "MaxEV", "EV90", "Chase%", "Z-Contact%"]
     pf_agg = pa_weighted_agg(pf_valid, pf_skill_cols)
