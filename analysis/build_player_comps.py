@@ -321,6 +321,15 @@ def _prep_pool(df: pd.DataFrame):
     return params
 
 
+def dist_to_pct(dist: float) -> float:
+    """Convert Euclidean career distance to an intuitive match percentage.
+
+    0 (identical) → 100%.  Decays exponentially: dist=0.10 ≈ 90%,
+    dist=0.25 ≈ 78%, dist=0.50 ≈ 61%, dist=0.677 (Blake Burke's loosest comp) ≈ 51%.
+    """
+    return round(100 * np.exp(-dist), 1)
+
+
 def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
                min_shared_levels: int = 1, exclude_self: bool = True):
     """Return top-N historical comps for a player.
@@ -435,10 +444,12 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
         if shared < min_shared_levels or weight_sum == 0:
             continue
 
+        d = np.sqrt(dist_sq / weight_sum)
         results.append({
             "PlayerId":       cand["PlayerId"],
             "Name":           cand["Name"],
-            "dist":           np.sqrt(dist_sq / weight_sum),
+            "dist":           d,
+            "match_pct":      dist_to_pct(d),
             "shared_levels":  shared,
             "graduated":      cand.get("graduated", False),
             "MLB_Season":     cand.get("MLB_Season", np.nan),
@@ -537,10 +548,12 @@ def find_career_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
             weight_sum += w
         if weight_sum == 0:
             continue
+        d = np.sqrt(dist_sq / weight_sum)
         results.append({
             "PlayerId":       cand["PlayerId"],
             "Name":           cand["Name"],
-            "dist":           np.sqrt(dist_sq / weight_sum),
+            "dist":           d,
+            "match_pct":      dist_to_pct(d),
             "graduated":      cand.get("graduated", False),
             "MLB_Season":     cand.get("MLB_Season", np.nan),
             "FirstYr_PPPA_Z": cand.get("FirstYr_PPPA_Z", np.nan),
