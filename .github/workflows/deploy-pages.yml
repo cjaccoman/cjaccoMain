@@ -8,6 +8,7 @@ on:
       - 'data/rankings/aaa_2026.csv'
       - 'output/build_rankings_html.py'
       - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
