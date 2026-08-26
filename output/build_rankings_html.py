@@ -1,12 +1,21 @@
 """Generate interactive prospect rankings HTML artifact."""
 import json
 import math
+import os
 import pandas as pd
 from pathlib import Path
 
 DATA_DIR   = Path(__file__).resolve().parent.parent / "data"
-SCRATCHPAD = Path(r"C:\Users\cjacc\AppData\Local\Temp\claude\C--Users-cjacc-PycharmProjects-prospectsMain\5dc88b54-dc8f-45dc-934f-30c09d0bfd05\scratchpad")
-OUT_PATH   = SCRATCHPAD / "prospect_rankings.html"
+
+# RANKINGS_OUT_DIR env var overrides output location (used by CI/GitHub Actions).
+# When set, output filename is index.html; otherwise uses local scratchpad path.
+_out_env = os.environ.get("RANKINGS_OUT_DIR")
+if _out_env:
+    SCRATCHPAD = Path(_out_env)
+    OUT_PATH   = SCRATCHPAD / "index.html"
+else:
+    SCRATCHPAD = Path(r"C:\Users\cjacc\AppData\Local\Temp\claude\C--Users-cjacc-PycharmProjects-prospectsMain\5dc88b54-dc8f-45dc-934f-30c09d0bfd05\scratchpad")
+    OUT_PATH   = SCRATCHPAD / "prospect_rankings.html"
 
 # ── Prospects data ──────────────────────────────────────────────────────────
 ps = pd.read_csv(DATA_DIR / "rankings" / "prospect_scores.csv")
