@@ -63,6 +63,7 @@ print(f"AAA 2026: {len(aaa_records)} players")
 
 HTML = """\
 <title>2026 Prospect Rankings</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root {
   --bg:#ffffff;--surface:#f6f8fa;--surface2:#eaeef2;--border:#d0d7de;
@@ -197,6 +198,30 @@ tbody tr:hover{background:var(--row-hover)}
 
 .no-results{text-align:center;padding:48px;color:var(--muted);font-size:13px}
 .null-cell{color:var(--muted)}
+
+/* ── Mobile ── */
+@media(max-width:640px){
+  body{font-size:12px}
+  .controls{padding:8px 10px;gap:6px}
+  .controls-title{font-size:13px}
+  input[type="search"]{width:100%;flex:1 1 100%}
+  select{flex:1 1 auto;min-width:80px}
+  .spacer{display:none}
+  td{padding:5px 7px}
+  th{padding:6px 7px}
+  .bar{width:28px}
+  /* Prospects: show Rank Name Pos Team Level Age TOOLS ABILITY Combined (cols 1-6, 9, 10, 14)
+     hide: Season(7) CareerPA(8) AgeScore(11) Current(12) OVR(13) RecentFlag(15) CareerFlag(16) */
+  #table th:nth-child(7),#table td:nth-child(7),
+  #table th:nth-child(8),#table td:nth-child(8),
+  #table th:nth-child(11),#table td:nth-child(11),
+  #table th:nth-child(12),#table td:nth-child(12),
+  #table th:nth-child(13),#table td:nth-child(13),
+  #table th:nth-child(15),#table td:nth-child(15),
+  #table th:nth-child(16),#table td:nth-child(16){display:none}
+  /* AAA: show Rank Name Team Pos Age PA PPPA Overall (cols 1-8), hide 9+ */
+  #aaa-table th:nth-child(n+9),#aaa-table td:nth-child(n+9){display:none}
+}
 </style>
 
 <!-- ══ Tab bar ══ -->

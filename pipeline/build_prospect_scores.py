@@ -14,12 +14,17 @@ Methodology:
 
   level_weight = LEVEL_DISCOUNT factors (AAA=1.00 → R=0.10).
   Per-level shrinkage:
-    level_den    = sum(PA × level_wt) for that player × level
-    shrink       = min(level_den / threshold, 1.0)
+    level_den    = sum(PA × level_wt) for that player × level  (used for career avg weighting)
+    level_raw_pa = sum(PA) for that player × level             (used for shrinkage)
+    shrink       = min(level_raw_pa / threshold, 1.0)
     shrunk_score = 50 + shrink × (level_avg − 50)
-  Thresholds (fixed, in AAA-equivalent PA):
-    TOOLS:   250  (tools metrics noisier → more data needed)
-    ABILITY: 175
+  Thresholds (raw PA, level-tiered — higher at lower levels to reflect shorter
+  seasons and noisier stats):
+    AAA/AA: 300  A+/A: 400  Rk: 600
+  Separating shrinkage from the level discount means sample size evidence (raw PA)
+  and level quality (level_wt) are judged independently. A player with 400 A-ball
+  PA gets full shrinkage weight while their production is still discounted by the
+  A-ball level weight (0.23×) in the career average blend.
 
 Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
   Current_Score  = 0.30 × TOOLS_Score + 0.50 × ABILITY_Score + 0.20 × Age_Score
@@ -77,8 +82,18 @@ MLB_PA_EXCL       = 50
 
 LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 
-TOOLS_PA_THRESH    = 250
-ABILITY_PA_THRESH  = 175
+# Raw-PA shrinkage thresholds per level.
+# Higher thresholds at lower levels reflect shorter seasons and noisier stats.
+# AAA/AA full seasons are ~500 PA; A+/A are similar but noisier; Rk is ~200 PA max.
+PA_THRESH_BY_LEVEL = {
+    "AAA": 300,
+    "AA":  300,
+    "A+":  400,
+    "A":   400,
+    "R":   600,
+}
+TOOLS_PA_THRESH   = PA_THRESH_BY_LEVEL   # kept for backward-compat reference
+ABILITY_PA_THRESH = PA_THRESH_BY_LEVEL
 ARCHETYPE_PATH     = DATA_DIR / "rankings" / "archetype_labels.csv"
 
 W_TOOLS   = 0.30
@@ -96,16 +111,29 @@ def _norm(s) -> str:
     return "".join(c for c in s if unicodedata.category(c) != "Mn").strip()
 
 
-def _wt_avg_shrunk(df: pd.DataFrame, score_col: str, threshold: float) -> pd.Series:
-    valid = df[["PlayerId", "Level", score_col, "wt"]].dropna(subset=[score_col]).copy()
+def _wt_avg_shrunk(df: pd.DataFrame, score_col: str, threshold) -> pd.Series:
+    """Compute PA-weighted career average with per-level shrinkage toward 50.
+
+    threshold: int (flat) or dict {Level -> int} for level-tiered thresholds.
+    career avg weighting uses AAA-equiv PA (level_den); shrinkage uses raw PA.
+    """
+    valid = df[["PlayerId", "Level", score_col, "wt", "PA"]].dropna(subset=[score_col]).copy()
     valid["_wtd"] = valid[score_col] * valid["wt"]
 
-    lgrp      = valid.groupby(["PlayerId", "Level"], observed=True)
-    level_den = lgrp["wt"].sum()
-    level_num = lgrp["_wtd"].sum()
-    level_avg = level_num / level_den
+    lgrp         = valid.groupby(["PlayerId", "Level"], observed=True)
+    level_den    = lgrp["wt"].sum()       # AAA-equiv PA — weights career avg blend
+    level_raw_pa = lgrp["PA"].sum()       # raw PA — drives shrinkage
+    level_num    = lgrp["_wtd"].sum()
+    level_avg    = level_num / level_den
 
-    level_shrink = (level_den / threshold).clip(upper=1.0)
+    if isinstance(threshold, dict):
+        # Map each (PlayerId, Level) index entry to its level-specific threshold
+        thresh_series = level_raw_pa.index.get_level_values("Level").map(threshold)
+        thresh_series = pd.Series(thresh_series.values, index=level_raw_pa.index, dtype=float)
+        level_shrink = (level_raw_pa / thresh_series).clip(upper=1.0)
+    else:
+        level_shrink = (level_raw_pa / threshold).clip(upper=1.0)
+
     level_shrunk = 50 + level_shrink * (level_avg - 50)
 
     final_num = (level_shrunk * level_den).groupby(level=0).sum()
