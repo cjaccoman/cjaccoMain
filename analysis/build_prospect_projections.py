@@ -57,6 +57,10 @@ REQUIRED = [f for f in CAREER_FEATURES
             if f not in ("MaxEV_career", "EV90_career", "Chase_career", "ZContact_career")]
 OPTIONAL = ["MaxEV_career", "EV90_career", "Chase_career", "ZContact_career"]
 
+# MiLB PA shrinkage: Career_PA_Proj_adj = Career_PA_Proj × min(career_milb_pa / threshold, 1.0)
+# Shrinks toward 0 for thin-resume players — a 17yo with 200 PA has 40% weight vs full credit.
+MILB_PA_SHRINK_THRESH = 500
+
 
 def main() -> None:
     pool = pd.read_csv(POOL_PATH)
@@ -159,6 +163,12 @@ def main() -> None:
         career_pa_p25 = float(np.percentile(top_cpa, 25))
         career_pa_p75 = float(np.percentile(top_cpa, 75))
 
+        # MiLB-PA shrinkage: discount projection for thin-resume players.
+        # A 17yo with 200 PA gets 40% weight; ≥500 PA gets full credit.
+        milb_pa      = float(row.get("Career_PA", 0) or 0)
+        milb_shrink  = min(milb_pa / MILB_PA_SHRINK_THRESH, 1.0)
+        career_pa_proj_adj = career_pa_proj * milb_shrink if pd.notna(career_pa_proj) else np.nan
+
         # ── MaxEV_proj ────────────────────────────────────────────────────────
         top_maxev   = pool_maxev[top_idx]
         ev_mask     = ~np.isnan(top_maxev)
@@ -172,14 +182,15 @@ def main() -> None:
             maxev_conf = float(ev_mpct.mean())
 
         records.append({
-            "PlayerId":        pid,
-            "Name":            name,
-            "Career_PA_Proj":  round(career_pa_proj, 0) if pd.notna(career_pa_proj) else np.nan,
-            "Career_PA_P25":   round(career_pa_p25, 0),
-            "Career_PA_P75":   round(career_pa_p75, 0),
-            "MaxEV_proj":      round(maxev_proj, 1) if pd.notna(maxev_proj) else np.nan,
-            "MaxEV_proj_n":    maxev_n,
-            "MaxEV_proj_conf": round(maxev_conf, 1) if pd.notna(maxev_conf) else np.nan,
+            "PlayerId":           pid,
+            "Name":               name,
+            "Career_PA_Proj":     round(career_pa_proj, 0) if pd.notna(career_pa_proj) else np.nan,
+            "Career_PA_Proj_Adj": round(career_pa_proj_adj, 0) if pd.notna(career_pa_proj_adj) else np.nan,
+            "Career_PA_P25":      round(career_pa_p25, 0),
+            "Career_PA_P75":      round(career_pa_p75, 0),
+            "MaxEV_proj":         round(maxev_proj, 1) if pd.notna(maxev_proj) else np.nan,
+            "MaxEV_proj_n":       maxev_n,
+            "MaxEV_proj_conf":    round(maxev_conf, 1) if pd.notna(maxev_conf) else np.nan,
         })
 
     out = pd.DataFrame(records)
