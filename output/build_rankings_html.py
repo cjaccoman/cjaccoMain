@@ -70,6 +70,56 @@ aaa_records = [
 raw_aaa = json.dumps(aaa_records, separators=(",", ":"))
 print(f"AAA 2026: {len(aaa_records)} players")
 
+# ── Luck tracker data ────────────────────────────────────────────────────────
+luck_df = pd.read_csv(DATA_DIR / "computed" / "babip_luck.csv")
+luck_df["PlayerId"] = luck_df["PlayerId"].astype(str)
+ps_luck = ps.copy()
+ps_luck["PlayerId"] = ps_luck["PlayerId"].astype(str)
+
+# Most recent qualifying season (2025/2026) per player
+luck_recent = (
+    luck_df[luck_df["Season"].isin([2025, 2026])]
+    .sort_values(["PlayerId", "Season"], ascending=[True, False])
+    .drop_duplicates(subset=["PlayerId"], keep="first")
+)
+# Prior season PPPA_Z_SL for jump calculation
+luck_prior = (
+    luck_df[luck_df["Season"].isin([2024, 2025])]
+    .sort_values(["PlayerId", "Season"], ascending=[True, False])
+    .drop_duplicates(subset=["PlayerId"], keep="first")[["PlayerId", "Season", "PPPA_Z_SL"]]
+    .rename(columns={"PPPA_Z_SL": "PPPA_prior", "Season": "Prior_Season"})
+)
+luck_recent = luck_recent.merge(luck_prior, on="PlayerId", how="left")
+luck_recent["PPPA_Jump"] = (luck_recent["PPPA_Z_SL"] - luck_recent["PPPA_prior"]).where(
+    luck_recent["Season"] != luck_recent["Prior_Season"]
+)
+
+# Merge with prospect pool for Combined_Rank / FantasyPos
+luck_merged = luck_recent.merge(
+    ps_luck[["PlayerId", "Combined_Rank", "FantasyPos"]], on="PlayerId", how="inner"
+)
+
+luck_out_cols = [
+    "Combined_Rank", "Name", "FantasyPos", "Level", "Season", "PA",
+    "Prior_Career_PA",
+    "BABIP", "BABIP_career", "BABIP_delta_z",
+    "HR/FB", "HRFB_career", "HRFB_delta_z",
+    "Luck_Score_raw", "Luck_Score",
+    "PPPA_Z_SL", "PPPA_Jump",
+]
+luck_merged = luck_merged.sort_values("Luck_Score", ascending=False, na_position="last")
+for c in ["BABIP", "BABIP_career", "BABIP_delta_z", "HR/FB", "HRFB_career",
+          "HRFB_delta_z", "Luck_Score_raw", "Luck_Score", "PPPA_Z_SL", "PPPA_Jump"]:
+    if c in luck_merged.columns:
+        luck_merged[c] = pd.to_numeric(luck_merged[c], errors="coerce").round(2)
+
+luck_records = [
+    {k: _to_json_val(row[k]) for k in luck_out_cols if k in luck_merged.columns}
+    for _, row in luck_merged.iterrows()
+]
+raw_luck = json.dumps(luck_records, separators=(",", ":"))
+print(f"Luck tracker: {len(luck_records)} prospects")
+
 HTML = """\
 <title>2026 Prospect Rankings</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -208,6 +258,22 @@ tbody tr:hover{background:var(--row-hover)}
 .no-results{text-align:center;padding:48px;color:var(--muted);font-size:13px}
 .null-cell{color:var(--muted)}
 
+/* ── Luck score coloring ── */
+.luck-hot2{background:#ff4d0022;color:#c0392b;font-weight:700}
+.luck-hot1{background:#ff8c0018;color:#e67e00;font-weight:600}
+.luck-cold2{background:#0066cc22;color:#1a6fb5;font-weight:700}
+.luck-cold1{background:#00998818;color:#007a6a;font-weight:600}
+:root[data-theme="dark"] .luck-hot2,:root[data-theme="dark"] .luck-hot2{background:#ff4d0033;color:#ff7f7f}
+:root[data-theme="dark"] .luck-hot1{background:#ff8c0028;color:#ffb347}
+:root[data-theme="dark"] .luck-cold2{background:#0066cc33;color:#79b8ff}
+:root[data-theme="dark"] .luck-cold1{background:#00998828;color:#56d3b5}
+@media(prefers-color-scheme:dark){
+  .luck-hot2{background:#ff4d0033;color:#ff7f7f}
+  .luck-hot1{background:#ff8c0028;color:#ffb347}
+  .luck-cold2{background:#0066cc33;color:#79b8ff}
+  .luck-cold1{background:#00998828;color:#56d3b5}
+}
+
 /* ── Mobile ── */
 @media(max-width:640px){
   body{font-size:12px}
@@ -230,6 +296,13 @@ tbody tr:hover{background:var(--row-hover)}
   #table th:nth-child(16),#table td:nth-child(16){display:none}
   /* AAA: show Rank Name Team Pos Age PA PPPA Overall (cols 1-8), hide 9+ */
   #aaa-table th:nth-child(n+9),#aaa-table td:nth-child(n+9){display:none}
+  /* Luck: show Rank Name Pos Level PA Luck PPPA_Z (cols 1-4,6,12,13), hide others */
+  #luck-table th:nth-child(5),#luck-table td:nth-child(5),
+  #luck-table th:nth-child(7),#luck-table td:nth-child(7),
+  #luck-table th:nth-child(9),#luck-table td:nth-child(9),
+  #luck-table th:nth-child(10),#luck-table td:nth-child(10),
+  #luck-table th:nth-child(11),#luck-table td:nth-child(11),
+  #luck-table th:nth-child(14),#luck-table td:nth-child(14){display:none}
 }
 </style>
 
@@ -237,6 +310,7 @@ tbody tr:hover{background:var(--row-hover)}
 <div class="tab-bar">
   <button class="tab-btn active" data-tab="prospects">Prospects</button>
   <button class="tab-btn" data-tab="aaa">AAA 2026</button>
+  <button class="tab-btn" data-tab="luck">Luck Tracker</button>
 </div>
 
 <!-- ══ Prospects panel ══ -->
@@ -334,6 +408,60 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-aaa-col="SB_succ" data-type="num">SB%</th>
       </tr></thead>
       <tbody id="aaa-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ Luck Tracker panel ══ -->
+<div class="panel" id="panel-luck">
+  <div class="controls">
+    <span class="controls-title">Luck Tracker</span>
+    <span class="controls-count" id="luck-count"></span>
+    <input type="search" id="luck-search" placeholder="Search player…" autocomplete="off" />
+    <select id="luck-level-filter">
+      <option value="">All levels</option>
+      <option>R</option><option>A</option><option>A+</option>
+      <option>AA</option><option>AAA</option>
+    </select>
+    <select id="luck-pos-filter">
+      <option value="">All positions</option>
+      <option value="C">C</option><option value="1B">1B</option>
+      <option value="2B">2B</option><option value="3B">3B</option>
+      <option value="SS">SS</option><option value="OF">OF</option>
+    </select>
+    <select id="luck-dir-filter">
+      <option value="">All players</option>
+      <option value="lucky">Lucky (regression risk)</option>
+      <option value="unlucky">Unlucky (buy-low)</option>
+    </select>
+    <select id="luck-pa-filter">
+      <option value="">All PA</option>
+      <option value="200">≥ 200 PA</option>
+      <option value="300">≥ 300 PA</option>
+      <option value="400">≥ 400 PA</option>
+    </select>
+    <div class="spacer"></div>
+    <button class="clear-btn" id="luck-clear-btn">Clear</button>
+  </div>
+  <div class="table-wrap">
+    <table id="luck-table">
+      <thead><tr>
+        <th class="num" data-luck-col="Combined_Rank" data-type="num">Rank</th>
+        <th data-luck-col="Name" data-type="str">Name</th>
+        <th data-luck-col="FantasyPos" data-type="str">Pos</th>
+        <th data-luck-col="Level" data-type="level">Level</th>
+        <th class="num" data-luck-col="Season" data-type="num">Year</th>
+        <th class="num" data-luck-col="PA" data-type="num">PA</th>
+        <th class="num" data-luck-col="Prior_Career_PA" data-type="num" title="Career PA from prior seasons — drives baseline reliability">Prior PA</th>
+        <th class="num" data-luck-col="BABIP" data-type="num">BABIP</th>
+        <th class="num" data-luck-col="BABIP_career" data-type="num">Career BA</th>
+        <th class="num" data-luck-col="BABIP_delta_z" data-type="num" title="BABIP vs career baseline, z-scored within Season+Level peers">BABIP Δz</th>
+        <th class="num" data-luck-col="HRFB_delta_z" data-type="num" title="HR/FB vs career baseline, z-scored within Season+Level peers">HRFB Δz</th>
+        <th class="num" data-luck-col="Luck_Score" data-type="num" title="Composite luck (BABIP 60% + HRFB 40%), shrunk by prior PA reliability. Positive = lucky.">Luck</th>
+        <th class="num" data-luck-col="PPPA_Z_SL" data-type="num" title="PPPA z-score vs same Season+Level peers">PPPA Z</th>
+        <th class="num" data-luck-col="PPPA_Jump" data-type="num" title="PPPA_Z change vs prior season">PPPA Δ</th>
+      </tr></thead>
+      <tbody id="luck-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -592,6 +720,112 @@ document.querySelector('th[data-aaa-col="Rank"]').classList.add('sort-asc');
 applyAAAFilters();
 
 /* ════════════════════════════════════════════
+   LUCK TRACKER TAB
+   ════════════════════════════════════════════ */
+const LUCK_RAW = LUCK_DATA_PLACEHOLDER;
+let luckSortCol='Luck_Score', luckSortDir=-1, luckFiltered=LUCK_RAW.slice();
+
+function luckClass(v){
+  if(v==null||isNaN(v))return'';
+  if(v>=2.5)return'luck-hot2';
+  if(v>=1.0)return'luck-hot1';
+  if(v<=-2.5)return'luck-cold2';
+  if(v<=-1.0)return'luck-cold1';
+  return'';
+}
+function luckCell(v){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  const cls=luckClass(v);
+  return`<td class="num${cls?' '+cls:''}">${(+v).toFixed(2)}</td>`;
+}
+function numCell(v,dec=2){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  return`<td class="num">${(+v).toFixed(dec)}</td>`;
+}
+function signCell(v,dec=2){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  return`<td class="num">${v>=0?'+':''}${(+v).toFixed(dec)}</td>`;
+}
+
+function renderLuck(){
+  const tbody=document.getElementById('luck-tbody');
+  document.getElementById('luck-count').textContent=luckFiltered.length.toLocaleString()+' players';
+  if(!luckFiltered.length){
+    tbody.innerHTML='<tr><td colspan="14" class="no-results">No players match.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=luckFiltered.map(r=>`<tr>
+    <td class="rank">${r.Combined_Rank}</td>
+    <td class="name">${r.Name}</td>
+    <td>${r.FantasyPos||'—'}</td>
+    <td><span class="${lclass(r.Level)}">${r.Level}</span></td>
+    <td class="num">${r.Season}</td>
+    <td class="num">${r.PA}</td>
+    <td class="num">${r.Prior_Career_PA!=null?Math.round(r.Prior_Career_PA):'—'}</td>
+    ${numCell(r.BABIP,3)}
+    ${numCell(r.BABIP_career,3)}
+    ${luckCell(r.BABIP_delta_z)}
+    ${r.HRFB_delta_z!=null?luckCell(r.HRFB_delta_z):'<td class="num null-cell">—</td>'}
+    ${luckCell(r.Luck_Score)}
+    ${numCell(r.PPPA_Z_SL,2)}
+    ${r.PPPA_Jump!=null?signCell(r.PPPA_Jump,2):'<td class="num null-cell">—</td>'}
+  </tr>`).join('');
+}
+
+function applyLuckFilters(){
+  const q=document.getElementById('luck-search').value.trim().toLowerCase();
+  const lvl=document.getElementById('luck-level-filter').value;
+  const pos=document.getElementById('luck-pos-filter').value;
+  const dir=document.getElementById('luck-dir-filter').value;
+  const minPA=parseInt(document.getElementById('luck-pa-filter').value)||0;
+  luckFiltered=LUCK_RAW.filter(r=>{
+    if(q&&!r.Name.toLowerCase().includes(q))return false;
+    if(lvl&&r.Level!==lvl)return false;
+    if(pos&&r.FantasyPos!==pos)return false;
+    if(minPA&&(r.PA??0)<minPA)return false;
+    if(dir==='lucky'&&!(r.Luck_Score!=null&&r.Luck_Score>0))return false;
+    if(dir==='unlucky'&&!(r.Luck_Score!=null&&r.Luck_Score<0))return false;
+    return true;
+  });
+  sortLuck();
+}
+
+function sortLuck(){
+  const type=document.querySelector(`th[data-luck-col="${luckSortCol}"]`)?.dataset.type;
+  luckFiltered.sort((a,b)=>{
+    let av=a[luckSortCol],bv=b[luckSortCol];
+    if(type==='level'){av=LVL[av]||0;bv=LVL[bv]||0;}
+    if(type==='str')return luckSortDir*String(av||'').localeCompare(String(bv||''));
+    return luckSortDir*((av??-Infinity)-(bv??-Infinity));
+  });
+  renderLuck();
+}
+
+document.querySelectorAll('th[data-luck-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.luckCol;
+    luckSortDir=(luckSortCol===col)?-luckSortDir:(col==='Combined_Rank'?1:-1);
+    luckSortCol=col;
+    document.querySelectorAll('th[data-luck-col]').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(luckSortDir===1?'sort-asc':'sort-desc');
+    sortLuck();
+  });
+});
+['luck-search','luck-level-filter','luck-pos-filter','luck-dir-filter','luck-pa-filter'].forEach(id=>{
+  document.getElementById(id).addEventListener(
+    id==='luck-search'?'input':'change', applyLuckFilters);
+});
+document.getElementById('luck-clear-btn').addEventListener('click',()=>{
+  document.getElementById('luck-search').value='';
+  ['luck-level-filter','luck-pos-filter','luck-dir-filter','luck-pa-filter'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  applyLuckFilters();
+});
+document.querySelector('th[data-luck-col="Luck_Score"]').classList.add('sort-desc');
+applyLuckFilters();
+
+/* ════════════════════════════════════════════
    TAB SWITCHING
    ════════════════════════════════════════════ */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -607,7 +841,8 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 
 html = HTML \
     .replace('PROSPECTS_DATA_PLACEHOLDER', raw) \
-    .replace('AAA_DATA_PLACEHOLDER', raw_aaa)
+    .replace('AAA_DATA_PLACEHOLDER', raw_aaa) \
+    .replace('LUCK_DATA_PLACEHOLDER', raw_luck)
 
 SCRATCHPAD.mkdir(parents=True, exist_ok=True)
 with open(OUT_PATH, 'w', encoding='utf-8') as f:
