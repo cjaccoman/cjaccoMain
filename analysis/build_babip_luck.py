@@ -141,29 +141,32 @@ def main() -> None:
         mld.loc[missing, "HR/FB"] = fill["HR/FB"].values
         mld.drop(columns=["_nname"], inplace=True)
 
-    # ── Career leave-one-out baselines ───────────────────────────────────────
-    # Only compute for players with >= MIN_CAREER_SEAS qualifying seasons
+    # ── Career leave-one-out baselines (grouped by PlayerId + Level) ─────────
+    # Each season's baseline is the player's career average at that same level,
+    # excluding the current season — so level effects don't contaminate the delta.
+    # Requires >= MIN_CAREER_SEAS qualifying seasons at the same level.
     valid_babip = mld[mld["BABIP"].notna()]
-    seas_count  = valid_babip.groupby("PlayerId")["Season"].count()
-    multi_pid   = seas_count[seas_count >= MIN_CAREER_SEAS].index
+    seas_count  = valid_babip.groupby(["PlayerId", "Level"])["Season"].count()
+    multi_keys  = seas_count[seas_count >= MIN_CAREER_SEAS].index  # MultiIndex (PlayerId, Level)
+    multi_mask  = valid_babip.set_index(["PlayerId", "Level"]).index.isin(multi_keys)
 
-    # BABIP baseline
     babip_base = (
-        valid_babip[valid_babip["PlayerId"].isin(multi_pid)]
-        .groupby("PlayerId", group_keys=False)
+        valid_babip[multi_mask]
+        .groupby(["PlayerId", "Level"], group_keys=False)
         .apply(lambda g: _leave_one_out_avg(g, "BABIP"))
     )
     mld["BABIP_career"] = babip_base.reindex(mld.index)
     mld["BABIP_delta"]  = mld["BABIP"] - mld["BABIP_career"]
 
-    # HR/FB baseline
+    # HR/FB baseline (same grouping)
     valid_hrfb = mld[mld["HR/FB"].notna()]
-    seas_count_hrfb = valid_hrfb.groupby("PlayerId")["Season"].count()
-    multi_pid_hrfb  = seas_count_hrfb[seas_count_hrfb >= MIN_CAREER_SEAS].index
+    seas_count_hrfb = valid_hrfb.groupby(["PlayerId", "Level"])["Season"].count()
+    multi_keys_hrfb = seas_count_hrfb[seas_count_hrfb >= MIN_CAREER_SEAS].index
+    multi_mask_hrfb = valid_hrfb.set_index(["PlayerId", "Level"]).index.isin(multi_keys_hrfb)
 
     hrfb_base = (
-        valid_hrfb[valid_hrfb["PlayerId"].isin(multi_pid_hrfb)]
-        .groupby("PlayerId", group_keys=False)
+        valid_hrfb[multi_mask_hrfb]
+        .groupby(["PlayerId", "Level"], group_keys=False)
         .apply(lambda g: _leave_one_out_avg(g, "HR/FB"))
     )
     mld["HRFB_career"] = hrfb_base.reindex(mld.index)
