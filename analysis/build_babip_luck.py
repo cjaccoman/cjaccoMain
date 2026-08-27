@@ -169,6 +169,24 @@ def main() -> None:
     mld["HRFB_career"] = hrfb_base.reindex(mld.index)
     mld["HRFB_delta"]  = mld["HR/FB"] - mld["HRFB_career"]
 
+    # ── BABIP_delta slope: PA-weighted OLS of (BABIP - Career_BABIP) on Season ─
+    # Positive = gap trending wider (BABIP pulling ahead of career baseline over time)
+    # Negative = gap shrinking (BABIP regressing toward or below career baseline)
+    # Requires >= 2 seasons with a non-null BABIP_delta.
+    slope_map = {}
+    for pid, grp in mld[mld["BABIP_delta"].notna()].groupby("PlayerId"):
+        if len(grp) < 2:
+            continue
+        seas = grp["Season"].values.astype(float)
+        delta = grp["BABIP_delta"].values
+        pa = grp["PA"].values.astype(float)
+        sc = seas - seas.mean()
+        denom = np.dot(pa, sc ** 2)
+        if denom < 1e-9:
+            continue
+        slope_map[pid] = np.dot(pa, sc * delta) / denom
+    mld["BABIP_Delta_Slope"] = mld["PlayerId"].map(slope_map)
+
     # ── Z-score deltas within Season+Level ────────────────────────────────────
     mld["BABIP_delta_z"] = _z_within(mld, "BABIP_delta", ["Season", "Level"])
     mld["HRFB_delta_z"]  = _z_within(mld, "HRFB_delta",  ["Season", "Level"])
@@ -220,6 +238,7 @@ def main() -> None:
         "PlayerId", "Name", "Season", "Level", "Team", "Age", "PA",
         "Prior_Career_PA",
         "BABIP", "BABIP_career", "BABIP_delta", "BABIP_delta_z",
+        "BABIP_Delta_Slope",
         "HR/FB", "HRFB_career", "HRFB_delta", "HRFB_delta_z",
         "Luck_Score_raw", "Luck_Score",
         "Luck_PPPA", "Luck_PPPA_pct",
@@ -240,6 +259,9 @@ def main() -> None:
     for col in ["Luck_PPPA_pct"]:
         if col in out.columns:
             out[col] = out[col].round(1)
+    for col in ["BABIP_Delta_Slope"]:
+        if col in out.columns:
+            out[col] = out[col].round(4)
     for col in ["BABIP_delta_z", "HRFB_delta_z", "Luck_Score_raw", "Luck_Score", "PPPA_Z_SL"]:
         if col in out.columns:
             out[col] = out[col].round(2)

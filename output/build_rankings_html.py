@@ -102,13 +102,13 @@ luck_merged = luck_recent.merge(
 luck_out_cols = [
     "Combined_Rank", "Name", "FantasyPos", "Level", "Season", "PA",
     "Prior_Career_PA",
-    "BABIP", "BABIP_career", "BABIP_delta_z",
+    "BABIP", "BABIP_career", "BABIP_delta_z", "BABIP_Delta_Slope",
     "HR/FB", "HRFB_career", "HRFB_delta_z",
     "Luck_PPPA", "Luck_PPPA_pct",
     "PPPA_Z_SL", "PPPA_Jump",
 ]
 luck_merged = luck_merged.sort_values("Luck_PPPA", ascending=False, na_position="last")
-for c in ["BABIP", "BABIP_career", "BABIP_delta_z", "HR/FB", "HRFB_career",
+for c in ["BABIP", "BABIP_career", "BABIP_delta_z", "BABIP_Delta_Slope", "HR/FB", "HRFB_career",
           "HRFB_delta_z", "Luck_PPPA", "Luck_PPPA_pct", "PPPA_Z_SL", "PPPA_Jump"]:
     if c in luck_merged.columns:
         luck_merged[c] = pd.to_numeric(luck_merged[c], errors="coerce").round(2)
@@ -456,6 +456,7 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-luck-col="BABIP" data-type="num">BABIP</th>
         <th class="num" data-luck-col="BABIP_career" data-type="num" title="Career PA-weighted BABIP baseline (current season excluded)">Career BABIP</th>
         <th class="num" data-luck-col="BABIP_delta_z" data-type="num" title="BABIP vs career baseline, z-scored within Season+Level peers">BABIP Δz</th>
+        <th class="num" data-luck-col="BABIP_Delta_Slope" data-type="num" title="PA-weighted OLS slope of (BABIP − Career BABIP) on Season. Positive = gap widening over career; negative = regressing toward or below baseline.">BABIP Δ slope</th>
         <th class="num" data-luck-col="HRFB_delta_z" data-type="num" title="HR/FB vs career baseline, z-scored within Season+Level peers">HRFB Δz</th>
         <th class="num" data-luck-col="Luck_PPPA" data-type="num" title="Luck expressed in PPPA units (shown with % of season PPPA). BABIP deviation × BIP rate × 2.8 + HR/FB deviation × FB rate × 8, shrunk by prior PA reliability. Positive = lucky.">Luck PPPA</th>
         <th class="num" data-luck-col="PPPA_Z_SL" data-type="num" title="PPPA z-score vs same Season+Level peers">PPPA Z</th>
@@ -766,7 +767,7 @@ function renderLuck(){
   const tbody=document.getElementById('luck-tbody');
   document.getElementById('luck-count').textContent=luckFiltered.length.toLocaleString()+' players';
   if(!luckFiltered.length){
-    tbody.innerHTML='<tr><td colspan="14" class="no-results">No players match.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="15" class="no-results">No players match.</td></tr>';
     return;
   }
   tbody.innerHTML=luckFiltered.map(r=>`<tr>
@@ -780,6 +781,7 @@ function renderLuck(){
     ${numCell(r.BABIP,3)}
     ${numCell(r.BABIP_career,3)}
     ${luckCell(r.BABIP_delta_z)}
+    ${r.BABIP_Delta_Slope!=null?signCell(r.BABIP_Delta_Slope,4):'<td class="num null-cell">—</td>'}
     ${r.HRFB_delta_z!=null?luckCell(r.HRFB_delta_z):'<td class="num null-cell">—</td>'}
     ${luckPPPACell(r.Luck_PPPA,r.Luck_PPPA_pct)}
     ${numCell(r.PPPA_Z_SL,2)}
