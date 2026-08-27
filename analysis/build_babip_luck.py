@@ -1,0 +1,215 @@
+"""Build per-player-season BABIP and HR/FB luck tracker.
+
+For each player-season, computes deviation from that player's own career
+baseline to flag seasons where production was inflated or suppressed by luck
+(high BABIP, elevated HR/FB) vs. genuine skill.
+
+BABIP = (1B + 2B + 3B) / (PA - BB - IBB - SO - HR)
+   — approximates (H - HR) / (AB - SO - HR + SF); ignores HBP/SF/SH (~small)
+
+HR/FB sourced from missing_milb_data.csv (FanGraphs). HR/FB > 1.0 nulled
+(physically impossible, small-sample artifact).
+
+Career baseline is the leave-one-out PA-weighted average — current season
+excluded so the baseline isn't contaminated by the season being evaluated.
+
+Luck_Score = 0.60 × BABIP_delta_z + 0.40 × HRFB_delta_z
+  Positive = lucky (better than career baseline + peers)
+  Negative = unlucky
+
+Minimum PA filter: MIN_PA = 80 per season (same as main model floors).
+
+Output: data/computed/babip_luck.csv
+  One row per player-season. Sorted by PlayerId, Season.
+
+Run:
+  python analysis/build_babip_luck.py
+"""
+
+import numpy as np
+import pandas as pd
+from pathlib import Path
+
+DATA    = Path(__file__).resolve().parent.parent / "data"
+MLD     = DATA / "computed" / "minorLeagueData.csv"
+ADV     = DATA / "fangraphs" / "missing_milb_data.csv"
+ADV2    = DATA / "fangraphs" / "ml_updated_data.csv"   # 2026 override
+OUT     = DATA / "computed"  / "babip_luck.csv"
+
+MIN_PA          = 80    # minimum PA for a season to qualify
+MIN_CAREER_SEAS = 2     # need at least 2 qualifying seasons to compute a baseline delta
+
+
+def _babip(df: pd.DataFrame) -> pd.Series:
+    """BABIP = (1B+2B+3B) / (PA - BB - IBB - SO - HR); NaN when denominator <= 0."""
+    num   = df["1B"] + df["2B"] + df["3B"]
+    denom = df["PA"] - df["BB"] - df["IBB"] - df["SO"] - df["HR"]
+    return num.where(denom > 0) / denom.where(denom > 0)
+
+
+def _leave_one_out_avg(group: pd.DataFrame, col: str) -> pd.Series:
+    """PA-weighted career average excluding the current row (leave-one-out)."""
+    total_num = (group[col] * group["PA"]).sum()
+    total_den = group["PA"].sum()
+    row_num   = group[col] * group["PA"]
+    row_den   = group["PA"]
+    loo_num   = total_num - row_num
+    loo_den   = total_den - row_den
+    return (loo_num / loo_den.where(loo_den > 0)).where(loo_den > 0)
+
+
+def _z_within(df: pd.DataFrame, col: str, group_cols: list[str]) -> pd.Series:
+    """Z-score col within each group; NaN when group std == 0."""
+    grp  = df.groupby(group_cols, observed=True)[col]
+    mu   = grp.transform("mean")
+    std  = grp.transform("std")
+    return (df[col] - mu) / std.where(std > 0)
+
+
+def main() -> None:
+    # ── Load base stats ───────────────────────────────────────────────────────
+    mld = pd.read_csv(MLD)
+    mld = mld[mld["PA"] >= MIN_PA].copy()
+
+    mld["BABIP"] = _babip(mld)
+
+    # ── Load HR/FB ────────────────────────────────────────────────────────────
+    adv_cols = ["PlayerId", "Season", "Level", "HR/FB"]
+    adv = pd.read_csv(ADV, usecols=adv_cols)
+    # 2026 override
+    adv2 = pd.read_csv(ADV2, usecols=[c for c in adv_cols if c in
+                                       pd.read_csv(ADV2, nrows=0).columns])
+    adv = pd.concat([adv[~adv["Season"].isin(adv2["Season"].unique())], adv2],
+                    ignore_index=True)
+
+    # Null physically impossible HR/FB values
+    if "HR/FB" in adv.columns:
+        adv.loc[adv["HR/FB"] > 1.0, "HR/FB"] = np.nan
+
+    # Coerce PlayerId to string for join (mld uses int, adv uses str for recent players)
+    mld["PlayerId"] = mld["PlayerId"].astype(str)
+    adv["PlayerId"] = adv["PlayerId"].astype(str)
+
+    import unicodedata
+    def _norm(s: pd.Series) -> pd.Series:
+        return s.apply(lambda x: unicodedata.normalize("NFD", str(x))
+                       .encode("ascii", "ignore").decode().lower().strip()
+                       if pd.notna(x) else x)
+
+    # Primary join: PlayerId + Season + Level
+    hrfb_src = adv[["PlayerId", "Season", "Level", "HR/FB"]].dropna(subset=["HR/FB"])
+    mld = mld.merge(hrfb_src, on=["PlayerId", "Season", "Level"], how="left")
+
+    # Fallback: Name + Season + Level for rows still missing HR/FB
+    missing = mld["HR/FB"].isna()
+    if missing.any():
+        hrfb_name = hrfb_src.copy()
+        adv_full = pd.read_csv(ADV, usecols=["PlayerId", "Name", "Season", "Level", "HR/FB"])
+        adv2_cols = [c for c in ["PlayerId","Name","Season","Level","HR/FB"]
+                     if c in pd.read_csv(ADV2, nrows=0).columns]
+        adv2_full = pd.read_csv(ADV2, usecols=adv2_cols)
+        hrfb_name = pd.concat([
+            adv_full[~adv_full["Season"].isin(adv2_full["Season"].unique())],
+            adv2_full], ignore_index=True).dropna(subset=["HR/FB"])
+        hrfb_name["_nname"] = _norm(hrfb_name["Name"])
+        mld["_nname"] = _norm(mld["Name"])
+        fill_src = hrfb_name[["_nname","Season","Level","HR/FB"]].drop_duplicates(
+            subset=["_nname","Season","Level"])
+        fill = mld[missing][["_nname","Season","Level"]].merge(
+            fill_src, on=["_nname","Season","Level"], how="left")
+        mld.loc[missing, "HR/FB"] = fill["HR/FB"].values
+        mld.drop(columns=["_nname"], inplace=True)
+
+    # ── Career leave-one-out baselines ───────────────────────────────────────
+    # Only compute for players with >= MIN_CAREER_SEAS qualifying seasons
+    valid_babip = mld[mld["BABIP"].notna()]
+    seas_count  = valid_babip.groupby("PlayerId")["Season"].count()
+    multi_pid   = seas_count[seas_count >= MIN_CAREER_SEAS].index
+
+    # BABIP baseline
+    babip_base = (
+        valid_babip[valid_babip["PlayerId"].isin(multi_pid)]
+        .groupby("PlayerId", group_keys=False)
+        .apply(lambda g: _leave_one_out_avg(g, "BABIP"))
+    )
+    mld["BABIP_career"] = babip_base.reindex(mld.index)
+    mld["BABIP_delta"]  = mld["BABIP"] - mld["BABIP_career"]
+
+    # HR/FB baseline
+    valid_hrfb = mld[mld["HR/FB"].notna()]
+    seas_count_hrfb = valid_hrfb.groupby("PlayerId")["Season"].count()
+    multi_pid_hrfb  = seas_count_hrfb[seas_count_hrfb >= MIN_CAREER_SEAS].index
+
+    hrfb_base = (
+        valid_hrfb[valid_hrfb["PlayerId"].isin(multi_pid_hrfb)]
+        .groupby("PlayerId", group_keys=False)
+        .apply(lambda g: _leave_one_out_avg(g, "HR/FB"))
+    )
+    mld["HRFB_career"] = hrfb_base.reindex(mld.index)
+    mld["HRFB_delta"]  = mld["HR/FB"] - mld["HRFB_career"]
+
+    # ── Z-score deltas within Season+Level ────────────────────────────────────
+    mld["BABIP_delta_z"] = _z_within(mld, "BABIP_delta", ["Season", "Level"])
+    mld["HRFB_delta_z"]  = _z_within(mld, "HRFB_delta",  ["Season", "Level"])
+
+    # ── Composite Luck_Score ──────────────────────────────────────────────────
+    # Use whichever components are available; weight accordingly
+    has_babip = mld["BABIP_delta_z"].notna()
+    has_hrfb  = mld["HRFB_delta_z"].notna()
+    both      = has_babip & has_hrfb
+    only_bab  = has_babip & ~has_hrfb
+    only_hrfb = ~has_babip & has_hrfb
+
+    luck = pd.Series(np.nan, index=mld.index)
+    luck[both]      = 0.60 * mld.loc[both, "BABIP_delta_z"] + 0.40 * mld.loc[both, "HRFB_delta_z"]
+    luck[only_bab]  = mld.loc[only_bab, "BABIP_delta_z"]
+    luck[only_hrfb] = mld.loc[only_hrfb, "HRFB_delta_z"]
+    mld["Luck_Score"] = luck
+
+    # ── Output ────────────────────────────────────────────────────────────────
+    out_cols = [
+        "PlayerId", "Name", "Season", "Level", "Team", "Age", "PA",
+        "BABIP", "BABIP_career", "BABIP_delta", "BABIP_delta_z",
+        "HR/FB", "HRFB_career", "HRFB_delta", "HRFB_delta_z",
+        "Luck_Score",
+        "PPPA", "PPPA_Z_SL",
+    ]
+    out = mld[[c for c in out_cols if c in mld.columns]].sort_values(
+        ["PlayerId", "Season"]
+    )
+
+    # Round floats
+    for col in ["BABIP", "BABIP_career", "BABIP_delta", "HR/FB", "HRFB_career",
+                "HRFB_delta", "PPPA"]:
+        if col in out.columns:
+            out[col] = out[col].round(3)
+    for col in ["BABIP_delta_z", "HRFB_delta_z", "Luck_Score", "PPPA_Z_SL"]:
+        if col in out.columns:
+            out[col] = out[col].round(2)
+
+    out.to_csv(OUT, index=False)
+    print(f"Wrote {len(out):,} rows -> babip_luck.csv")
+    print(f"  BABIP populated    : {out['BABIP'].notna().sum():,}")
+    print(f"  BABIP_delta populated: {out['BABIP_delta'].notna().sum():,}")
+    print(f"  HRFB_delta populated : {out['HRFB_delta'].notna().sum():,}")
+    print(f"  Luck_Score populated : {out['Luck_Score'].notna().sum():,}")
+
+    # Sample: most lucky and most unlucky single seasons (min 200 PA)
+    qualified = out[out["PA"] >= 200].dropna(subset=["Luck_Score"])
+    print(f"\nTop 10 luckiest seasons (PA >= 200):")
+    top = qualified.nlargest(10, "Luck_Score")[
+        ["Name", "Season", "Level", "PA", "BABIP", "BABIP_career",
+         "HR/FB", "HRFB_career", "Luck_Score"]
+    ]
+    print(top.to_string(index=False))
+
+    print(f"\nTop 10 unluckiest seasons (PA >= 200):")
+    bot = qualified.nsmallest(10, "Luck_Score")[
+        ["Name", "Season", "Level", "PA", "BABIP", "BABIP_career",
+         "HR/FB", "HRFB_career", "Luck_Score"]
+    ]
+    print(bot.to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()

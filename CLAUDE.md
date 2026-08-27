@@ -343,6 +343,7 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `averages_season_league.csv` | Season+League baseline averages |
 | `averages_season_league_age.csv` | Season+League+Age baseline averages |
 | `player_comps.csv` | One row per player (20,367 total); PA-weighted PPPA_Z_SL and age at each MiLB level, plus first-year and career MLB PPPA_Z outcomes. Used by `analysis/build_player_comps.py` comparator. |
+| `babip_luck.csv` | One row per player-season (PA ≥ 80); BABIP and HR/FB deviation from each player's own career leave-one-out baseline. Columns: BABIP, BABIP_career, BABIP_delta, BABIP_delta_z, HR/FB, HRFB_career, HRFB_delta, HRFB_delta_z, Luck_Score (0.60×BABIP_delta_z + 0.40×HRFB_delta_z). Positive = lucky, negative = unlucky. Built by `analysis/build_babip_luck.py`. |
 
 ### `data/rankings/` — Scores & Rankings
 
@@ -435,6 +436,7 @@ analysis/skill_pppa_translation.py     # Skill_PPPA full-population level discou
 analysis/build_player_comps.py         # Build player_comps.csv + prospect comparator tool
 pipeline/build_tbc_rankings.py         # Build tbc_rankings.csv from tbc_prospect_rankings.csv
 pipeline/build_situational_splits.py   # Build situational_splits.csv (RISP, platoon, count splits)
+analysis/build_babip_luck.py           # Build babip_luck.csv — per-season BABIP + HR/FB luck vs career baseline
 ```
 
 ### Player Cards
