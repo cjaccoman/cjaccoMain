@@ -104,12 +104,12 @@ luck_out_cols = [
     "Prior_Career_PA",
     "BABIP", "BABIP_career", "BABIP_delta_z",
     "HR/FB", "HRFB_career", "HRFB_delta_z",
-    "Luck_Score_raw", "Luck_Score",
+    "Luck_PPPA", "Luck_PPPA_pct",
     "PPPA_Z_SL", "PPPA_Jump",
 ]
-luck_merged = luck_merged.sort_values("Luck_Score", ascending=False, na_position="last")
+luck_merged = luck_merged.sort_values("Luck_PPPA", ascending=False, na_position="last")
 for c in ["BABIP", "BABIP_career", "BABIP_delta_z", "HR/FB", "HRFB_career",
-          "HRFB_delta_z", "Luck_Score_raw", "Luck_Score", "PPPA_Z_SL", "PPPA_Jump"]:
+          "HRFB_delta_z", "Luck_PPPA", "Luck_PPPA_pct", "PPPA_Z_SL", "PPPA_Jump"]:
     if c in luck_merged.columns:
         luck_merged[c] = pd.to_numeric(luck_merged[c], errors="coerce").round(2)
 
@@ -457,7 +457,7 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-luck-col="BABIP_career" data-type="num">Career BA</th>
         <th class="num" data-luck-col="BABIP_delta_z" data-type="num" title="BABIP vs career baseline, z-scored within Season+Level peers">BABIP Δz</th>
         <th class="num" data-luck-col="HRFB_delta_z" data-type="num" title="HR/FB vs career baseline, z-scored within Season+Level peers">HRFB Δz</th>
-        <th class="num" data-luck-col="Luck_Score" data-type="num" title="Composite luck (BABIP 60% + HRFB 40%), shrunk by prior PA reliability. Positive = lucky.">Luck</th>
+        <th class="num" data-luck-col="Luck_PPPA" data-type="num" title="Luck expressed in PPPA units (shown with % of season PPPA). BABIP deviation × BIP rate × 2.8 + HR/FB deviation × FB rate × 8, shrunk by prior PA reliability. Positive = lucky.">Luck PPPA</th>
         <th class="num" data-luck-col="PPPA_Z_SL" data-type="num" title="PPPA z-score vs same Season+Level peers">PPPA Z</th>
         <th class="num" data-luck-col="PPPA_Jump" data-type="num" title="PPPA_Z change vs prior season">PPPA Δ</th>
       </tr></thead>
@@ -723,7 +723,7 @@ applyAAAFilters();
    LUCK TRACKER TAB
    ════════════════════════════════════════════ */
 const LUCK_RAW = LUCK_DATA_PLACEHOLDER;
-let luckSortCol='Luck_Score', luckSortDir=-1, luckFiltered=LUCK_RAW.slice();
+let luckSortCol='Luck_PPPA', luckSortDir=-1, luckFiltered=LUCK_RAW.slice();
 
 function luckClass(v){
   if(v==null||isNaN(v))return'';
@@ -737,6 +737,21 @@ function luckCell(v){
   if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
   const cls=luckClass(v);
   return`<td class="num${cls?' '+cls:''}">${(+v).toFixed(2)}</td>`;
+}
+function luckPPPAClass(v){
+  if(v==null||isNaN(v))return'';
+  if(v>=0.20)return'luck-hot2';
+  if(v>=0.08)return'luck-hot1';
+  if(v<=-0.20)return'luck-cold2';
+  if(v<=-0.08)return'luck-cold1';
+  return'';
+}
+function luckPPPACell(pppa,pct){
+  if(pppa==null||isNaN(pppa))return'<td class="num null-cell">—</td>';
+  const cls=luckPPPAClass(pppa);
+  const sign=pppa>=0?'+':'';
+  const pctStr=(pct!=null&&!isNaN(pct))?` <span style="opacity:.7;font-size:.85em">(${pct>=0?'+':''}${(+pct).toFixed(0)}%)</span>`:'';
+  return`<td class="num${cls?' '+cls:''}">${sign}${(+pppa).toFixed(3)}${pctStr}</td>`;
 }
 function numCell(v,dec=2){
   if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
@@ -766,7 +781,7 @@ function renderLuck(){
     ${numCell(r.BABIP_career,3)}
     ${luckCell(r.BABIP_delta_z)}
     ${r.HRFB_delta_z!=null?luckCell(r.HRFB_delta_z):'<td class="num null-cell">—</td>'}
-    ${luckCell(r.Luck_Score)}
+    ${luckPPPACell(r.Luck_PPPA,r.Luck_PPPA_pct)}
     ${numCell(r.PPPA_Z_SL,2)}
     ${r.PPPA_Jump!=null?signCell(r.PPPA_Jump,2):'<td class="num null-cell">—</td>'}
   </tr>`).join('');
@@ -783,8 +798,8 @@ function applyLuckFilters(){
     if(lvl&&r.Level!==lvl)return false;
     if(pos&&r.FantasyPos!==pos)return false;
     if(minPA&&(r.PA??0)<minPA)return false;
-    if(dir==='lucky'&&!(r.Luck_Score!=null&&r.Luck_Score>0))return false;
-    if(dir==='unlucky'&&!(r.Luck_Score!=null&&r.Luck_Score<0))return false;
+    if(dir==='lucky'&&!(r.Luck_PPPA!=null&&r.Luck_PPPA>0))return false;
+    if(dir==='unlucky'&&!(r.Luck_PPPA!=null&&r.Luck_PPPA<0))return false;
     return true;
   });
   sortLuck();
@@ -822,7 +837,7 @@ document.getElementById('luck-clear-btn').addEventListener('click',()=>{
   });
   applyLuckFilters();
 });
-document.querySelector('th[data-luck-col="Luck_Score"]').classList.add('sort-desc');
+document.querySelector('th[data-luck-col="Luck_PPPA"]').classList.add('sort-desc');
 applyLuckFilters();
 
 /* ════════════════════════════════════════════

@@ -50,6 +50,13 @@ MIN_PA           = 150   # minimum PA per season — below this BABIP is too noi
 MIN_CAREER_SEAS  = 2    # need at least 2 qualifying seasons to compute a baseline delta
 PRIOR_PA_THRESH  = 300  # prior-season PA for full baseline reliability (≈ 2 solid seasons)
 
+# PPPA conversion constants
+# Hits from BABIP luck: weighted avg of 1B(2pts), 2B(4pts), 3B(6pts) in scoring system
+# Using typical MiLB distribution ~65% singles, ~28% doubles, ~7% triples → ≈2.85; rounded to 2.8
+HIT_PTS = 2.8
+# Extra HRs from HR/FB luck: HR(+4) + TB(+4) = 8 deterministic pts (excludes context-dependent R/RBI)
+HR_PTS  = 8
+
 
 def _babip(df: pd.DataFrame) -> pd.Series:
     """BABIP = (1B+2B+3B) / (PA - BB - IBB - SO - HR); NaN when denominator <= 0."""
@@ -181,13 +188,32 @@ def main() -> None:
     mld["Luck_Score_raw"] = luck
 
     # ── Baseline reliability shrinkage ────────────────────────────────────────
-    # Prior_Career_PA = total career PA minus current season's PA.
-    # When current season dominates career PA, the leave-one-out baseline is
-    # thin and the delta is unreliable — shrink toward 0.
-    total_pa          = mld.groupby("PlayerId")["PA"].transform("sum")
+    total_pa           = mld.groupby("PlayerId")["PA"].transform("sum")
     mld["Prior_Career_PA"] = (total_pa - mld["PA"]).clip(lower=0)
-    baseline_rel      = (mld["Prior_Career_PA"] / PRIOR_PA_THRESH).clip(upper=1.0)
-    mld["Luck_Score"] = mld["Luck_Score_raw"] * baseline_rel
+    baseline_rel       = (mld["Prior_Career_PA"] / PRIOR_PA_THRESH).clip(upper=1.0)
+    mld["Luck_Score"]  = mld["Luck_Score_raw"] * baseline_rel
+
+    # ── PPPA conversion ───────────────────────────────────────────────────────
+    # Express luck in PPPA units so magnitude is intuitive.
+    # BIP_rate = balls in play per PA
+    bip      = (mld["PA"] - mld["BB"] - mld["IBB"] - mld["SO"] - mld["HR"]).clip(lower=0)
+    bip_rate = bip / mld["PA"]
+
+    # BABIP component: extra hits per PA * hit scoring value * reliability weight
+    babip_pppa = mld["BABIP_delta"].fillna(0) * bip_rate * HIT_PTS * baseline_rel
+
+    # HRFB component: extra HRs per PA * HR scoring value, only where HR/FB exists
+    hrfb_has  = mld["HR/FB"].notna() & (mld["HR/FB"] > 0)
+    fb_est    = mld["HR"].where(hrfb_has, 0) / mld["HR/FB"].where(hrfb_has, 1)
+    hrfb_pppa = mld["HRFB_delta"].fillna(0) * (fb_est / mld["PA"]) * HR_PTS * baseline_rel
+    hrfb_pppa = hrfb_pppa.where(hrfb_has & mld["HRFB_delta"].notna(), 0)
+
+    mld["Luck_PPPA"]     = (babip_pppa + hrfb_pppa).where(mld["BABIP_delta"].notna())
+    mld["Luck_PPPA_pct"] = (
+        (mld["Luck_PPPA"] / mld["PPPA"] * 100)
+        .where(mld["PPPA"].notna() & (mld["PPPA"].abs() > 0.01))
+        .clip(lower=-200, upper=200)
+    )
 
     # ── Output ────────────────────────────────────────────────────────────────
     out_cols = [
@@ -196,6 +222,7 @@ def main() -> None:
         "BABIP", "BABIP_career", "BABIP_delta", "BABIP_delta_z",
         "HR/FB", "HRFB_career", "HRFB_delta", "HRFB_delta_z",
         "Luck_Score_raw", "Luck_Score",
+        "Luck_PPPA", "Luck_PPPA_pct",
         "PPPA", "PPPA_Z_SL",
     ]
     out = mld[[c for c in out_cols if c in mld.columns]].sort_values(
@@ -207,6 +234,12 @@ def main() -> None:
                 "HRFB_delta", "PPPA"]:
         if col in out.columns:
             out[col] = out[col].round(3)
+    for col in ["Luck_PPPA"]:
+        if col in out.columns:
+            out[col] = out[col].round(4)
+    for col in ["Luck_PPPA_pct"]:
+        if col in out.columns:
+            out[col] = out[col].round(1)
     for col in ["BABIP_delta_z", "HRFB_delta_z", "Luck_Score_raw", "Luck_Score", "PPPA_Z_SL"]:
         if col in out.columns:
             out[col] = out[col].round(2)
