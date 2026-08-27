@@ -17,7 +17,17 @@ Luck_Score = 0.60 × BABIP_delta_z + 0.40 × HRFB_delta_z
   Positive = lucky (better than career baseline + peers)
   Negative = unlucky
 
-Minimum PA filter: MIN_PA = 80 per season (same as main model floors).
+Minimum PA filter: MIN_PA = 150 per season — below this, single-season BABIP
+  is too noisy (r < 0.20 at 100 PA, improves toward ~0.50 at 400+ PA).
+
+Baseline reliability shrinkage: Luck_Score is multiplied by
+  min(Prior_Career_PA / PRIOR_PA_THRESH, 1.0), where Prior_Career_PA is the
+  sum of PA in all other qualifying seasons. When most of a player's career is
+  the current season, the leave-one-out baseline is thin and unreliable — the
+  shrinkage discounts the Luck_Score toward 0 rather than reporting a false
+  high/low. PRIOR_PA_THRESH = 300 (roughly 2 solid seasons).
+
+  Luck_Score_raw is the pre-shrinkage score; Luck_Score is the final value.
 
 Output: data/computed/babip_luck.csv
   One row per player-season. Sorted by PlayerId, Season.
@@ -36,8 +46,9 @@ ADV     = DATA / "fangraphs" / "missing_milb_data.csv"
 ADV2    = DATA / "fangraphs" / "ml_updated_data.csv"   # 2026 override
 OUT     = DATA / "computed"  / "babip_luck.csv"
 
-MIN_PA          = 80    # minimum PA for a season to qualify
-MIN_CAREER_SEAS = 2     # need at least 2 qualifying seasons to compute a baseline delta
+MIN_PA           = 150   # minimum PA per season — below this BABIP is too noisy
+MIN_CAREER_SEAS  = 2    # need at least 2 qualifying seasons to compute a baseline delta
+PRIOR_PA_THRESH  = 300  # prior-season PA for full baseline reliability (≈ 2 solid seasons)
 
 
 def _babip(df: pd.DataFrame) -> pd.Series:
@@ -82,9 +93,12 @@ def main() -> None:
     adv = pd.concat([adv[~adv["Season"].isin(adv2["Season"].unique())], adv2],
                     ignore_index=True)
 
-    # Null physically impossible HR/FB values
+    # Null physically impossible / extreme small-sample HR/FB values.
+    # > 1.0 is a FanGraphs denominator miscounting artifact.
+    # = 1.0 (100% HR/FB) is physically possible but only at tiny FB counts
+    # where it's pure noise; treating it as missing is safer.
     if "HR/FB" in adv.columns:
-        adv.loc[adv["HR/FB"] > 1.0, "HR/FB"] = np.nan
+        adv.loc[adv["HR/FB"] >= 1.0, "HR/FB"] = np.nan
 
     # Coerce PlayerId to string for join (mld uses int, adv uses str for recent players)
     mld["PlayerId"] = mld["PlayerId"].astype(str)
@@ -164,14 +178,24 @@ def main() -> None:
     luck[both]      = 0.60 * mld.loc[both, "BABIP_delta_z"] + 0.40 * mld.loc[both, "HRFB_delta_z"]
     luck[only_bab]  = mld.loc[only_bab, "BABIP_delta_z"]
     luck[only_hrfb] = mld.loc[only_hrfb, "HRFB_delta_z"]
-    mld["Luck_Score"] = luck
+    mld["Luck_Score_raw"] = luck
+
+    # ── Baseline reliability shrinkage ────────────────────────────────────────
+    # Prior_Career_PA = total career PA minus current season's PA.
+    # When current season dominates career PA, the leave-one-out baseline is
+    # thin and the delta is unreliable — shrink toward 0.
+    total_pa          = mld.groupby("PlayerId")["PA"].transform("sum")
+    mld["Prior_Career_PA"] = (total_pa - mld["PA"]).clip(lower=0)
+    baseline_rel      = (mld["Prior_Career_PA"] / PRIOR_PA_THRESH).clip(upper=1.0)
+    mld["Luck_Score"] = mld["Luck_Score_raw"] * baseline_rel
 
     # ── Output ────────────────────────────────────────────────────────────────
     out_cols = [
         "PlayerId", "Name", "Season", "Level", "Team", "Age", "PA",
+        "Prior_Career_PA",
         "BABIP", "BABIP_career", "BABIP_delta", "BABIP_delta_z",
         "HR/FB", "HRFB_career", "HRFB_delta", "HRFB_delta_z",
-        "Luck_Score",
+        "Luck_Score_raw", "Luck_Score",
         "PPPA", "PPPA_Z_SL",
     ]
     out = mld[[c for c in out_cols if c in mld.columns]].sort_values(
@@ -183,7 +207,7 @@ def main() -> None:
                 "HRFB_delta", "PPPA"]:
         if col in out.columns:
             out[col] = out[col].round(3)
-    for col in ["BABIP_delta_z", "HRFB_delta_z", "Luck_Score", "PPPA_Z_SL"]:
+    for col in ["BABIP_delta_z", "HRFB_delta_z", "Luck_Score_raw", "Luck_Score", "PPPA_Z_SL"]:
         if col in out.columns:
             out[col] = out[col].round(2)
 
@@ -192,7 +216,8 @@ def main() -> None:
     print(f"  BABIP populated    : {out['BABIP'].notna().sum():,}")
     print(f"  BABIP_delta populated: {out['BABIP_delta'].notna().sum():,}")
     print(f"  HRFB_delta populated : {out['HRFB_delta'].notna().sum():,}")
-    print(f"  Luck_Score populated : {out['Luck_Score'].notna().sum():,}")
+    print(f"  Luck_Score_raw populated : {out['Luck_Score_raw'].notna().sum():,}")
+    print(f"  Luck_Score populated     : {out['Luck_Score'].notna().sum():,}")
 
     # Sample: most lucky and most unlucky single seasons (min 200 PA)
     qualified = out[out["PA"] >= 200].dropna(subset=["Luck_Score"])
