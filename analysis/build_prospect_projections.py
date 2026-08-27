@@ -21,6 +21,14 @@ Distance metric mirrors find_career_comps() in build_player_comps.py:
     (included only when both prospect and comp have data)
   Weights from CAREER_FEATURES dict.
 
+Position-stratified comps: comps are restricted to the same positional category as
+the prospect (using FantasyPos from prospect_scores.csv). Falls back to the full pool
+when same-position eligible pool < MIN_POS_COMPS. Position career PA signals are then
+naturally embedded in the projection without a post-hoc multiplier.
+
+Positional mapping (comp pool -> PosCat):
+  C -> C | 1B -> 1B | 2B/IF -> 2B | 3B -> 3B | SS -> SS | LF/CF/RF/OF -> OF
+
 Run:
   python analysis/build_prospect_projections.py
 """
@@ -32,10 +40,12 @@ from pathlib import Path
 DATA      = Path(__file__).resolve().parent.parent / "data"
 POOL_PATH = DATA / "computed"  / "player_comps.csv"
 PS_PATH   = DATA / "rankings"  / "prospect_scores.csv"
+POS_PATH  = DATA / "api"       / "player_positions.csv"
 OUT_PATH  = DATA / "rankings"  / "prospect_projections.csv"
 
 N_COMPS      = 30   # comps per prospect
 MIN_EV_COMPS = 5    # minimum comps with MaxEV data to report MaxEV_proj
+MIN_POS_COMPS = 60  # minimum same-position eligible comps before falling back to full pool
 
 # Must match CAREER_FEATURES in build_player_comps.py
 CAREER_FEATURES = {
@@ -62,13 +72,33 @@ OPTIONAL = ["MaxEV_career", "EV90_career", "Chase_career", "ZContact_career"]
 MILB_PA_SHRINK_THRESH = 500
 
 
+_POS_MAP = {
+    "C": "C", "1B": "1B", "2B": "2B", "3B": "3B", "SS": "SS",
+    "LF": "OF", "CF": "OF", "RF": "OF", "OF": "OF",
+    "IF": "2B",  # generic infield -> 2B bucket
+}
+
+
 def main() -> None:
     pool = pd.read_csv(POOL_PATH)
     ps   = pd.read_csv(PS_PATH)
+    pos  = pd.read_csv(POS_PATH)
 
     # Pool eligible: must have all required career features
     eligible = pool.dropna(subset=REQUIRED).reset_index(drop=True)
     print(f"Pool: {len(pool):,} total  ->  {len(eligible):,} with required career features")
+
+    # Attach position category to the eligible pool
+    eligible = eligible.merge(pos, on="MLBAM_ID", how="left")
+    eligible["PosCat"] = eligible["Position"].map(_POS_MAP)
+    eligible_poscat = eligible["PosCat"].values  # (n_pool,)
+
+    # Count eligible comps per position category (for fallback threshold check)
+    pos_pool_counts = eligible["PosCat"].value_counts().to_dict()
+    print("Eligible comps by position:", {k: v for k, v in sorted(pos_pool_counts.items())})
+
+    # Prospect -> position lookup (FantasyPos from prospect_scores.csv)
+    ps_pos = ps.set_index("PlayerId")["FantasyPos"].to_dict()
 
     # Compute z-score params from eligible pool
     req_mu  = eligible[REQUIRED].mean().values.copy()       # (n_req,)
@@ -108,6 +138,8 @@ def main() -> None:
 
     records = []
     skipped = 0
+    n_pos_stratified = 0
+    n_fallback = 0
 
     for _, row in ps.iterrows():
         pid  = row["PlayerId"]
@@ -147,6 +179,17 @@ def main() -> None:
         # Exclude self
         self_idx = pool_pid_to_idx[pid]
         dist[self_idx] = np.inf
+
+        # Position-stratified comp selection: restrict to same PosCat when pool is large enough.
+        # Career length by position (C shortest, SS longest) is naturally embedded in the
+        # projection this way — no post-hoc multiplier needed.
+        prospect_pos = ps_pos.get(pid)
+        if prospect_pos and pos_pool_counts.get(prospect_pos, 0) >= MIN_POS_COMPS:
+            non_pos = eligible_poscat != prospect_pos
+            dist[non_pos] = np.inf
+            n_pos_stratified += 1
+        else:
+            n_fallback += 1
 
         # Top N comps
         top_idx   = np.argpartition(dist, N_COMPS)[:N_COMPS]
@@ -197,8 +240,10 @@ def main() -> None:
     out.to_csv(OUT_PATH, index=False)
 
     print(f"\nWrote {len(out):,} prospects  ({skipped} skipped — missing from pool or required features)")
-    print(f"  Career_PA_Proj non-null : {out['Career_PA_Proj'].notna().sum():,}")
-    print(f"  MaxEV_proj non-null     : {out['MaxEV_proj'].notna().sum():,}")
+    print(f"  Position-stratified comps : {n_pos_stratified:,}")
+    print(f"  Full-pool fallback        : {n_fallback:,}")
+    print(f"  Career_PA_Proj non-null   : {out['Career_PA_Proj'].notna().sum():,}")
+    print(f"  MaxEV_proj non-null       : {out['MaxEV_proj'].notna().sum():,}")
 
     # Sample output — top 25 by prospect rank
     ps_ranked = ps[["PlayerId", "Combined_Rank"]].merge(out, on="PlayerId")
