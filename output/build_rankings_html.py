@@ -454,7 +454,7 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-luck-col="PA" data-type="num">PA</th>
         <th class="num" data-luck-col="Prior_Career_PA" data-type="num" title="Career PA from prior seasons — drives baseline reliability">Prior PA</th>
         <th class="num" data-luck-col="BABIP" data-type="num">BABIP</th>
-        <th class="num" data-luck-col="BABIP_career" data-type="num">Career BA</th>
+        <th class="num" data-luck-col="BABIP_career" data-type="num" title="Career PA-weighted BABIP baseline (current season excluded)">Career BABIP</th>
         <th class="num" data-luck-col="BABIP_delta_z" data-type="num" title="BABIP vs career baseline, z-scored within Season+Level peers">BABIP Δz</th>
         <th class="num" data-luck-col="HRFB_delta_z" data-type="num" title="HR/FB vs career baseline, z-scored within Season+Level peers">HRFB Δz</th>
         <th class="num" data-luck-col="Luck_PPPA" data-type="num" title="Luck expressed in PPPA units (shown with % of season PPPA). BABIP deviation × BIP rate × 2.8 + HR/FB deviation × FB rate × 8, shrunk by prior PA reliability. Positive = lucky.">Luck PPPA</th>
