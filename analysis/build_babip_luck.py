@@ -141,18 +141,19 @@ def main() -> None:
         mld.loc[missing, "HR/FB"] = fill["HR/FB"].values
         mld.drop(columns=["_nname"], inplace=True)
 
-    # ── Career leave-one-out baselines (grouped by PlayerId + Level) ─────────
-    # Each season's baseline is the player's career average at that same level,
-    # excluding the current season — so level effects don't contaminate the delta.
-    # Requires >= MIN_CAREER_SEAS qualifying seasons at the same level.
+    # ── Career leave-one-out baselines (grouped by PlayerId) ─────────────────
+    # Cross-level career average: all qualifying seasons regardless of level.
+    # Level BABIP norms shift universally (better pitching/defense up the ladder),
+    # so the trend affects everyone equally and doesn't distort player comparisons.
+    # Using cross-level maximises coverage vs. same-level-only grouping.
+    # Requires >= MIN_CAREER_SEAS qualifying seasons total.
     valid_babip = mld[mld["BABIP"].notna()]
-    seas_count  = valid_babip.groupby(["PlayerId", "Level"])["Season"].count()
-    multi_keys  = seas_count[seas_count >= MIN_CAREER_SEAS].index  # MultiIndex (PlayerId, Level)
-    multi_mask  = valid_babip.set_index(["PlayerId", "Level"]).index.isin(multi_keys)
+    seas_count  = valid_babip.groupby("PlayerId")["Season"].count()
+    multi_pid   = seas_count[seas_count >= MIN_CAREER_SEAS].index
 
     babip_base = (
-        valid_babip[multi_mask]
-        .groupby(["PlayerId", "Level"], group_keys=False)
+        valid_babip[valid_babip["PlayerId"].isin(multi_pid)]
+        .groupby("PlayerId", group_keys=False)
         .apply(lambda g: _leave_one_out_avg(g, "BABIP"))
     )
     mld["BABIP_career"] = babip_base.reindex(mld.index)
@@ -160,13 +161,12 @@ def main() -> None:
 
     # HR/FB baseline (same grouping)
     valid_hrfb = mld[mld["HR/FB"].notna()]
-    seas_count_hrfb = valid_hrfb.groupby(["PlayerId", "Level"])["Season"].count()
-    multi_keys_hrfb = seas_count_hrfb[seas_count_hrfb >= MIN_CAREER_SEAS].index
-    multi_mask_hrfb = valid_hrfb.set_index(["PlayerId", "Level"]).index.isin(multi_keys_hrfb)
+    seas_count_hrfb = valid_hrfb.groupby("PlayerId")["Season"].count()
+    multi_pid_hrfb  = seas_count_hrfb[seas_count_hrfb >= MIN_CAREER_SEAS].index
 
     hrfb_base = (
-        valid_hrfb[multi_mask_hrfb]
-        .groupby(["PlayerId", "Level"], group_keys=False)
+        valid_hrfb[valid_hrfb["PlayerId"].isin(multi_pid_hrfb)]
+        .groupby("PlayerId", group_keys=False)
         .apply(lambda g: _leave_one_out_avg(g, "HR/FB"))
     )
     mld["HRFB_career"] = hrfb_base.reindex(mld.index)
