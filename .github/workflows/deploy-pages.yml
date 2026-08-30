@@ -6,6 +6,7 @@ on:
     paths:
       - 'data/rankings/prospect_scores.csv'
       - 'data/rankings/aaa_2026.csv'
+      - 'data/computed/babip_luck.csv'
       - 'output/build_rankings_html.py'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
