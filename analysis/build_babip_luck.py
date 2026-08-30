@@ -55,9 +55,10 @@ PRIOR_PA_THRESH  = 300  # prior-season PA for full baseline reliability (≈ 2 s
 # Luck_Score is already baseline_rel-shrunk, so thin-prior-PA seasons barely adjust.
 # α = 0.20: +2.5 SD lucky → 0.50x PA weight; +4 SD lucky → floor of 0.25x
 # Unlucky seasons (negative Luck_Score) get upweighted, capped at 1.50x
-LUCK_PA_ALPHA    = 0.20
-LUCK_PA_FLOOR    = 0.25  # very lucky seasons still contribute ≥25% of actual PA
-LUCK_PA_CEIL     = 1.50  # unlucky seasons upweighted by at most 50%
+LUCK_PA_ALPHA     = 0.20
+LUCK_PA_THRESHOLD = 1.0   # |Luck_Score| must exceed this to trigger any PA adjustment
+LUCK_PA_FLOOR     = 0.25  # very lucky seasons still contribute ≥25% of actual PA
+LUCK_PA_CEIL      = 1.50  # unlucky seasons upweighted by at most 50%
 
 # PPPA conversion constants
 # Hits from BABIP luck: weighted avg of 1B(2pts), 2B(4pts), 3B(6pts) in scoring system
@@ -226,9 +227,15 @@ def main() -> None:
     # ── Luck-adjusted effective PA ────────────────────────────────────────────
     # PA_luck_weight discounts lucky seasons so they contribute less when career
     # averages are computed downstream. Unlucky seasons get a modest upweight.
+    # Threshold gate: only fires when |Luck_Score| >= LUCK_PA_THRESHOLD (1.0 SD).
+    # Mild year-to-year fluctuations (< 1 SD) leave PA unchanged — prevents
+    # compounding of noise across many mildly-lucky career seasons.
     # Where Luck_Score is null (< 2 career seasons), PA_luck_weight = PA (no change).
-    luck_factor = (1.0 - LUCK_PA_ALPHA * mld["Luck_Score"]).clip(
-        lower=LUCK_PA_FLOOR, upper=LUCK_PA_CEIL
+    luck_factor = pd.Series(1.0, index=mld.index)
+    applies = mld["Luck_Score"].notna() & (mld["Luck_Score"].abs() >= LUCK_PA_THRESHOLD)
+    luck_factor[applies] = (
+        (1.0 - LUCK_PA_ALPHA * mld.loc[applies, "Luck_Score"])
+        .clip(lower=LUCK_PA_FLOOR, upper=LUCK_PA_CEIL)
     )
     mld["PA_luck_weight"] = (mld["PA"] * luck_factor).where(
         mld["Luck_Score"].notna(), mld["PA"]
