@@ -58,7 +58,7 @@ PRIOR_PA_THRESH  = 300  # prior-season PA for full baseline reliability (≈ 2 s
 LUCK_PA_ALPHA     = 0.20
 LUCK_PA_THRESHOLD = 1.0   # |Luck_Score| must exceed this to trigger any PA adjustment
 LUCK_PA_FLOOR     = 0.25  # very lucky seasons still contribute ≥25% of actual PA
-LUCK_PA_CEIL      = 1.50  # unlucky seasons upweighted by at most 50%
+LUCK_PA_CEIL      = 1.00  # never upweight unlucky seasons — only discount lucky ones
 
 # PPPA conversion constants
 # Hits from BABIP luck: weighted avg of 1B(2pts), 2B(4pts), 3B(6pts) in scoring system
@@ -226,7 +226,9 @@ def main() -> None:
 
     # ── Luck-adjusted effective PA ────────────────────────────────────────────
     # PA_luck_weight discounts lucky seasons so they contribute less when career
-    # averages are computed downstream. Unlucky seasons get a modest upweight.
+    # averages are computed downstream. Unlucky seasons are NOT upweighted (cap=1.0)
+    # — only discounting lucky outliers, avoiding compositional rank redistribution
+    # of neutral players caused by upweighting others.
     # Threshold gate: only fires when |Luck_Score| >= LUCK_PA_THRESHOLD (1.0 SD).
     # Mild year-to-year fluctuations (< 1 SD) leave PA unchanged — prevents
     # compounding of noise across many mildly-lucky career seasons.
