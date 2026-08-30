@@ -50,6 +50,15 @@ MIN_PA           = 150   # minimum PA per season — below this BABIP is too noi
 MIN_CAREER_SEAS  = 2    # need at least 2 qualifying seasons to compute a baseline delta
 PRIOR_PA_THRESH  = 300  # prior-season PA for full baseline reliability (≈ 2 solid seasons)
 
+# Luck-adjusted PA weighting
+# Discount effective PA for lucky seasons so they pull the career average less.
+# Luck_Score is already baseline_rel-shrunk, so thin-prior-PA seasons barely adjust.
+# α = 0.20: +2.5 SD lucky → 0.50x PA weight; +4 SD lucky → floor of 0.25x
+# Unlucky seasons (negative Luck_Score) get upweighted, capped at 1.50x
+LUCK_PA_ALPHA    = 0.20
+LUCK_PA_FLOOR    = 0.25  # very lucky seasons still contribute ≥25% of actual PA
+LUCK_PA_CEIL     = 1.50  # unlucky seasons upweighted by at most 50%
+
 # PPPA conversion constants
 # Hits from BABIP luck: weighted avg of 1B(2pts), 2B(4pts), 3B(6pts) in scoring system
 # Using typical MiLB distribution ~65% singles, ~28% doubles, ~7% triples → ≈2.85; rounded to 2.8
@@ -214,6 +223,17 @@ def main() -> None:
     baseline_rel       = (mld["Prior_Career_PA"] / PRIOR_PA_THRESH).clip(upper=1.0)
     mld["Luck_Score"]  = mld["Luck_Score_raw"] * baseline_rel
 
+    # ── Luck-adjusted effective PA ────────────────────────────────────────────
+    # PA_luck_weight discounts lucky seasons so they contribute less when career
+    # averages are computed downstream. Unlucky seasons get a modest upweight.
+    # Where Luck_Score is null (< 2 career seasons), PA_luck_weight = PA (no change).
+    luck_factor = (1.0 - LUCK_PA_ALPHA * mld["Luck_Score"]).clip(
+        lower=LUCK_PA_FLOOR, upper=LUCK_PA_CEIL
+    )
+    mld["PA_luck_weight"] = (mld["PA"] * luck_factor).where(
+        mld["Luck_Score"].notna(), mld["PA"]
+    )
+
     # ── PPPA conversion ───────────────────────────────────────────────────────
     # Express luck in PPPA units so magnitude is intuitive.
     # BIP_rate = balls in play per PA
@@ -239,7 +259,7 @@ def main() -> None:
     # ── Output ────────────────────────────────────────────────────────────────
     out_cols = [
         "PlayerId", "Name", "Season", "Level", "Team", "Age", "PA",
-        "Prior_Career_PA",
+        "Prior_Career_PA", "PA_luck_weight",
         "BABIP", "BABIP_career", "BABIP_delta", "BABIP_delta_z",
         "BABIP_Delta_Slope",
         "HR/FB", "HRFB_career", "HRFB_delta", "HRFB_delta_z",

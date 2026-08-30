@@ -61,6 +61,7 @@ OVR_PATH      = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
 OUT_PATH      = DATA_DIR / "rankings" / "prospect_scores.csv"
 HIT_PATH      = DATA_DIR / "api" / "milb_hitting.csv"
 POS_PATH      = DATA_DIR / "api" / "player_positions.csv"
+LUCK_PATH     = DATA_DIR / "computed" / "babip_luck.csv"
 
 # Discipline gate — applied post-blend to Combined_Score.
 # Thresholds are percentile cutoffs applied to disc_composite_z (z-scored within pool).
@@ -111,17 +112,20 @@ def _norm(s) -> str:
     return "".join(c for c in s if unicodedata.category(c) != "Mn").strip()
 
 
-def _wt_avg_shrunk(df: pd.DataFrame, score_col: str, threshold) -> pd.Series:
+def _wt_avg_shrunk(df: pd.DataFrame, score_col: str, threshold,
+                   wt_col: str = "wt") -> pd.Series:
     """Compute PA-weighted career average with per-level shrinkage toward 50.
 
     threshold: int (flat) or dict {Level -> int} for level-tiered thresholds.
-    career avg weighting uses AAA-equiv PA (level_den); shrinkage uses raw PA.
+    wt_col: column to use for career avg weighting (default "wt" = PA × level_wt).
+            Pass "wt_luck" to use luck-adjusted effective PA × level_wt instead.
+    Shrinkage always uses raw PA regardless of wt_col.
     """
-    valid = df[["PlayerId", "Level", score_col, "wt", "PA"]].dropna(subset=[score_col]).copy()
-    valid["_wtd"] = valid[score_col] * valid["wt"]
+    valid = df[["PlayerId", "Level", score_col, wt_col, "PA"]].dropna(subset=[score_col]).copy()
+    valid["_wtd"] = valid[score_col] * valid[wt_col]
 
     lgrp         = valid.groupby(["PlayerId", "Level"], observed=True)
-    level_den    = lgrp["wt"].sum()       # AAA-equiv PA — weights career avg blend
+    level_den    = lgrp[wt_col].sum()     # equiv PA — weights career avg blend
     level_raw_pa = lgrp["PA"].sum()       # raw PA — drives shrinkage
     level_num    = lgrp["_wtd"].sum()
     level_avg    = level_num / level_den
@@ -165,6 +169,23 @@ def main() -> None:
     scores = tools.merge(ability, on=["PlayerId", "Season", "Level"], how="left")
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
+
+    # Join luck-adjusted PA weights from babip_luck.csv.
+    # PA_luck_weight discounts lucky seasons (high BABIP/HR-FB vs career baseline)
+    # so they pull the ABILITY career average less. Rows without a luck score
+    # (< 2 career qualifying seasons) retain PA as-is (no adjustment).
+    if LUCK_PATH.exists():
+        luck = pd.read_csv(
+            LUCK_PATH,
+            usecols=["PlayerId", "Season", "Level", "PA_luck_weight"],
+        )
+        luck["PlayerId"] = luck["PlayerId"].astype(scores["PlayerId"].dtype)
+        scores = scores.merge(luck, on=["PlayerId", "Season", "Level"], how="left")
+        scores["PA_luck_weight"] = scores["PA_luck_weight"].fillna(scores["PA"])
+    else:
+        scores["PA_luck_weight"] = scores["PA"]
+    scores["wt_luck"] = scores["PA_luck_weight"] * scores["level_wt"]
+
     print(f"Loaded {len(scores):,} player-season rows")
 
     # MLB exclusion sets
@@ -205,7 +226,7 @@ def main() -> None:
     # Career-average scores with per-level shrinkage
     hist        = scores[scores["PlayerId"].isin(pool["PlayerId"])]
     tools_avg   = _wt_avg_shrunk(hist, "TOOLS_Score",   TOOLS_PA_THRESH)
-    ability_avg = _wt_avg_shrunk(hist, "ABILITY_Score", ABILITY_PA_THRESH)
+    ability_avg = _wt_avg_shrunk(hist, "ABILITY_Score", ABILITY_PA_THRESH, wt_col="wt_luck")
     total_wpa   = hist.groupby("PlayerId")["wt"].sum().rename("Total_Weighted_PA")
     career_pa   = hist.groupby("PlayerId")["PA"].sum().rename("Career_PA")
     last_season = hist.groupby("PlayerId")["Season"].max().rename("Last_Season")
