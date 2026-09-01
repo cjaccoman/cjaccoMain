@@ -70,6 +70,35 @@ aaa_records = [
 raw_aaa = json.dumps(aaa_records, separators=(",", ":"))
 print(f"AAA 2026: {len(aaa_records)} players")
 
+# ── Pitcher data ─────────────────────────────────────────────────────────────
+_pitcher_path = DATA_DIR / "rankings" / "pitcher_scores.csv"
+if _pitcher_path.exists():
+    pit = pd.read_csv(_pitcher_path, dtype={"PlayerId": str})
+    for c in ["STUFF_Score", "PERFORMANCE_Score", "Age_Score",
+              "Current_Score", "OVR_Score", "Combined_Score"]:
+        if c in pit.columns:
+            pit[c] = pit[c].round(1)
+    pit["Age"] = pit["Age"].fillna("").astype(str).str.replace(".0", "", regex=False)
+    pit["Career_IP"] = pit["Career_IP"].round(1)
+    pit_cols = ["Combined_Rank", "SP_Rank", "RP_Rank", "Name", "Team", "Level", "Age", "Role",
+                "Career_IP", "Career_G", "Career_GS",
+                "STUFF_Score", "PERFORMANCE_Score", "Age_Score",
+                "Current_Score", "OVR_Score", "Combined_Score"]
+    pit_cols = [c for c in pit_cols if c in pit.columns]
+    sp_df = pit[pit["Role"] == "SP"].copy()
+    rp_df = pit[pit["Role"] == "RP"].copy()
+    raw_sp = json.dumps(
+        [{k: _to_json_val(row[k]) for k in pit_cols if k in sp_df.columns}
+         for _, row in sp_df.iterrows()], separators=(",", ":"))
+    raw_rp = json.dumps(
+        [{k: _to_json_val(row[k]) for k in pit_cols if k in rp_df.columns}
+         for _, row in rp_df.iterrows()], separators=(",", ":"))
+    print(f"SP prospects: {len(sp_df)} | RP prospects: {len(rp_df)}")
+else:
+    raw_sp = "[]"
+    raw_rp = "[]"
+    print("pitcher_scores.csv not found — SP/RP tabs will be empty")
+
 # ── Luck tracker data ────────────────────────────────────────────────────────
 luck_df = pd.read_csv(DATA_DIR / "computed" / "babip_luck.csv")
 luck_df["PlayerId"] = luck_df["PlayerId"].astype(str)
@@ -309,6 +338,8 @@ tbody tr:hover{background:var(--row-hover)}
 <!-- ══ Tab bar ══ -->
 <div class="tab-bar">
   <button class="tab-btn active" data-tab="prospects">Prospects</button>
+  <button class="tab-btn" data-tab="sp">SP Prospects</button>
+  <button class="tab-btn" data-tab="rp">RP Prospects</button>
   <button class="tab-btn" data-tab="aaa">AAA 2026</button>
   <button class="tab-btn" data-tab="luck">Luck Tracker</button>
 </div>
@@ -361,6 +392,78 @@ tbody tr:hover{background:var(--row-hover)}
         <th data-col="Career_Disc_Flag" data-type="str">Career Flag</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ SP Prospects panel ══ -->
+<div class="panel" id="panel-sp">
+  <div class="controls">
+    <span class="controls-title">SP Prospects 2026</span>
+    <span class="controls-count" id="sp-count"></span>
+    <input type="search" id="sp-search" placeholder="Search pitcher…" autocomplete="off" />
+    <select id="sp-team-filter"><option value="">All teams</option></select>
+    <select id="sp-level-filter">
+      <option value="">All levels</option>
+      <option>R</option><option>A</option><option>A+</option>
+      <option>AA</option><option>AAA</option>
+    </select>
+    <div class="spacer"></div>
+    <button class="clear-btn" id="sp-clear-btn">Clear</button>
+  </div>
+  <div class="table-wrap">
+    <table id="sp-table">
+      <thead><tr>
+        <th class="num" data-sp-col="SP_Rank" data-type="num">Rank</th>
+        <th data-sp-col="Name" data-type="str">Name</th>
+        <th data-sp-col="Team" data-type="str">Team</th>
+        <th data-sp-col="Level" data-type="level">Level</th>
+        <th class="num" data-sp-col="Age" data-type="num">Age</th>
+        <th class="num" data-sp-col="Career_IP" data-type="num">Career IP</th>
+        <th class="num" data-sp-col="STUFF_Score" data-type="num">STUFF</th>
+        <th class="num" data-sp-col="PERFORMANCE_Score" data-type="num">PERF</th>
+        <th class="num" data-sp-col="Age_Score" data-type="num">Age</th>
+        <th class="num" data-sp-col="Current_Score" data-type="num">Current</th>
+        <th class="num" data-sp-col="OVR_Score" data-type="num">OVR</th>
+        <th class="num" data-sp-col="Combined_Score" data-type="num">Combined</th>
+      </tr></thead>
+      <tbody id="sp-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ RP Prospects panel ══ -->
+<div class="panel" id="panel-rp">
+  <div class="controls">
+    <span class="controls-title">RP Prospects 2026</span>
+    <span class="controls-count" id="rp-count"></span>
+    <input type="search" id="rp-search" placeholder="Search pitcher…" autocomplete="off" />
+    <select id="rp-team-filter"><option value="">All teams</option></select>
+    <select id="rp-level-filter">
+      <option value="">All levels</option>
+      <option>R</option><option>A</option><option>A+</option>
+      <option>AA</option><option>AAA</option>
+    </select>
+    <div class="spacer"></div>
+    <button class="clear-btn" id="rp-clear-btn">Clear</button>
+  </div>
+  <div class="table-wrap">
+    <table id="rp-table">
+      <thead><tr>
+        <th class="num" data-rp-col="RP_Rank" data-type="num">Rank</th>
+        <th data-rp-col="Name" data-type="str">Name</th>
+        <th data-rp-col="Team" data-type="str">Team</th>
+        <th data-rp-col="Level" data-type="level">Level</th>
+        <th class="num" data-rp-col="Age" data-type="num">Age</th>
+        <th class="num" data-rp-col="Career_IP" data-type="num">Career IP</th>
+        <th class="num" data-rp-col="STUFF_Score" data-type="num">STUFF</th>
+        <th class="num" data-rp-col="PERFORMANCE_Score" data-type="num">PERF</th>
+        <th class="num" data-rp-col="Age_Score" data-type="num">Age</th>
+        <th class="num" data-rp-col="Current_Score" data-type="num">Current</th>
+        <th class="num" data-rp-col="OVR_Score" data-type="num">OVR</th>
+        <th class="num" data-rp-col="Combined_Score" data-type="num">Combined</th>
+      </tr></thead>
+      <tbody id="rp-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -618,6 +721,94 @@ document.querySelector('th[data-col="Combined_Rank"]').classList.add('sort-asc')
 applyFilters();
 
 /* ════════════════════════════════════════════
+   PITCHER TABS (SP + RP)
+   ════════════════════════════════════════════ */
+const SP_RAW = SP_DATA_PLACEHOLDER;
+const RP_RAW = RP_DATA_PLACEHOLDER;
+
+function makePitcherTab(RAW, prefix, rankCol){
+  let sortCol=rankCol, sortDir=1, filtered=RAW.slice();
+
+  const tf=document.getElementById(prefix+'-team-filter');
+  [...new Set(RAW.map(r=>r.Team))].sort().forEach(t=>{
+    const o=document.createElement('option');o.value=t;o.textContent=t;tf.appendChild(o);
+  });
+
+  function renderPit(){
+    const tbody=document.getElementById(prefix+'-tbody');
+    document.getElementById(prefix+'-count').textContent=filtered.length.toLocaleString()+' pitchers';
+    if(!filtered.length){
+      tbody.innerHTML='<tr><td colspan="12" class="no-results">No pitchers match.</td></tr>';
+      return;
+    }
+    tbody.innerHTML=filtered.map(r=>`<tr>
+      <td class="rank">${r[rankCol]??'—'}</td>
+      <td class="name">${r.Name}</td>
+      <td>${r.Team}</td>
+      <td><span class="${lclass(r.Level)}">${r.Level}</span></td>
+      <td class="num">${r.Age}</td>
+      <td class="num">${r.Career_IP!=null?(+r.Career_IP).toFixed(1):'—'}</td>
+      <td class="num">${r.STUFF_Score!=null?bar(r.STUFF_Score):''}</td>
+      <td class="num">${r.PERFORMANCE_Score!=null?bar(r.PERFORMANCE_Score):''}</td>
+      <td class="num">${r.Age_Score!=null?bar(r.Age_Score):''}</td>
+      <td class="num">${r.Current_Score!=null?bar(r.Current_Score):''}</td>
+      <td class="num">${r.OVR_Score!=null?bar(r.OVR_Score):''}</td>
+      <td class="num">${r.Combined_Score!=null?bar(r.Combined_Score):''}</td>
+    </tr>`).join('');
+  }
+
+  function applyFilters(){
+    const q=document.getElementById(prefix+'-search').value.trim().toLowerCase();
+    const team=document.getElementById(prefix+'-team-filter').value;
+    const lvl=document.getElementById(prefix+'-level-filter').value;
+    filtered=RAW.filter(r=>{
+      if(q&&!r.Name.toLowerCase().includes(q))return false;
+      if(team&&r.Team!==team)return false;
+      if(lvl&&r.Level!==lvl)return false;
+      return true;
+    });
+    doSort();
+  }
+
+  function doSort(){
+    const type=document.querySelector(`th[data-${prefix}-col="${sortCol}"]`)?.dataset.type;
+    filtered.sort((a,b)=>{
+      let av=a[sortCol],bv=b[sortCol];
+      if(type==='level'){av=LVL[av]||0;bv=LVL[bv]||0;}
+      if(type==='str')return sortDir*String(av||'').localeCompare(String(bv||''));
+      return sortDir*((av??Infinity)-(bv??Infinity));
+    });
+    renderPit();
+  }
+
+  document.querySelectorAll(`th[data-${prefix}-col]`).forEach(th=>{
+    th.addEventListener('click',()=>{
+      const col=th.dataset[prefix+'Col']||(prefix==='sp'?th.dataset.spCol:th.dataset.rpCol);
+      sortDir=(sortCol===col)?-sortDir:(col===rankCol?1:-1);
+      sortCol=col;
+      document.querySelectorAll(`th[data-${prefix}-col]`).forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+      th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+      doSort();
+    });
+  });
+
+  [prefix+'-search',prefix+'-team-filter',prefix+'-level-filter'].forEach(id=>{
+    document.getElementById(id).addEventListener(id.endsWith('-search')?'input':'change',applyFilters);
+  });
+  document.getElementById(prefix+'-clear-btn').addEventListener('click',()=>{
+    document.getElementById(prefix+'-search').value='';
+    [prefix+'-team-filter',prefix+'-level-filter'].forEach(id=>{ document.getElementById(id).value=''; });
+    applyFilters();
+  });
+  const rankTh=document.querySelector(`th[data-${prefix}-col="${rankCol}"]`);
+  if(rankTh)rankTh.classList.add('sort-asc');
+  applyFilters();
+}
+
+if(SP_RAW.length) makePitcherTab(SP_RAW,'sp','SP_Rank');
+if(RP_RAW.length) makePitcherTab(RP_RAW,'rp','RP_Rank');
+
+/* ════════════════════════════════════════════
    AAA 2026 TAB
    ════════════════════════════════════════════ */
 const AAA_RAW = AAA_DATA_PLACEHOLDER;
@@ -858,6 +1049,8 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 
 html = HTML \
     .replace('PROSPECTS_DATA_PLACEHOLDER', raw) \
+    .replace('SP_DATA_PLACEHOLDER', raw_sp) \
+    .replace('RP_DATA_PLACEHOLDER', raw_rp) \
     .replace('AAA_DATA_PLACEHOLDER', raw_aaa) \
     .replace('LUCK_DATA_PLACEHOLDER', raw_luck)
 

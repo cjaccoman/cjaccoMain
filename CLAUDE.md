@@ -61,6 +61,9 @@ Added best-season K% and peer-relative PPPA (PPPA_Z_SL_best) as arc features to 
 ### v0.6 — AAA Rankings & SB Translation Analysis
 Added `build_aaa_rankings.py` (ProspectSavant-based AAA power rankings) and `sb_translation_analysis.py` (chained level-to-level SB discount factors). 2023+ era chained factors (normalized AAA=1.0): AA=0.84, A+=0.71, A=0.57, R=0.39. These became the PPPA_Score level weights in Phase 3. Also added `build_rk_rankings.py` for Rookie ball. **Superseded in v1.0**: level discounts rederived from Skill_PPPA full-population study (`analysis/skill_pppa_translation.py`); see current values below.
 
+### v1.1 — Pitcher Rankings (August 2026)
+Added complete pitcher prospect scoring system with separate SP and RP rankings. Two new composites mirroring the hitter model: STUFF_Score (raw stuff / physical skills) and PERFORMANCE_Score (demonstrated production). Data fetched via MLB Stats API pitching endpoints. Key design decisions: age cutoff ≤ 25 (vs. ≤ 24 for hitters); IP shrinkage thresholds STUFF=167 IP, PERFORMANCE=120 IP; level discounts same as hitters; no pool re-standardization after career averaging (avoids double-standardization amplification). New files: `fetch/fetch_milb_pitching.py`, `pipeline/build_pitcher_features.py`, `pipeline/build_pitcher_scores.py`, `data/api/milb_pitching.csv`, `data/api/milb_pitching_advanced.csv`, `data/rankings/pitcher_features.csv`, `data/rankings/pitcher_scores.csv`.
+
 ### v1.0 — Overhaul: TOOLS_Score + ABILITY_Score (August 2026)
 **Complete replacement of Phase 1–4 scoring.** The old Skill_Score, MLB_Proj_Score, PPPA_Score, and Age_Score are all retired. New model is two complementary composites — TOOLS (physical skills, era+level normalized) and ABILITY (demonstrated production) — blended with a PA-weighted OVR trajectory score. Era analysis derived empirically from MLB outcome data (2006–2026). Full details below.
 
@@ -317,6 +320,8 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 |------|-------------|
 | `milb_hitting.csv` | Raw counting stats from MLB Stats API (2006–2026, PA ≥ 10, Age ≤ 26) |
 | `milb_advanced.csv` | Rate/batted ball stats from API seasonAdvanced endpoint; includes Whiff% (swingAndMisses/totalSwings, all levels) and SwStr% (swingAndMisses/numberOfPitches) |
+| `milb_pitching.csv` | Raw pitching counting stats from MLB Stats API (2006–2026, IP ≥ 10, Age ≤ 26): G, GS, IP, ER, K, BB, HRA, W, L, SV, HLD, BS, CG, SHO, QS, WP |
+| `milb_pitching_advanced.csv` | Rate/batted ball stats from pitching seasonAdvanced endpoint: K%, BB%, K-BB%, Whiff%, BABIP, GB%, LD%, FB%, GB/FB, QS |
 | `milb_pitches_agg.csv` | Aggregated pitch-level metrics from game feeds: Chase%, Z-Contact% (AAA 2023–2026), PullAir% (all levels/seasons). **Whiff% column is broken — all 7,860 non-null rows are 0 (never computed). Do not use; `milb_advanced.csv` is authoritative for Whiff%.** |
 | `milb_pitches_games.csv` | Raw game-level pitch cache (one row per player × game) |
 | `milb_statcast_aaa.csv` | Baseball Savant statcast data for AAA |
@@ -352,6 +357,8 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `prospect_features.csv` | One row per player-season-level; all raw inputs for TOOLS/ABILITY scoring. Includes `career_FBs_est` (total career FB estimate across all qualifying seasons) and `prior_FBs_est` (same, excluding this row's own season — used for fallback-tier HRFB shrinkage in build_tools_score.py). |
 | `tools_scores.csv` | Per-player-season TOOLS_Score (standardized to 50±10) |
 | `ability_scores.csv` | Per-player-season ABILITY_Score (standardized to 50±10) |
+| `pitcher_features.csv` | One row per pitcher-season-level; raw inputs for STUFF/PERFORMANCE scoring: ERA, K%, BB%, K-BB%, Whiff%, GB%, PPI_skill, era labels, era-adjusted z-scores. |
+| `pitcher_scores.csv` | Current 2026 pitcher prospect pool: 1,258 SP + 2,491 RP. Columns: STUFF_Score, PERFORMANCE_Score, Age_Score, Current_Score, OVR_Score, Combined_Score, SP_Rank/RP_Rank. |
 | `archetype_labels.csv` | Prospect archetype assignments |
 | `prospect_scores_ovr.csv` | All-time OVR scores (2006+, all prospects including graduates) |
 | `prospect_scores.csv` | Current 2026 prospect pool scores + Combined_Score + dynasty positional adjustment columns (`FantasyPos`, `Pos_Bonus`, `Pos_Adj_Score`, `Pos_Adj_Rank`) |
@@ -412,13 +419,18 @@ pipeline/build_archetypes.py              # Assign archetype labels
 pipeline/build_prospect_scores.py         # Aggregate current-pool scores → prospect_scores.csv
 output/build_aaa_rankings.py              # 2026 AAA power rankings → aaa_2026.csv
 output/build_rk_rankings.py              # 2026 Rookie rankings → rk_2026.csv
-output/build_rankings_html.py            # Build HTML artifact (prospects + AAA tabs)
+output/build_rankings_html.py            # Build HTML artifact (prospects + AAA + SP + RP tabs)
+
+# Pitcher pipeline (run after hitter pipeline)
+pipeline/build_pitcher_features.py        # Build pitcher_features.csv (STUFF/PERFORMANCE input features)
+pipeline/build_pitcher_scores.py          # Aggregate current-pool pitcher scores → pitcher_scores.csv
 ```
 
 ### Data Fetch / Refresh (run independently)
 
 ```
 fetch/fetch_milb_data.py               # Refresh milb_hitting.csv + milb_advanced.csv from MLB Stats API
+fetch/fetch_milb_pitching.py           # Refresh milb_pitching.csv + milb_pitching_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitches.py            # Refresh milb_pitches_agg.csv (incremental by default)
 fetch/fetch_milb_statcast.py           # Refresh milb_statcast_aaa.csv from Baseball Savant
 fetch/fetch_prospectsavant.py          # Refresh data/prospectSavant/ CSV files
@@ -450,6 +462,61 @@ cards/regen_all_cards.py               # Regenerate all existing PNG cards in Pl
 **Card output:** `~/Documents/prospectFiles/PlayerCards/2026/{Team}/{Name}.png`
 **Graduated players:** Moved to `PlayerCards/2026/Graduated/{Level}/` subfolders.
 **Skip list in `cards/regen_all_cards.py`:** Henry Bolte, Travis Bazzana.
+
+---
+
+## Pitcher Model (v1.1)
+
+### Pitching Fantasy Scoring Formula
+
+`TP_pit = 5×W − 3×L − 1×ER − 2×HR + 2×K − 0.5×BB + 0.75×IP + 4.25×CG + 4×SHO + 5×SV + 3×HLD − 3×BS + 2.5×QS + 1×RW − 1×RL`
+
+**PPI_skill** (controllable rate points per inning): `2×K/IP − 0.5×BB/IP − 1×ER/IP − 2×HRA/IP + 0.75`
+
+### Architecture
+
+Same structure as hitter model:
+```
+Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
+Current_Score  = 0.30 × STUFF_Score + 0.50 × PERFORMANCE_Score + 0.20 × Age_Score
+OVR_Score      = 0.40 × STUFF_OVR + 0.40 × PERF_OVR + 0.20 × Slope_Score
+```
+
+### STUFF_Score (raw physical skills)
+
+**Weights:** K/Whiff composite (45%) + −BB% command (35%) + GB% (20%)
+
+- K/Whiff composite: `0.5×K%_adj + 0.5×Whiff%_adj`
+- Command: `−BB%_adj` (inverted — lower BB% = better)
+- Contact mgmt: `GB%_adj`
+
+Age adjustment: each component × (1 + 0.20 × −Age_Z_SL), clipped ±2 SD.
+
+### PERFORMANCE_Score (demonstrated production)
+
+**Weights:** ERA_adj (40%) + KBB_adj (30%) + PPI_adj (30%)
+
+- ERA_adj: inverted (lower ERA = better)
+- KBB_adj: K-BB% era-adjusted z-score
+- PPI_adj: PPI_skill era-adjusted z-score
+
+Age adjustment: same as STUFF.
+
+### Key Differences from Hitter Model
+
+- **No pool re-standardization**: career averages are already on 50±10 scale from per-row standardization. Re-standardizing within the current pool would double-standardize and amplify outliers (shrinkage compresses the career distribution; pool re-standardization then over-expands it). Hitter model also does this but with a smaller, more selective current pool — the effect is milder there.
+- **IP shrinkage thresholds**: STUFF=167 IP (~1 full SP season), PERFORMANCE=120 IP.
+- **Age cutoff**: ≤ 25 (vs. ≤ 24 for hitters).
+- **Role determination**: SP if GS/G ≥ 0.5 in most recent qualifying season.
+- **IP parsing**: MLB Stats API returns IP as "45.2" where ".2" = 2 outs = 2/3 IP. `parse_ip("45.2") → 45.667`.
+- **QS availability**: only in `seasonAdvanced` endpoint, not `season`. Both endpoints are fetched per season×level.
+
+### Data Sources
+
+- `milb_pitching.csv`: counting stats (IP, K, BB, ER, HRA, W, L, SV, HLD, BS, CG, SHO, QS, WP, G, GS, BF, H, HBP, IBB, SVO).
+- `milb_pitching_advanced.csv`: rate stats (K%, BB%, K-BB%, Whiff%, BABIP, GB%, LD%, FB%, GB/FB, QS).
+- Era labels: same MLB-derived breaks (K%: 2015; HR/FB: 2016, 2022; PPPA: 2010, 2021).
+- Level discounts: same as hitters (AAA=1.00, AA=0.59, A+=0.34, A=0.23, R=0.10).
 
 ---
 
