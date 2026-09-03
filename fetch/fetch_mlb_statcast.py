@@ -1,20 +1,29 @@
 """Fetch season-by-season MLB Statcast data from Baseball Savant leaderboards.
 
-Pulls five endpoints per season and merges into one wide file:
+Pulls seven endpoints per season and merges into one wide file:
   1. Statcast EV leaderboard  — MaxEV, AvgEV, EV50, Barrel%, SweetSpot%, EV95%
   2. Expected stats            — xBA, xSLG, xwOBA (and actual deltas), PA, BIP
   3. Sprint speed              — SprintSpeed, Bolts, HP_to_1B          (2015+)
   4. Outs above average        — OAA, FieldingRunsPrevented, directional OAA (2016+)
   5. Arm strength              — MaxArmStrength, ArmOverall, by position (2020+)
+  6. Swing-take                — run values by zone: heart/shadow/chase/waste (2015+)
+  7. Percentile rankings       — 0–100 percentile ranks for 22 Statcast metrics (2015+)
+                                 (xwOBA, xBA, xSLG, Brl%, HardHit%, Chase%, Whiff%,
+                                  K%, BB%, SprintSpeed, OAA, AvgEV, MaxEV,
+                                  BatSpeed, SquaredUp, SwingLength, ArmStrength, etc.)
+                                 NOTE: values are percentile ranks (0–100), not raw stats.
 
 Plus one career-aggregate pull (year param ignored — always same data):
-  6. Bat tracking              — AvgBatSpeed, SwingLength, HardSwing%, etc.
+  8. Bat tracking              — AvgBatSpeed, SwingLength, HardSwing%, etc.
 
 Coverage per endpoint:
-  EV / xStats / Sprint speed : 2015–current
-  OAA                        : 2016–current
-  Arm strength               : 2020–current
-  Bat tracking               : career aggregate only
+  EV / xStats / Sprint speed / Swing-take / Percentile rankings : 2015–current
+  OAA                                                            : 2016–current
+  Arm strength                                                   : 2020–current
+  Bat tracking                                                   : career aggregate only
+
+Note: "hardhit" and "exit-velocity-barrels" Savant pages are filtered views of the
+EV leaderboard — not separate endpoints. ev95percent = Hard Hit%, brl_percent = Brl%.
 
 Outputs:
   data/api/mlb_statcast.csv      — one row per player × season (2015–current)
@@ -73,6 +82,16 @@ URL_OAA = (
 URL_ARM = (
     "https://baseballsavant.mlb.com/leaderboard/arm-strength"
     "?year={year}&min=0&csv=true"
+)
+URL_SWINGTAKE = (
+    "https://baseballsavant.mlb.com/leaderboard/swing-take"
+    "?year={year}&min=0&csv=true"
+    # NOTE: do NOT pass type=batter — that returns empty. Omitting type returns batters.
+)
+URL_PCTRANKS = (
+    "https://baseballsavant.mlb.com/leaderboard/percentile-rankings"
+    "?type=batter&year={year}&min=0&csv=true"
+    # Returns 0–100 percentile ranks (not raw stats) for ~22 Statcast metrics.
 )
 URL_BATTRACK = (
     "https://baseballsavant.mlb.com/leaderboard/bat-tracking"
@@ -238,6 +257,59 @@ def parse_arm(df: pd.DataFrame, year: int) -> pd.DataFrame:
     return df[[c for c in keep if c in df.columns]]
 
 
+def parse_swingtake(df: pd.DataFrame, year: int) -> pd.DataFrame:
+    """Parse swing-take run values by pitch zone."""
+    df = df.copy()
+    df["Season"]   = year
+    df["MLBAM_ID"] = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
+
+    rename = {
+        "pa":           "ST_PA",
+        "pitches":      "ST_Pitches",
+        "runs_all":     "RunVal_All",
+        "runs_heart":   "RunVal_Heart",
+        "runs_shadow":  "RunVal_Shadow",
+        "runs_chase":   "RunVal_Chase",
+        "runs_waste":   "RunVal_Waste",
+    }
+    df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+    keep = ["Season", "MLBAM_ID"] + [v for v in rename.values() if v in df.columns]
+    return df[[c for c in keep if c in df.columns]]
+
+
+def parse_pctranks(df: pd.DataFrame, year: int) -> pd.DataFrame:
+    """Parse percentile rankings — values are 0–100 percentile ranks, not raw stats."""
+    df = df.copy()
+    df["Season"]   = year
+    df["MLBAM_ID"] = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
+
+    rename = {
+        "xwoba":            "pct_xwOBA",
+        "xba":              "pct_xBA",
+        "xslg":             "pct_xSLG",
+        "xiso":             "pct_xISO",
+        "xobp":             "pct_xOBP",
+        "brl":              "pct_Barrels",
+        "brl_percent":      "pct_Brl%",
+        "exit_velocity":    "pct_AvgEV",
+        "max_ev":           "pct_MaxEV",
+        "hard_hit_percent": "pct_HardHit%",
+        "k_percent":        "pct_K%",
+        "bb_percent":       "pct_BB%",
+        "whiff_percent":    "pct_Whiff%",
+        "chase_percent":    "pct_Chase%",
+        "arm_strength":     "pct_ArmStrength",
+        "sprint_speed":     "pct_SprintSpeed",
+        "oaa":              "pct_OAA",
+        "bat_speed":        "pct_BatSpeed",
+        "squared_up_rate":  "pct_SquaredUp",
+        "swing_length":     "pct_SwingLength",
+    }
+    df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+    keep = ["Season", "MLBAM_ID"] + [v for v in rename.values() if v in df.columns]
+    return df[[c for c in keep if c in df.columns]]
+
+
 def parse_battrack(df: pd.DataFrame) -> pd.DataFrame:
     """Parse bat tracking leaderboard (career aggregate)."""
     df = df.copy()
@@ -286,7 +358,7 @@ def main() -> None:
 
     all_season_rows: list[pd.DataFrame] = []
 
-    n_ep = 5  # EV + xStats + Speed + OAA + Arm
+    n_ep = 7  # EV + xStats + Speed + OAA + Arm + SwingTake + PctRanks
     print(f"\nFetching {len(fetch_seasons)} season(s) × {n_ep} endpoints each\n")
 
     for i, year in enumerate(fetch_seasons, 1):
@@ -297,6 +369,8 @@ def main() -> None:
         spd_df = _fetch_csv(URL_SPEED.format(year=year))
         oaa_df = _fetch_csv(URL_OAA.format(year=year)) if year >= FIRST_OAA else None
         arm_df = _fetch_csv(URL_ARM.format(year=year)) if year >= FIRST_ARM else None
+        st_df  = _fetch_csv(URL_SWINGTAKE.format(year=year))
+        pct_df = _fetch_csv(URL_PCTRANKS.format(year=year))
 
         parts: list[pd.DataFrame] = []
         tags  = []
@@ -325,6 +399,16 @@ def main() -> None:
             p = parse_arm(arm_df, year); parts.append(p); tags.append(f"Arm:{len(p)}")
         elif year >= FIRST_ARM:
             tags.append("Arm:0")
+
+        if st_df is not None:
+            p = parse_swingtake(st_df, year); parts.append(p); tags.append(f"ST:{len(p)}")
+        else:
+            tags.append("ST:0")
+
+        if pct_df is not None:
+            p = parse_pctranks(pct_df, year); parts.append(p); tags.append(f"Pct:{len(p)}")
+        else:
+            tags.append("Pct:0")
 
         print("  ".join(tags))
 
