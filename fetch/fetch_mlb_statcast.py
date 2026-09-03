@@ -1,16 +1,20 @@
 """Fetch season-by-season MLB Statcast data from Baseball Savant leaderboards.
 
-Pulls three endpoints per season and merges into one wide file:
+Pulls five endpoints per season and merges into one wide file:
   1. Statcast EV leaderboard  — MaxEV, AvgEV, EV50, Barrel%, SweetSpot%, EV95%
   2. Expected stats            — xBA, xSLG, xwOBA (and actual deltas), PA, BIP
-  3. Sprint speed              — sprint_speed, bolts, hp_to_1b
+  3. Sprint speed              — SprintSpeed, Bolts, HP_to_1B          (2015+)
+  4. Outs above average        — OAA, FieldingRunsPrevented, directional OAA (2016+)
+  5. Arm strength              — MaxArmStrength, ArmOverall, by position (2020+)
 
-Plus one career-aggregate pull (same data regardless of year filter):
-  4. Bat tracking              — avg_bat_speed, swing_length, hard_swing_rate, etc.
+Plus one career-aggregate pull (year param ignored — always same data):
+  6. Bat tracking              — AvgBatSpeed, SwingLength, HardSwing%, etc.
 
-Coverage:
-  Statcast / Expected / Sprint speed : 2015–current
-  Bat tracking                        : career aggregate only (not per-season)
+Coverage per endpoint:
+  EV / xStats / Sprint speed : 2015–current
+  OAA                        : 2016–current
+  Arm strength               : 2020–current
+  Bat tracking               : career aggregate only
 
 Outputs:
   data/api/mlb_statcast.csv      — one row per player × season (2015–current)
@@ -40,9 +44,11 @@ API_DIR.mkdir(parents=True, exist_ok=True)
 SEASON_OUT   = API_DIR / "mlb_statcast.csv"
 BATTRACK_OUT = API_DIR / "mlb_bat_tracking.csv"
 
-FIRST_SEASON   = 2015   # Statcast tracking began in MLB
-CURRENT_SEASON = 2026
-SEASONS        = list(range(FIRST_SEASON, CURRENT_SEASON + 1))
+FIRST_SEASON      = 2015   # Statcast tracking began in MLB
+FIRST_OAA         = 2016   # OAA coverage starts 2016
+FIRST_ARM         = 2020   # Arm strength coverage starts 2020
+CURRENT_SEASON    = 2026
+SEASONS           = list(range(FIRST_SEASON, CURRENT_SEASON + 1))
 
 SLEEP_SEC = 1.2
 HEADERS   = {"User-Agent": "prospectsMain/1.0 (baseball research)"}
@@ -59,6 +65,14 @@ URL_XSTATS = (
 URL_SPEED = (
     "https://baseballsavant.mlb.com/leaderboard/sprint_speed"
     "?min_opp=0&position=&team=&year={year}&csv=true"
+)
+URL_OAA = (
+    "https://baseballsavant.mlb.com/leaderboard/outs_above_average"
+    "?type=Batter&startYear={year}&endYear={year}&split=no&team=&min=0&csv=true"
+)
+URL_ARM = (
+    "https://baseballsavant.mlb.com/leaderboard/arm-strength"
+    "?year={year}&min=0&csv=true"
 )
 URL_BATTRACK = (
     "https://baseballsavant.mlb.com/leaderboard/bat-tracking"
@@ -91,29 +105,36 @@ def _fetch_csv(url: str, retries: int = 2) -> pd.DataFrame | None:
 
 
 # ---------------------------------------------------------------------------
+# Name helper
+# ---------------------------------------------------------------------------
+
+def _flip_name(s) -> str:
+    """'Last, First' -> 'First Last'"""
+    if pd.isna(s):
+        return ""
+    parts = [p.strip() for p in str(s).split(",")]
+    return " ".join(reversed(parts))
+
+
+# ---------------------------------------------------------------------------
 # Per-season parsers
 # ---------------------------------------------------------------------------
 
 def parse_ev(df: pd.DataFrame, year: int) -> pd.DataFrame:
     """Parse statcast EV leaderboard."""
     df = df.copy()
-    df["Season"]    = year
-    df["MLBAM_ID"]  = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
-
-    # Name: 'last_name, first_name' -> 'First Last'
-    name_col = "last_name, first_name"
-    if name_col in df.columns:
-        df["Name"] = df[name_col].apply(
-            lambda s: " ".join(reversed([p.strip() for p in str(s).split(",")])) if pd.notna(s) else ""
-        )
+    df["Season"]   = year
+    df["MLBAM_ID"] = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
+    if "last_name, first_name" in df.columns:
+        df["Name"] = df["last_name, first_name"].apply(_flip_name)
 
     rename = {
         "attempts":               "BattedBalls",
         "max_hit_speed":          "MaxEV",
         "avg_hit_speed":          "AvgEV",
         "ev50":                   "EV50",
-        "fbld":                   "EV_FBLD",     # avg EV on FB+LD
-        "gb":                     "EV_GB",        # avg EV on GB
+        "fbld":                   "EV_FBLD",
+        "gb":                     "EV_GB",
         "avg_hit_angle":          "AvgLaunchAngle",
         "anglesweetspotpercent":  "SweetSpot%",
         "max_distance":           "MaxDist",
@@ -135,12 +156,6 @@ def parse_xstats(df: pd.DataFrame, year: int) -> pd.DataFrame:
     df = df.copy()
     df["Season"]   = year
     df["MLBAM_ID"] = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
-
-    name_col = "last_name, first_name"
-    if name_col in df.columns:
-        df["Name"] = df[name_col].apply(
-            lambda s: " ".join(reversed([p.strip() for p in str(s).split(",")])) if pd.notna(s) else ""
-        )
 
     rename = {
         "pa":                       "PA",
@@ -177,14 +192,58 @@ def parse_speed(df: pd.DataFrame, year: int) -> pd.DataFrame:
     return df[[c for c in keep if c in df.columns]]
 
 
+def parse_oaa(df: pd.DataFrame, year: int) -> pd.DataFrame:
+    """Parse outs above average leaderboard (fielding, batter perspective)."""
+    df = df.copy()
+    df["Season"]   = year
+    df["MLBAM_ID"] = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
+
+    rename = {
+        "outs_above_average":                          "OAA",
+        "fielding_runs_prevented":                     "FieldingRunsPrev",
+        "outs_above_average_infront":                  "OAA_Infront",
+        "outs_above_average_lateral_toward3bline":     "OAA_Lat3B",
+        "outs_above_average_lateral_toward1bline":     "OAA_Lat1B",
+        "outs_above_average_behind":                   "OAA_Behind",
+        "outs_above_average_rhh":                      "OAA_vsRHH",
+        "outs_above_average_lhh":                      "OAA_vsLHH",
+    }
+    df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+    keep = ["Season", "MLBAM_ID"] + [v for v in rename.values() if v in df.columns]
+    return df[[c for c in keep if c in df.columns]]
+
+
+def parse_arm(df: pd.DataFrame, year: int) -> pd.DataFrame:
+    """Parse arm strength leaderboard."""
+    df = df.copy()
+    df["Season"]   = year
+    df["MLBAM_ID"] = pd.to_numeric(df["player_id"], errors="coerce").astype("Int64")
+
+    rename = {
+        "max_arm_strength": "MaxArmStrength",
+        "arm_overall":      "ArmOverall",
+        "arm_inf":          "Arm_INF",
+        "arm_of":           "Arm_OF",
+        "arm_1b":           "Arm_1B",
+        "arm_2b":           "Arm_2B",
+        "arm_3b":           "Arm_3B",
+        "arm_ss":           "Arm_SS",
+        "arm_lf":           "Arm_LF",
+        "arm_cf":           "Arm_CF",
+        "arm_rf":           "Arm_RF",
+        "total_throws":     "TotalThrows",
+    }
+    df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+    keep = ["Season", "MLBAM_ID"] + [v for v in rename.values() if v in df.columns]
+    return df[[c for c in keep if c in df.columns]]
+
+
 def parse_battrack(df: pd.DataFrame) -> pd.DataFrame:
     """Parse bat tracking leaderboard (career aggregate)."""
     df = df.copy()
     df["MLBAM_ID"] = pd.to_numeric(df["id"], errors="coerce").astype("Int64")
-
-    name_col = "name"
-    if name_col in df.columns:
-        df["Name"] = df[name_col]
+    if "name" in df.columns:
+        df["Name"] = df["name"]
 
     rename = {
         "swings_competitive":         "SwingsCompetitive",
@@ -214,7 +273,6 @@ def main() -> None:
 
     print("=== fetch_mlb_statcast.py ===\n")
 
-    # Determine scope
     full_mode = args.full or not SEASON_OUT.exists()
     if full_mode:
         print(f"Full mode — fetching seasons {FIRST_SEASON}–{CURRENT_SEASON}")
@@ -228,77 +286,83 @@ def main() -> None:
 
     all_season_rows: list[pd.DataFrame] = []
 
-    print(f"\nFetching {len(fetch_seasons)} season(s) × 3 endpoints each\n")
+    n_ep = 5  # EV + xStats + Speed + OAA + Arm
+    print(f"\nFetching {len(fetch_seasons)} season(s) × {n_ep} endpoints each\n")
+
     for i, year in enumerate(fetch_seasons, 1):
         print(f"[{i:3}/{len(fetch_seasons)}] {year}", end="  ")
 
-        ev_df    = _fetch_csv(URL_EV.format(year=year))
-        xst_df   = _fetch_csv(URL_XSTATS.format(year=year))
-        spd_df   = _fetch_csv(URL_SPEED.format(year=year))
+        ev_df  = _fetch_csv(URL_EV.format(year=year))
+        xst_df = _fetch_csv(URL_XSTATS.format(year=year))
+        spd_df = _fetch_csv(URL_SPEED.format(year=year))
+        oaa_df = _fetch_csv(URL_OAA.format(year=year)) if year >= FIRST_OAA else None
+        arm_df = _fetch_csv(URL_ARM.format(year=year)) if year >= FIRST_ARM else None
 
-        counts = []
+        parts: list[pd.DataFrame] = []
+        tags  = []
 
         if ev_df is not None:
-            ev_parsed = parse_ev(ev_df, year)
-            counts.append(f"EV:{len(ev_parsed)}")
+            p = parse_ev(ev_df, year);  parts.append(p); tags.append(f"EV:{len(p)}")
         else:
-            ev_parsed = pd.DataFrame()
-            counts.append("EV:0")
+            tags.append("EV:0")
 
         if xst_df is not None:
-            xst_parsed = parse_xstats(xst_df, year)
-            counts.append(f"xStats:{len(xst_parsed)}")
+            p = parse_xstats(xst_df, year); parts.append(p); tags.append(f"xSt:{len(p)}")
         else:
-            xst_parsed = pd.DataFrame()
-            counts.append("xStats:0")
+            tags.append("xSt:0")
 
         if spd_df is not None:
-            spd_parsed = parse_speed(spd_df, year)
-            counts.append(f"Spd:{len(spd_parsed)}")
+            p = parse_speed(spd_df, year); parts.append(p); tags.append(f"Spd:{len(p)}")
         else:
-            spd_parsed = pd.DataFrame()
-            counts.append("Spd:0")
+            tags.append("Spd:0")
 
-        print("  ".join(counts))
+        if oaa_df is not None:
+            p = parse_oaa(oaa_df, year); parts.append(p); tags.append(f"OAA:{len(p)}")
+        elif year >= FIRST_OAA:
+            tags.append("OAA:0")
 
-        # Merge the three into one wide frame keyed on Season + MLBAM_ID
-        if ev_parsed.empty and xst_parsed.empty and spd_parsed.empty:
+        if arm_df is not None:
+            p = parse_arm(arm_df, year); parts.append(p); tags.append(f"Arm:{len(p)}")
+        elif year >= FIRST_ARM:
+            tags.append("Arm:0")
+
+        print("  ".join(tags))
+
+        if not parts:
             continue
 
-        base = ev_parsed if not ev_parsed.empty else pd.DataFrame(columns=["Season", "MLBAM_ID"])
-        if not xst_parsed.empty:
-            base = base.merge(xst_parsed, on=["Season", "MLBAM_ID"], how="outer")
-        if not spd_parsed.empty:
-            base = base.merge(spd_parsed, on=["Season", "MLBAM_ID"], how="outer")
+        # Outer-merge all parsed frames on Season + MLBAM_ID
+        base = parts[0]
+        for other in parts[1:]:
+            base = base.merge(other, on=["Season", "MLBAM_ID"], how="outer")
 
-        # Consolidate Name column (may come from EV or xStats)
-        name_cols = [c for c in base.columns if c == "Name"]
+        # Consolidate duplicate Name columns from multiple merges
+        name_cols = [c for c in base.columns if c.startswith("Name")]
         if len(name_cols) > 1:
-            base["Name"] = base["Name_x"].combine_first(base["Name_y"])
-            base = base.drop(columns=["Name_x", "Name_y"], errors="ignore")
+            base["Name"] = base[name_cols[0]].combine_first(base[name_cols[1]])
+            for nc in name_cols[1:]:
+                base = base.drop(columns=[nc], errors="ignore")
 
         all_season_rows.append(base)
 
-    # Combine with existing
+    # Combine with existing history
     if all_season_rows:
-        new_df = pd.concat(all_season_rows, ignore_index=True)
+        new_df   = pd.concat(all_season_rows, ignore_index=True)
         combined = pd.concat([existing, new_df], ignore_index=True)
     else:
         combined = existing
 
-    # Sort and save
     combined = combined.sort_values(["Season", "MLBAM_ID"]).reset_index(drop=True)
     combined.to_csv(SEASON_OUT, index=False)
     print(f"\nWrote {len(combined):,} rows -> {SEASON_OUT}")
     print(f"Columns ({len(combined.columns)}): {list(combined.columns)}")
-
     seasons_present = sorted(combined["Season"].dropna().unique())
     print(f"Seasons: {int(seasons_present[0])}–{int(seasons_present[-1])}, "
           f"{len(seasons_present)} seasons, "
           f"{combined['MLBAM_ID'].nunique():,} unique players")
 
     # -----------------------------------------------------------------------
-    # Bat tracking — career aggregate (pull once)
+    # Bat tracking — career aggregate
     # -----------------------------------------------------------------------
     print("\nFetching bat tracking (career aggregate)...")
     bt_df = _fetch_csv(URL_BATTRACK)

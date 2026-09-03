@@ -325,7 +325,7 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `milb_pitches_agg.csv` | Aggregated pitch-level metrics from game feeds: Chase%, Z-Contact% (AAA 2023–2026), PullAir% (all levels/seasons). **Whiff% column is broken — all 7,860 non-null rows are 0 (never computed). Do not use; `milb_advanced.csv` is authoritative for Whiff%.** |
 | `milb_pitches_games.csv` | Raw game-level pitch cache (one row per player × game) |
 | `milb_statcast_aaa.csv` | Baseball Savant statcast data for AAA |
-| `mlb_statcast.csv` | Season-by-season MLB Statcast (2015–current, 9,822 rows): MaxEV, AvgEV, EV50, EV_FBLD, EV_GB, Brl%, SweetSpot%, EV95%, xBA, xSLG, xwOBA (and actuals + deltas), SprintSpeed, Bolts, HP_to_1B. Built by `fetch/fetch_mlb_statcast.py`. |
+| `mlb_statcast.csv` | Season-by-season MLB Statcast (2015–current, 9,826 rows, 54 cols): MaxEV, AvgEV, EV50, EV_FBLD/GB, Brl%, SweetSpot%, EV95%, xBA, xSLG, xwOBA (+ actuals + deltas), PA, BIP, SprintSpeed, Bolts, HP_to_1B (2015+); OAA, FieldingRunsPrev, directional OAA, OAA_vsRHH/LHH (2016+); MaxArmStrength, ArmOverall, Arm by position (2020+). Built by `fetch/fetch_mlb_statcast.py`. |
 | `mlb_bat_tracking.csv` | Career-aggregate bat tracking for 647 MLB players: AvgBatSpeed, SwingLength, HardSwing%, SquaredUp/Swing, Blast/Swing, Whiff/Swing. Career aggregate only — Savant does not expose per-season bat tracking. |
 | `mlb_statcast_ev.csv` | Legacy career-aggregate MaxEV only (2,570 players). Used by `analysis/build_player_comps.py` for MaxEV_mlb fallback. May be superseded by `mlb_statcast.csv`. |
 | `player_birthdays.csv` | Cached birth dates (~2,766 MLBAM_IDs) |
