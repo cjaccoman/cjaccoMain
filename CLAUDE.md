@@ -429,6 +429,8 @@ pipeline/build_pitcher_scores.py          # Aggregate current-pool pitcher score
 ### Data Fetch / Refresh (run independently)
 
 ```
+fetch/fetch_mlb_data.py                # Refresh hist_mlb_data.csv from MLB Stats API (replaces FanGraphs manual export)
+                                       #   incremental by default (current season only); --full refetches 2006–current
 fetch/fetch_milb_data.py               # Refresh milb_hitting.csv + milb_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitching.py           # Refresh milb_pitching.csv + milb_pitching_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitches.py            # Refresh milb_pitches_agg.csv (incremental by default)
