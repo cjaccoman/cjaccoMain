@@ -325,6 +325,9 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `milb_pitches_agg.csv` | Aggregated pitch-level metrics from game feeds: Chase%, Z-Contact% (AAA 2023–2026), PullAir% (all levels/seasons). **Whiff% column is broken — all 7,860 non-null rows are 0 (never computed). Do not use; `milb_advanced.csv` is authoritative for Whiff%.** |
 | `milb_pitches_games.csv` | Raw game-level pitch cache (one row per player × game) |
 | `milb_statcast_aaa.csv` | Baseball Savant statcast data for AAA |
+| `mlb_statcast.csv` | Season-by-season MLB Statcast (2015–current, 9,822 rows): MaxEV, AvgEV, EV50, EV_FBLD, EV_GB, Brl%, SweetSpot%, EV95%, xBA, xSLG, xwOBA (and actuals + deltas), SprintSpeed, Bolts, HP_to_1B. Built by `fetch/fetch_mlb_statcast.py`. |
+| `mlb_bat_tracking.csv` | Career-aggregate bat tracking for 647 MLB players: AvgBatSpeed, SwingLength, HardSwing%, SquaredUp/Swing, Blast/Swing, Whiff/Swing. Career aggregate only — Savant does not expose per-season bat tracking. |
+| `mlb_statcast_ev.csv` | Legacy career-aggregate MaxEV only (2,570 players). Used by `analysis/build_player_comps.py` for MaxEV_mlb fallback. May be superseded by `mlb_statcast.csv`. |
 | `player_birthdays.csv` | Cached birth dates (~2,766 MLBAM_IDs) |
 | `player_positions.csv` | MLBAM_ID → Position lookup |
 | `chadwick.csv` | MLBAM ↔ FanGraphs ID crosswalk (127,760 players) |
@@ -434,6 +437,7 @@ fetch/fetch_mlb_data.py                # Refresh hist_mlb_data.csv from MLB Stat
 fetch/fetch_milb_data.py               # Refresh milb_hitting.csv + milb_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitching.py           # Refresh milb_pitching.csv + milb_pitching_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitches.py            # Refresh milb_pitches_agg.csv (incremental by default)
+fetch/fetch_mlb_statcast.py            # Refresh mlb_statcast.csv + mlb_bat_tracking.csv from Baseball Savant (incremental by default; --full refetches 2015–current)
 fetch/fetch_milb_statcast.py           # Refresh milb_statcast_aaa.csv from Baseball Savant
 fetch/fetch_prospectsavant.py          # Refresh data/prospectSavant/ CSV files
 fetch/merge_pitches_history.py         # Merge historical pitch game feeds into milb_pitches_agg.csv
