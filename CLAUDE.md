@@ -324,6 +324,9 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `milb_pitching_advanced.csv` | Rate/batted ball stats from pitching seasonAdvanced endpoint: K%, BB%, K-BB%, Whiff%, BABIP, GB%, LD%, FB%, GB/FB, QS |
 | `milb_pitches_agg.csv` | Aggregated pitch-level metrics from game feeds: Chase%, Z-Contact% (AAA 2023–2026), PullAir% (all levels/seasons). **Whiff% column is broken — all 7,860 non-null rows are 0 (never computed). Do not use; `milb_advanced.csv` is authoritative for Whiff%.** |
 | `milb_pitches_games.csv` | Raw game-level pitch cache (one row per player × game) |
+| `milb_expected_stats.csv` | Statcast expected stats per player-season at all 5 MiLB levels (2015–2026): xBA, xSLG, xwOBA, xwOBAcon. Built by `fetch/fetch_milb_splits.py`. |
+| `milb_season_advanced.csv` | Per-season batted-ball type breakdown for all 5 levels (1988+): LD%/FB%/GB%/POP%, SwStr% from raw swing counts, BABIP, ISO, BB/K, PitchesPerPA, GIDP rate. API ignores season param — full all-time pull per level (~44k rows/level). Built by `fetch/fetch_milb_splits.py --season-advanced`. |
+| `milb_career_advanced.csv` | Career-aggregate version of milb_season_advanced (one row per player-level). Built by `fetch/fetch_milb_splits.py --career-advanced`. |
 | `milb_statcast_aaa.csv` | Baseball Savant statcast data for AAA |
 | `mlb_statcast.csv` | Season-by-season MLB Statcast (2015–current, 9,826 rows, 81 cols). Sources: (1) EV leaderboard — MaxEV, AvgEV, EV50, Brl%, SweetSpot%, EV95%, distances; (2) Expected stats — xBA, xSLG, xwOBA + actuals + deltas, PA, BIP; (3) Sprint speed — SprintSpeed, Bolts, HP_to_1B; (4) OAA (2016+) — OAA, FieldingRunsPrev, directional OAA, OAA_vsRHH/LHH; (5) Arm strength (2020+) — MaxArmStrength, ArmOverall, Arm by position; (6) Swing-take — RunVal_All/Heart/Shadow/Chase/Waste (zone run values); (7) Percentile rankings — 20 `pct_*` columns (0–100 percentile ranks, not raw values): pct_xwOBA, pct_HardHit%, pct_Chase%, pct_Whiff%, pct_BatSpeed, pct_SprintSpeed, pct_OAA, etc. Built by `fetch/fetch_mlb_statcast.py`. **hardhit/evbarrels Savant pages are filtered views of EV leaderboard — ev95percent = HardHit%, brl_percent = Brl%.** |
 | `mlb_bat_tracking.csv` | Career-aggregate bat tracking for 647 MLB players: AvgBatSpeed, SwingLength, HardSwing%, SquaredUp/Swing, Blast/Swing, Whiff/Swing. Career aggregate only — Savant does not expose per-season bat tracking. |
@@ -437,6 +440,7 @@ fetch/fetch_mlb_data.py                # Refresh hist_mlb_data.csv from MLB Stat
 fetch/fetch_milb_data.py               # Refresh milb_hitting.csv + milb_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitching.py           # Refresh milb_pitching.csv + milb_pitching_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitches.py            # Refresh milb_pitches_agg.csv (incremental by default)
+fetch/fetch_milb_splits.py             # Refresh milb_expected_stats.csv (xwOBA per level, 2015+); --season-advanced for full batted-ball breakdown; --career-advanced for career aggregate
 fetch/fetch_mlb_statcast.py            # Refresh mlb_statcast.csv + mlb_bat_tracking.csv from Baseball Savant (incremental by default; --full refetches 2015–current)
 fetch/fetch_milb_statcast.py           # Refresh milb_statcast_aaa.csv from Baseball Savant
 fetch/fetch_prospectsavant.py          # Refresh data/prospectSavant/ CSV files
