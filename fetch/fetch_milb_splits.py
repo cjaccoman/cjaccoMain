@@ -216,10 +216,12 @@ def parse_career_adv_row(sp: dict, level: str) -> dict:
 # expectedStatistics
 # ---------------------------------------------------------------------------
 
-def fetch_expected_stats(seasons: list[int]) -> pd.DataFrame:
-    all_rows, total, i = [], len(seasons) * len(SPORT_IDS), 0
+def fetch_expected_stats(seasons: list[int], sport_ids: dict | None = None) -> pd.DataFrame:
+    if sport_ids is None:
+        sport_ids = SPORT_IDS
+    all_rows, total, i = [], len(seasons) * len(sport_ids), 0
     for season in seasons:
-        for level, sport_id in SPORT_IDS.items():
+        for level, sport_id in sport_ids.items():
             i += 1
             print(f"  [{i:3}/{total}] expectedStatistics {level} {season}", end="  ", flush=True)
             splits = fetch_paginated("expectedStatistics", sport_id, season)
@@ -236,9 +238,11 @@ def fetch_expected_stats(seasons: list[int]) -> pd.DataFrame:
 # rows sorted by player name. We pull once per level (no season loop needed).
 # ---------------------------------------------------------------------------
 
-def fetch_season_advanced() -> pd.DataFrame:
+def fetch_season_advanced(sport_ids: dict | None = None) -> pd.DataFrame:
+    if sport_ids is None:
+        sport_ids = SPORT_IDS
     all_rows = []
-    for level, sport_id in SPORT_IDS.items():
+    for level, sport_id in sport_ids.items():
         print(f"  statsSingleSeasonAdvanced {level}", end="  ", flush=True)
         splits = fetch_paginated("statsSingleSeasonAdvanced", sport_id, season=None)
         rows = [parse_season_adv_row(sp, level) for sp in splits]
@@ -252,9 +256,11 @@ def fetch_season_advanced() -> pd.DataFrame:
 # careerAdvanced
 # ---------------------------------------------------------------------------
 
-def fetch_career_advanced() -> pd.DataFrame:
+def fetch_career_advanced(sport_ids: dict | None = None) -> pd.DataFrame:
+    if sport_ids is None:
+        sport_ids = SPORT_IDS
     all_rows = []
-    for level, sport_id in SPORT_IDS.items():
+    for level, sport_id in sport_ids.items():
         print(f"  careerAdvanced {level}", end="  ", flush=True)
         splits = fetch_paginated("careerAdvanced", sport_id, season=None)
         rows = [parse_career_adv_row(sp, level) for sp in splits]
@@ -276,28 +282,43 @@ def main() -> None:
                         help="Build milb_season_advanced.csv (per-season batted-ball breakdown; slow — ~45k rows/level)")
     parser.add_argument("--career-advanced", action="store_true",
                         help="Build milb_career_advanced.csv (career-aggregate batted-ball breakdown; slow)")
+    parser.add_argument("--level", choices=list(SPORT_IDS.keys()),
+                        help="Limit to one level (e.g. AAA). Useful for chunked runs.")
     args = parser.parse_args()
 
     print("=== fetch_milb_splits.py ===\n", flush=True)
+
+    # Restrict sport ids if --level specified
+    active_sport_ids = (
+        {args.level: SPORT_IDS[args.level]} if args.level else SPORT_IDS
+    )
 
     # -----------------------------------------------------------------------
     # expectedStatistics
     # -----------------------------------------------------------------------
     all_seasons = [y for y in range(FIRST_SEASON, CURRENT_SEASON + 1) if y not in SKIP_SEASONS]
-    full_mode   = args.full or not OUT_EXPECTED.exists()
 
-    if full_mode:
-        fetch_seasons  = all_seasons
-        existing_exp   = pd.DataFrame()
+    # Full mode if file doesn't exist yet, OR if --full, OR if --level (partial
+    # run — we need to read+preserve the other levels from the existing file).
+    if args.full or not OUT_EXPECTED.exists():
+        fetch_seasons = all_seasons
+        existing_exp  = pd.DataFrame()
+        if args.level:
+            # Preserve other levels from existing file if present
+            if OUT_EXPECTED.exists():
+                existing_exp = pd.read_csv(OUT_EXPECTED, dtype={"MLBAMID": "Int64"})
+                existing_exp = existing_exp[existing_exp["Level"] != args.level]
         print(f"Full mode: expectedStatistics {FIRST_SEASON}–{CURRENT_SEASON} "
-              f"({len(fetch_seasons)} seasons × {len(SPORT_IDS)} levels)\n", flush=True)
+              f"({len(fetch_seasons)} seasons × {len(active_sport_ids)} level(s))\n", flush=True)
     else:
-        fetch_seasons  = [CURRENT_SEASON]
-        existing_exp   = pd.read_csv(OUT_EXPECTED, dtype={"MLBAMID": "Int64"})
-        existing_exp   = existing_exp[existing_exp["Season"] != CURRENT_SEASON]
+        fetch_seasons = [CURRENT_SEASON]
+        existing_exp  = pd.read_csv(OUT_EXPECTED, dtype={"MLBAMID": "Int64"})
+        existing_exp  = existing_exp[existing_exp["Season"] != CURRENT_SEASON]
+        if args.level:
+            existing_exp = existing_exp[existing_exp["Level"] != args.level]
         print(f"Incremental mode: refreshing {CURRENT_SEASON} only\n", flush=True)
 
-    new_exp = fetch_expected_stats(fetch_seasons)
+    new_exp = fetch_expected_stats(fetch_seasons, active_sport_ids)
 
     if not new_exp.empty:
         combined = pd.concat([existing_exp, new_exp], ignore_index=True)
@@ -316,9 +337,13 @@ def main() -> None:
     if args.season_advanced:
         print(f"\n=== statsSingleSeasonAdvanced (all-time per-season breakdown) ===\n", flush=True)
         print("NOTE: season param ignored by API — full all-time pull per level", flush=True)
-        sa_df = fetch_season_advanced()
+        sa_df = fetch_season_advanced(active_sport_ids)
         if not sa_df.empty:
             sa_df["MLBAMID"] = pd.to_numeric(sa_df["MLBAMID"], errors="coerce").astype("Int64")
+            if args.level and OUT_SEASON_ADV.exists():
+                existing_sa = pd.read_csv(OUT_SEASON_ADV, dtype={"MLBAMID": "Int64"})
+                existing_sa = existing_sa[existing_sa["Level"] != args.level]
+                sa_df = pd.concat([existing_sa, sa_df], ignore_index=True)
             sa_df = sa_df.sort_values(["Season", "Level", "Name"]).reset_index(drop=True)
             sa_df.to_csv(OUT_SEASON_ADV, index=False)
             print(f"\nWrote {len(sa_df):,} rows -> {OUT_SEASON_ADV}", flush=True)
@@ -335,7 +360,7 @@ def main() -> None:
     # -----------------------------------------------------------------------
     if args.career_advanced:
         print(f"\n=== careerAdvanced (career-aggregate) ===\n", flush=True)
-        ca_df = fetch_career_advanced()
+        ca_df = fetch_career_advanced(active_sport_ids)
         if not ca_df.empty:
             ca_df["MLBAMID"] = pd.to_numeric(ca_df["MLBAMID"], errors="coerce").astype("Int64")
             ca_df = ca_df.sort_values(["Level", "Name"]).reset_index(drop=True)
