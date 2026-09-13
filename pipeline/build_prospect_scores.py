@@ -148,7 +148,7 @@ def _wt_avg_shrunk(df: pd.DataFrame, score_col: str, threshold,
 def to_50_10(s: pd.Series) -> pd.Series:
     mu, sig = s.mean(), s.std()
     if sig > 0:
-        return (50 + 10 * (s - mu) / sig).clip(lower=0, upper=100).round(2)
+        return (50 + 10 * (s - mu) / sig).clip(lower=0).round(2)
     return pd.Series(50.0, index=s.index)
 
 

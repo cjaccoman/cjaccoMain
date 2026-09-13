@@ -102,7 +102,7 @@ def _wt_avg_shrunk(df: pd.DataFrame, score_col: str, threshold: float) -> pd.Ser
 def to_50_10(s: pd.Series) -> pd.Series:
     mu, sig = s.mean(), s.std()
     if sig > 0:
-        return (50 + 10 * (s - mu) / sig).clip(lower=0, upper=100).round(2)
+        return (50 + 10 * (s - mu) / sig).clip(lower=0).round(2)
     return pd.Series(50.0, index=s.index)
 
 
@@ -289,7 +289,7 @@ def main() -> None:
     if slope_raw.notna().sum() >= 2:
         mu, sig = slope_raw.mean(), slope_raw.std()
         pool["Slope_Score"] = (
-            (50 + 10 * (slope_raw - mu) / sig).clip(lower=0, upper=100).round(2)
+            (50 + 10 * (slope_raw - mu) / sig).clip(lower=0).round(2)
             if sig > 0 else pd.Series(50.0, index=pool.index)
         )
     else:
