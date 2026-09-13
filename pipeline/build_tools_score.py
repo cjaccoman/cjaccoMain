@@ -8,11 +8,10 @@ Component weights:
   Power        35%
   Athleticism  20%
 
-Age adjustment (AGE_ALPHA = 0.11):
-  Applied to Discipline and Power only — athleticism (speed) is a physical tool
-  not expected to improve with age, same rationale as SB in ABILITY_Score.
-  Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
-  A player 2 SD younger than peers gets a ~40% boost; 2 SD older gets a ~40% cut.
+Age adjustment: none.
+  All stats are era+level normalized against peers — adding an age multiplier
+  would double-count age. A 19yo in AA is already compared only against other
+  19yo AA players; their Chase% z-score already reflects that context.
 
 Discipline sub-weights:
   Full tier (Chase% + Z-Contact% available — AAA 2023+, all levels 2026 via ProspectSavant):
@@ -62,15 +61,6 @@ OUT_PATH    = DATA_DIR / "rankings" / "tools_scores.csv"
 
 # Top-level component weights
 W = dict(discipline=0.45, power=0.35, athleticism=0.20)
-
-# Piecewise age multiplier (empirically derived from career PPPA_Z regression, N=4,655):
-#   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
-# Global linear slope: 0.077/SD. Youth kink at −1.5 SD adds 0.192/SD beyond the threshold.
-# Old cliff not statistically significant (p=0.27) — no separate kink on the old side.
-# Athleticism excluded — speed is a physical tool, not expected to improve with age.
-AGE_LINEAR      = 0.077
-AGE_KINK        = 0.192
-AGE_KINK_THRESH = 1.5
 
 # Discipline sub-weights (full tier)
 WD = dict(chase=0.40, zcontact=0.35, whiff=0.25)
@@ -214,13 +204,6 @@ def main() -> None:
     disc  = standardize_component(disc)
     power = standardize_component(power)
     ath   = standardize_component(ath)
-
-    # 3b. Piecewise age multiplier on Discipline and Power only.
-    # Athleticism excluded — speed is a physical tool, not expected to improve with age.
-    age_z   = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
-    age_mult = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
-    disc  = disc  * age_mult
-    power = power * age_mult
 
     # 4. Blend — missing component fills with 0 (era+level average, neutral)
     tools_raw = (
