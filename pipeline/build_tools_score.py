@@ -8,7 +8,7 @@ Component weights:
   Power        35%
   Athleticism  20%
 
-Age adjustment (AGE_ALPHA = 0.20):
+Age adjustment (AGE_ALPHA = 0.11):
   Applied to Discipline and Power only — athleticism (speed) is a physical tool
   not expected to improve with age, same rationale as SB in ABILITY_Score.
   Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
@@ -65,7 +65,7 @@ W = dict(discipline=0.45, power=0.35, athleticism=0.20)
 
 # Age adjustment: Discipline and Power are multiplied by (1 + AGE_ALPHA × −Age_Z_SL).
 # Athleticism excluded — speed is a physical tool, not expected to improve with age.
-AGE_ALPHA = 0.20
+AGE_ALPHA = 0.11
 
 # Discipline sub-weights (full tier)
 WD = dict(chase=0.40, zcontact=0.35, whiff=0.25)

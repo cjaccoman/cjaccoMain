@@ -50,7 +50,7 @@ LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 STUFF_IP_THRESH       = 167.0
 PERFORMANCE_IP_THRESH = 120.0
 
-AGE_ALPHA  = 0.20   # per-component age multiplier
+AGE_ALPHA  = 0.11   # per-component age multiplier — empirically derived from career PPPA_Z regression
 AGE_CLIP   = 2.0    # ±2 SD clip on age adjustment
 
 W_STUFF   = 0.30

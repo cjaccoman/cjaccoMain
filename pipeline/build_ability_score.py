@@ -9,7 +9,7 @@ Component weights:
   SB Talent       15%  -- SB_pct × (SB/PA), z-scored within Season+Level
   Game Power      15%  -- 0.5 × PullAir% + 0.5 × HR_AB, z-scored within Season+Level
 
-Age adjustment (AGE_ALPHA = 0.20):
+Age adjustment (AGE_ALPHA = 0.11):
   Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
   A player 2 SD younger than peers gets a ~40% boost to every component;
   a player 2 SD older gets a ~40% cut. Weights stay proportional — age is
@@ -53,7 +53,7 @@ W = dict(fantasy=0.45, discipline=0.25, sb=0.15, power=0.15)
 
 # Age adjustment: each component is multiplied by (1 + AGE_ALPHA × −Age_Z_SL).
 # Age_Z_SL is clipped to ±2 SD before applying so extreme outliers don't dominate.
-AGE_ALPHA = 0.20
+AGE_ALPHA = 0.11
 
 # PPPA level discount factors (Skill_PPPA full-population study, analysis/skill_pppa_translation.py)
 LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
