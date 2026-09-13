@@ -51,9 +51,13 @@ MIN_ROWS    = 10    # minimum rows in Season+Level cell before falling back to L
 # Component weights
 W = dict(fantasy=0.45, discipline=0.25, sb=0.15, power=0.15)
 
-# Age adjustment: each component is multiplied by (1 + AGE_ALPHA × −Age_Z_SL).
-# Age_Z_SL is clipped to ±2 SD before applying so extreme outliers don't dominate.
-AGE_ALPHA = 0.11
+# Piecewise age multiplier (empirically derived from career PPPA_Z regression, N=4,655):
+#   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
+# Global linear slope: 0.077/SD. Youth kink at −1.5 SD adds 0.192/SD beyond the threshold.
+# Old cliff not statistically significant (p=0.27) — no separate kink on the old side.
+AGE_LINEAR      = 0.077
+AGE_KINK        = 0.192
+AGE_KINK_THRESH = 1.5
 
 # PPPA level discount factors (Skill_PPPA full-population study, analysis/skill_pppa_translation.py)
 LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
@@ -204,7 +208,8 @@ def main() -> None:
     # strength within the peer distribution, not the raw stat values.
     # SB excluded: speed is a physical tool, not expected to improve with age —
     # a 23yo swiping 40 bags is as impressive as a 19yo doing the same.
-    age_mult = (1.0 + AGE_ALPHA * (-df["Age_Z_SL"]).clip(-2.0, 2.0)).fillna(1.0)
+    age_z    = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
+    age_mult = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
     fantasy  = fantasy * age_mult
     disc     = disc    * age_mult
     gp       = gp      * age_mult

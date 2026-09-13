@@ -50,8 +50,9 @@ LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 STUFF_IP_THRESH       = 167.0
 PERFORMANCE_IP_THRESH = 120.0
 
-AGE_ALPHA  = 0.11   # per-component age multiplier — empirically derived from career PPPA_Z regression
-AGE_CLIP   = 2.0    # ±2 SD clip on age adjustment
+AGE_LINEAR      = 0.077   # global linear slope (empirically derived, career PPPA_Z regression)
+AGE_KINK        = 0.192   # extra slope per SD below -1.5 SD (youth kink, p=0.0000)
+AGE_KINK_THRESH = 1.5
 
 W_STUFF   = 0.30
 W_PERF    = 0.50
@@ -68,9 +69,10 @@ def to_50_10(s: pd.Series) -> pd.Series:
 
 
 def age_adj(component: pd.Series, age_z: pd.Series) -> pd.Series:
-    """Apply age multiplier: component × (1 + alpha × -age_z), clipped."""
-    adj_factor = (1.0 + AGE_ALPHA * (-age_z.clip(-AGE_CLIP, AGE_CLIP))).fillna(1.0)
-    return component * adj_factor
+    """Piecewise age multiplier: linear + youth kink below -1.5 SD."""
+    az     = (-age_z).clip(-3.0, 3.0).fillna(0.0)
+    factor = 1.0 + AGE_LINEAR * az + AGE_KINK * (az - AGE_KINK_THRESH).clip(lower=0)
+    return component * factor
 
 
 def ppi_slope(df: pd.DataFrame) -> pd.Series:

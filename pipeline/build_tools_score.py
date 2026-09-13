@@ -63,9 +63,14 @@ OUT_PATH    = DATA_DIR / "rankings" / "tools_scores.csv"
 # Top-level component weights
 W = dict(discipline=0.45, power=0.35, athleticism=0.20)
 
-# Age adjustment: Discipline and Power are multiplied by (1 + AGE_ALPHA × −Age_Z_SL).
+# Piecewise age multiplier (empirically derived from career PPPA_Z regression, N=4,655):
+#   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
+# Global linear slope: 0.077/SD. Youth kink at −1.5 SD adds 0.192/SD beyond the threshold.
+# Old cliff not statistically significant (p=0.27) — no separate kink on the old side.
 # Athleticism excluded — speed is a physical tool, not expected to improve with age.
-AGE_ALPHA = 0.11
+AGE_LINEAR      = 0.077
+AGE_KINK        = 0.192
+AGE_KINK_THRESH = 1.5
 
 # Discipline sub-weights (full tier)
 WD = dict(chase=0.40, zcontact=0.35, whiff=0.25)
@@ -210,9 +215,10 @@ def main() -> None:
     power = standardize_component(power)
     ath   = standardize_component(ath)
 
-    # 3b. Age multiplier on Discipline and Power only.
+    # 3b. Piecewise age multiplier on Discipline and Power only.
     # Athleticism excluded — speed is a physical tool, not expected to improve with age.
-    age_mult = (1.0 + AGE_ALPHA * (-df["Age_Z_SL"]).clip(-2.0, 2.0)).fillna(1.0)
+    age_z   = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
+    age_mult = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
     disc  = disc  * age_mult
     power = power * age_mult
 
