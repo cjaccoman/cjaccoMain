@@ -315,9 +315,15 @@ def main() -> None:
     pool["ABILITY_Score"] = to_50_10(pool["ABILITY_Score"].fillna(50))
 
     # Age_Score: Age_Z_SL inverted (younger than peers = positive), standardized to 50±10.
-    # Uses most-recent season Age_Z_SL from the latest row per player.
+    # Uses most-recent season, highest level row per player — break ties by level so a
+    # player with both an AAA row and an R-ball rehab row in the same season gets the
+    # AAA Age_Z_SL rather than the R-ball one (which would read as "old for R-ball").
+    _level_order = {"AAA": 5, "AA": 4, "A+": 3, "A": 2, "R": 1}
+    _scores_lvl = scores.copy()
+    _scores_lvl["_lvl_num"] = _scores_lvl["Level"].map(_level_order).fillna(0)
     recent_age_z = (
-        scores.sort_values("Season", ascending=False)
+        _scores_lvl
+        .sort_values(["Season", "_lvl_num"], ascending=[False, False])
         .drop_duplicates("PlayerId")
         .set_index("PlayerId")["Age_Z_SL"]
     )
