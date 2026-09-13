@@ -41,6 +41,7 @@ ADJUSTMENTS = [
     ("Whiff%",      "EraK%",    "Whiff%_adj"),
     ("Chase%",      "EraK%",    "Chase%_adj"),
     ("Z-Contact%",  "EraK%",    "ZContact%_adj"),
+    ("BB%",         "EraK%",    "BB%_adj"),
     ("HR/FB",       "EraHR/FB", "HRFB_adj"),
     ("3B_PA",       "EraSB",    "3B_PA_adj"),
 ]
@@ -125,14 +126,23 @@ def main() -> None:
     if stale:
         df = df.drop(columns=stale)
 
+    # Chase% and Z-Contact% have no meaningful pre-High-K data (only ~34 total rows
+    # across both Contact Era cells).  Fold them into High-K Era so they don't get
+    # their own sparse cell with an unreliable mean/std.
+    CHASE_STATS = {"Chase%", "Z-Contact%"}
+
     for stat_col, era_col, out_col in ADJUSTMENTS:
         if stat_col not in df.columns or era_col not in df.columns:
             print(f"SKIP {out_col} — {stat_col} or {era_col} missing\n")
             continue
 
-        print_summary(df, stat_col, era_col, out_col)
+        work_df = df
+        if stat_col in CHASE_STATS:
+            work_df = df.assign(**{era_col: df[era_col].replace({"Contact Era": "High-K Era"})})
 
-        adj = era_level_adjust(df, stat_col, era_col)
+        print_summary(work_df, stat_col, era_col, out_col)
+
+        adj = era_level_adjust(work_df, stat_col, era_col)
         adj.name = out_col
 
         n_total = df[stat_col].notna().sum()
