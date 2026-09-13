@@ -66854,397 +66854,395 @@ PlayerId,MLBAM_ID,Season,Name,Team,Level,League,Age,G,PA,1B,2B,3B,HR,R,RBI,BB,IB
 703151,703151,2026,William Bergolla Jr.,CWS,AAA,International League,21.0,10,43,12,4,0,0,5,8,5,0,4,1,2,2
 27496,683357,2026,Owen Caissie,MIA,AAA,International League,23.0,3,13,1,0,0,2,3,3,5,0,4,0,0,0
 811312,811312,2026,Justin Riemer,OAK,AAA,Pacific Coast League,24.0,3,11,4,0,0,0,2,1,1,0,2,0,0,1
-805127,805127,2026,Devin Taylor,OAK,AAA,Pacific Coast League,22.0,7,33,9,1,0,2,8,7,3,0,10,1,0,0
 804606,804606,2026,Konnor Griffin,PIT,AAA,International League,20.0,7,31,6,3,0,0,4,1,7,0,6,0,3,2
-804241,804241,2026,Zach Levenson,STL,AAA,International League,24.0,8,33,6,1,0,4,7,10,2,0,10,1,0,0
 33549,691019,2026,Kyle Teel,CWS,AAA,International League,24.0,14,58,14,2,0,3,9,9,4,0,13,1,0,0
 802117,802117,2026,Patrick Clohisy,ATL,AAA,International League,24.0,38,156,35,9,1,3,29,16,20,0,34,1,22,4
 29858,672016,2026,Denzel Clarke,OAK,AAA,Pacific Coast League,26.0,11,41,9,0,1,2,6,7,7,0,12,0,0,0
+804241,804241,2026,Zach Levenson,STL,AAA,International League,24.0,9,37,6,1,0,5,8,13,2,0,10,1,0,0
 29668,691785,2026,Marcelo Mayer,SF,AAA,Pacific Coast League,23.0,4,19,4,1,0,1,3,3,2,0,9,0,0,0
-26517,682622,2026,Noelvi Marte,CIN,AAA,International League,24.0,57,244,57,12,2,9,37,40,13,0,40,2,9,1
 811965,811965,2026,Joshua Kuroda-Grauer,OAK,AAA,Pacific Coast League,23.0,42,215,52,12,3,1,49,26,16,0,14,2,4,1
+26517,682622,2026,Noelvi Marte,CIN,AAA,International League,24.0,58,247,58,12,2,9,37,40,13,0,41,3,9,1
+805127,805127,2026,Devin Taylor,OAK,AAA,Pacific Coast League,22.0,9,41,10,1,0,2,8,8,4,0,14,2,0,0
 703607,703607,2026,Henry Bolte,OAK,AAA,Pacific Coast League,22.0,37,177,33,7,3,12,41,28,17,0,39,1,17,2
 22515,671218,2026,Heliot Ramos,SF,AAA,Pacific Coast League,26.0,7,31,5,3,0,1,7,2,5,0,9,0,0,0
-694266,694266,2026,D'Andre Smith,NYM,AAA,International League,25.0,23,83,17,4,0,4,13,12,9,0,15,1,9,1
-808265,808265,2026,Franklin Arias,BOS,AAA,International League,20.0,35,157,32,11,0,4,24,31,14,1,24,0,3,2
 694249,694249,2026,Cole Carrigg,COL,AAA,Pacific Coast League,24.0,57,257,50,15,5,6,55,42,27,0,39,3,30,7
 28816,694203,2026,Denzer Guzman,LAA,AAA,Pacific Coast League,22.0,58,268,50,16,2,12,45,57,27,0,48,5,9,4
 25346,682927,2026,Ronny Simon,PIT,AAA,International League,26.0,115,499,99,33,2,7,61,72,65,2,85,8,35,10
 22563,672356,2026,Gabriel Arias,CLE,AAA,International League,26.0,5,18,2,0,0,3,3,5,2,0,3,1,0,0
 33390,805811,2026,Bryce Eldridge,SF,AAA,Pacific Coast League,21.0,30,137,27,6,0,5,25,22,20,1,41,0,0,0
 29766,680869,2026,Zack Gelof,OAK,AAA,Pacific Coast League,26.0,15,70,10,3,0,5,13,14,14,0,9,2,3,0
-682774,682774,2026,Andrick Nava,MIL,AAA,International League,24.0,15,54,10,2,0,4,9,10,5,0,7,4,1,1
+694266,694266,2026,D'Andre Smith,NYM,AAA,International League,25.0,25,93,18,5,0,4,15,12,10,0,18,1,9,1
+805126,805126,2026,Charlie Szykowny,SF,AAA,Pacific Coast League,26.0,11,43,9,4,0,1,4,4,1,0,4,2,0,0
+808265,808265,2026,Franklin Arias,BOS,AAA,International League,20.0,36,161,32,11,0,4,24,31,14,1,24,0,3,2
 701852,701852,2026,Drew Cavanaugh,SF,AAA,Pacific Coast League,24.0,32,137,22,9,0,6,27,22,18,0,34,3,3,0
 25705,687957,2026,Dustin Harris,SD,AAA,Pacific Coast League,26.0,74,318,60,14,5,12,57,52,33,0,47,0,19,5
-683610,683610,2026,Leandro Pineda,WSH,AAA,International League,24.0,36,145,21,6,2,10,31,22,20,0,32,2,0,2
-694514,694514,2026,Sterlin Thompson,COL,AAA,Pacific Coast League,25.0,82,361,64,15,2,11,66,54,69,1,56,9,20,5
-31500,690022,2026,Ryan Ritter,COL,AAA,Pacific Coast League,25.0,54,243,50,10,2,4,38,26,28,0,48,4,9,1
+682774,682774,2026,Andrick Nava,MIL,AAA,International League,24.0,16,58,11,2,0,4,10,10,5,0,8,4,1,1
 27770,691728,2026,Zac Veen,COL,AAA,Pacific Coast League,24.0,100,445,63,33,8,24,82,87,48,0,91,3,18,2
 805999,805999,2026,A.J. Ewing,NYM,AAA,International League,21.0,12,51,11,3,1,0,9,4,5,0,5,0,5,0
 806956,806956,2026,Ethan Salas,SD,AAA,Pacific Coast League,20.0,24,105,18,6,2,3,13,24,14,0,10,3,3,2
 691408,691408,2026,Maick Collado,CLE,AAA,International League,23.0,12,47,6,7,0,1,8,7,2,0,5,0,1,0
+694514,694514,2026,Sterlin Thompson,COL,AAA,Pacific Coast League,25.0,84,370,65,15,2,12,68,55,70,1,58,9,20,5
 805207,805207,2026,Caden Bodine,TB,AAA,International League,22.0,11,47,7,4,0,2,3,7,5,0,5,1,2,0
-814299,814299,2026,Pascanel Ferreras,HOU,AAA,Pacific Coast League,24.0,63,272,49,22,1,6,41,41,19,0,66,8,7,6
 824615,824615,2026,Connor Hujsak,TB,AAA,International League,24.0,9,32,4,3,1,2,5,7,0,0,9,0,1,2
-814154,814154,2026,Scott Bandura,SF,AAA,Pacific Coast League,24.0,92,421,75,28,3,10,69,62,47,0,60,8,24,2
 800325,800325,2026,Luis Lara,MIL,AAA,International League,21.0,78,346,70,10,3,9,67,42,54,3,48,6,24,7
 694378,694378,2026,Jacob Gonzalez,CWS,AAA,International League,24.0,53,239,32,12,1,19,43,63,33,0,49,2,8,3
+814299,814299,2026,Pascanel Ferreras,HOU,AAA,Pacific Coast League,24.0,64,277,49,22,1,6,41,41,19,0,68,9,7,6
+31500,690022,2026,Ryan Ritter,COL,AAA,Pacific Coast League,25.0,55,248,50,10,2,4,38,26,28,0,51,4,9,1
+813833,813833,2026,Cole Conn,OAK,AAA,Pacific Coast League,24.0,28,128,22,11,1,2,27,15,14,0,26,0,5,0
 29779,691777,2026,Max Muncy,OAK,AAA,Pacific Coast League,23.0,17,77,11,4,0,6,16,16,7,0,22,1,0,0
+814154,814154,2026,Scott Bandura,SF,AAA,Pacific Coast League,24.0,94,430,76,28,3,10,71,62,48,0,61,8,24,2
 681400,681400,2026,Danny Serretti,AZ,AAA,Pacific Coast League,26.0,35,141,25,6,1,5,19,16,21,0,32,1,1,1
+677578,677578,2026,Carlos Rodríguez,SD,AAA,Pacific Coast League,25.0,119,525,114,18,8,6,62,75,52,1,57,7,23,5
 694206,694206,2026,Daniel Guilarte,MIL,AAA,International League,22.0,5,21,6,0,0,0,2,1,2,0,8,0,3,1
-677578,677578,2026,Carlos Rodríguez,SD,AAA,Pacific Coast League,25.0,116,510,110,18,8,6,61,73,51,1,53,7,22,5
 695731,695731,2026,Braden Montgomery,CWS,AAA,International League,23.0,29,132,23,8,0,4,32,19,18,0,32,2,3,4
+683610,683610,2026,Leandro Pineda,WSH,AAA,International League,24.0,38,153,21,6,2,10,32,23,22,0,33,3,0,2
 694371,694371,2026,Tommy Troy,AZ,AAA,Pacific Coast League,24.0,51,237,43,13,3,4,44,30,32,0,55,2,7,2
 691458,691458,2026,Blaze Jordan,STL,AAA,International League,23.0,57,252,41,19,1,11,37,35,19,0,29,6,2,2
 803011,803011,2026,Sam Antonacci,CWS,AAA,International League,23.0,14,67,11,2,0,2,6,7,15,1,8,1,5,0
 699393,699393,2026,Pedro Ramírez,CHC,AAA,International League,22.0,43,196,32,11,1,9,34,40,21,1,32,6,19,2
 695490,695490,2026,Edwin Arroyo,CIN,AAA,International League,22.0,73,332,57,13,5,15,54,43,28,2,61,4,13,0
 703520,703520,2026,Brett Bateman,TOR,AAA,International League,24.0,84,359,68,18,2,3,61,33,62,0,67,4,20,3
+800060,800060,2026,Xavier Isaac,TB,AAA,International League,22.0,12,52,6,4,0,3,10,4,9,0,16,1,2,0
 694197,694197,2026,Angel Genao,CLE,AAA,International League,22.0,72,309,54,17,1,10,48,42,38,0,48,5,9,4
-813833,813833,2026,Cole Conn,OAK,AAA,Pacific Coast League,24.0,27,124,21,10,1,2,26,15,13,0,25,0,5,0
+678173,678173,2026,David McCabe,ATL,AAA,International League,26.0,19,79,12,5,0,4,9,19,6,0,18,3,0,0
 805805,805805,2026,Walker Jenkins,MIN,AAA,International League,21.0,69,307,49,17,3,12,51,28,42,0,48,3,17,4
 25629,683227,2026,Cody Freeman,TEX,AAA,Pacific Coast League,25.0,26,118,23,6,0,3,22,18,11,0,15,3,1,0
 26031,687093,2026,Vaughn Grissom,LAA,AAA,Pacific Coast League,25.0,10,41,10,2,0,0,3,6,2,0,8,4,0,1
-800060,800060,2026,Xavier Isaac,TB,AAA,International League,22.0,11,48,5,4,0,3,10,4,8,0,15,1,2,0
 26420,677347,2026,Kyren Paris,LAA,AAA,Pacific Coast League,24.0,62,289,40,18,0,13,42,50,50,0,82,8,16,3
 25999,683748,2026,Victor Mesa Jr.,TB,AAA,International League,24.0,23,101,14,8,1,4,17,12,13,0,24,1,1,6
 702068,702068,2026,Cole Gabrielson,NYY,AAA,International League,25.0,11,39,10,1,0,0,3,2,3,0,6,0,0,0
 694410,694410,2026,LuJames Groover,AZ,AAA,Pacific Coast League,24.0,96,440,79,27,2,6,69,57,53,2,67,6,4,0
 695020,695020,2026,Tanner Murray,CWS,AAA,International League,26.0,6,30,4,1,0,2,6,7,6,0,7,1,2,0
-805347,805347,2026,Jim Jarvis,ATL,AAA,International League,25.0,92,422,73,23,6,6,62,43,60,1,66,9,36,10
+691024,691024,2026,Cayden Wallace,WSH,AAA,International League,24.0,54,213,37,10,1,11,35,40,15,0,40,6,8,4
 33322,807713,2026,Matt Shaw,CHC,AAA,International League,24.0,9,36,8,2,0,0,5,5,3,0,9,1,2,0
 695720,695720,2026,Tommy White,OAK,AAA,Pacific Coast League,23.0,55,252,47,12,2,9,44,47,12,0,35,7,1,1
 815873,815873,2026,Sean Keys,TOR,AAA,International League,23.0,51,226,28,11,3,14,33,46,32,1,46,6,1,0
 34979,695681,2026,Christian Moore,LAA,AAA,Pacific Coast League,23.0,86,418,59,25,6,11,83,60,73,0,94,10,15,4
 801442,801442,2026,Jack Pineda,KC,AAA,International League,26.0,22,92,14,10,0,2,15,15,3,0,15,2,2,0
 672613,672613,2026,Eliezer Alfonzo,LAD,AAA,Pacific Coast League,26.0,66,256,48,18,0,2,36,25,28,1,21,4,1,1
-22558,672284,2026,Jarred Kelenic,NYY,AAA,International League,26.0,74,318,48,16,5,14,65,49,39,3,75,3,20,5
-693850,693850,2026,Kala'i Rosario,MIN,AAA,International League,23.0,33,127,22,4,1,8,23,17,10,0,38,0,2,0
-801194,801194,2026,Max Anderson,DET,AAA,International League,24.0,100,448,78,22,2,14,61,53,51,0,59,15,4,2
+701649,701649,2026,James Triantos,CHC,AAA,International League,23.0,107,465,87,30,1,9,73,58,33,1,56,10,27,8
 815589,815589,2026,Bo Davidson,SF,AAA,Pacific Coast League,23.0,47,213,33,13,1,9,33,37,23,0,39,1,5,1
 29993,691781,2026,Brady House,WSH,AAA,International League,23.0,50,222,40,11,3,8,26,34,12,0,53,2,3,0
-678173,678173,2026,David McCabe,ATL,AAA,International League,26.0,17,70,10,4,0,4,9,19,5,0,16,3,0,0
+693850,693850,2026,Kala'i Rosario,MIN,AAA,International League,23.0,35,134,23,4,1,9,25,18,10,0,42,0,2,0
+680996,680996,2026,Luke Mann,OAK,AAA,Pacific Coast League,26.0,20,78,13,3,0,5,16,11,7,0,18,1,0,0
+801194,801194,2026,Max Anderson,DET,AAA,International League,24.0,102,457,79,22,2,15,63,54,51,0,61,16,4,2
+702331,702331,2026,Noah Mendlinger,STL,AAA,International League,25.0,67,221,41,10,2,2,22,23,26,0,31,3,1,1
 24729,681351,2026,Logan O'Hoppe,TEX,AAA,Pacific Coast League,26.0,20,92,10,10,0,3,16,21,10,0,15,3,0,0
-694876,694876,2026,Cooper Ingle,CLE,AAA,International League,24.0,95,433,62,21,1,19,78,65,82,1,101,5,2,1
-702331,702331,2026,Noah Mendlinger,STL,AAA,International League,25.0,66,217,40,10,2,2,22,23,25,0,30,3,1,1
+805347,805347,2026,Jim Jarvis,ATL,AAA,International League,25.0,94,431,74,23,6,6,63,43,60,1,70,9,37,11
+29794,700932,2026,Kyle Manzardo,CLE,AAA,International League,25.0,29,131,20,9,0,5,19,30,14,0,33,1,1,0
 27763,691011,2026,Drew Romo,CWS,AAA,International League,24.0,17,68,10,3,0,4,11,11,7,0,18,1,1,1
 29554,680728,2026,Adrian Del Castillo,AZ,AAA,Pacific Coast League,26.0,26,115,13,10,0,5,19,16,18,0,20,2,0,0
-701649,701649,2026,James Triantos,CHC,AAA,International League,23.0,105,456,86,27,1,9,71,56,32,1,54,10,26,8
-24597,680716,2026,Jonathan Ornelas,MIL,AAA,International League,26.0,88,334,60,15,3,11,51,47,28,0,77,7,12,4
-703448,703448,2026,Cam Cannarella,MIA,AAA,International League,22.0,39,177,29,12,0,3,27,11,26,0,42,3,11,2
+691006,691006,2026,Kevin Parada,NYM,AAA,International League,24.0,28,97,17,5,1,2,9,16,9,0,23,3,1,0
 694211,694211,2026,Manuel Pena,AZ,AAA,Pacific Coast League,22.0,52,227,48,9,0,5,25,27,13,0,54,3,3,0
-23794,677954,2026,Jordan Groshans,ATL,AAA,International League,26.0,8,30,4,2,1,1,3,2,3,0,4,0,0,0
-813852,813852,2026,Trey Paige,STL,AAA,International League,25.0,7,29,5,2,0,1,5,3,2,0,4,0,0,0
-691006,691006,2026,Kevin Parada,NYM,AAA,International League,24.0,27,93,16,5,1,2,9,16,9,0,22,3,1,0
+696486,696486,2026,James Tibbs III,LAD,AAA,Pacific Coast League,23.0,134,611,84,31,3,29,106,101,105,1,140,9,10,1
+694876,694876,2026,Cooper Ingle,CLE,AAA,International League,24.0,96,439,62,21,1,20,79,68,82,1,102,5,2,1
 31396,682988,2026,Tyler Locklear,AZ,AAA,Pacific Coast League,25.0,68,302,50,16,1,10,42,46,34,0,57,13,4,3
 701162,701162,2026,Ben Malgeri,DET,AAA,International League,26.0,65,297,45,17,3,9,47,34,38,0,74,4,8,2
-694196,694196,2026,Diego Velasquez,SF,AAA,Pacific Coast League,22.0,28,116,18,10,1,0,15,3,15,0,23,4,1,0
+22558,672284,2026,Jarred Kelenic,NYY,AAA,International League,26.0,76,328,49,16,5,14,65,50,40,3,78,3,20,5
+24597,680716,2026,Jonathan Ornelas,MIL,AAA,International League,26.0,89,338,60,15,3,11,51,47,29,0,77,7,12,4
 26224,687231,2026,Darell Hernaiz,OAK,AAA,Pacific Coast League,24.0,46,217,40,11,1,2,41,23,29,0,27,5,4,0
-680996,680996,2026,Luke Mann,OAK,AAA,Pacific Coast League,26.0,18,69,11,3,0,4,14,10,7,0,14,1,0,0
 691913,691913,2026,Jesus Castillo,PIT,AAA,International League,22.0,20,77,19,1,0,0,10,4,8,0,14,0,2,1
 29695,680574,2026,Matt McLain,CIN,AAA,International League,26.0,5,20,3,2,0,0,3,1,2,0,5,0,0,0
-805126,805126,2026,Charlie Szykowny,SF,AAA,Pacific Coast League,26.0,9,35,6,3,0,1,4,3,1,0,4,2,0,0
-696486,696486,2026,James Tibbs III,LAD,AAA,Pacific Coast League,23.0,133,606,83,31,3,28,104,99,103,1,140,9,10,1
-691024,691024,2026,Cayden Wallace,WSH,AAA,International League,24.0,52,205,34,10,1,10,32,38,14,0,38,6,8,3
-23792,677950,2026,Alek Thomas,LAD,AAA,Pacific Coast League,26.0,60,273,41,18,3,10,38,45,25,0,41,11,7,1
 681230,681230,2026,BJ Murray Jr.,CHC,AAA,International League,26.0,118,516,79,24,9,16,74,68,69,0,110,6,9,4
-823356,823356,2026,Payton Eeles,BAL,AAA,International League,26.0,58,225,47,5,0,2,20,18,34,1,44,4,6,6
+800387,800387,2026,Fernando Peguero,BAL,AAA,International League,21.0,26,84,16,3,1,2,10,5,8,1,24,0,5,0
 801501,801501,2026,Nate Furman,SF,AAA,Pacific Coast League,24.0,102,468,84,25,1,7,63,48,52,0,55,2,19,5
+23792,677950,2026,Alek Thomas,LAD,AAA,Pacific Coast League,26.0,61,278,42,18,3,10,39,45,26,0,43,11,7,1
 687521,687521,2026,Eric Brown Jr.,MIL,AAA,International League,25.0,16,47,11,0,0,1,4,1,6,0,10,1,3,0
-814409,814409,2026,Seaver King,WSH,AAA,International League,23.0,68,310,53,12,2,14,46,43,24,0,73,5,10,2
 687749,687749,2026,Jase Bowen,SD,AAA,Pacific Coast League,25.0,49,222,28,11,5,13,48,36,21,1,59,2,7,4
-680636,680636,2026,Ramon Mendoza,STL,AAA,International League,25.0,107,430,71,28,2,9,62,48,45,0,81,7,2,1
+692150,692150,2026,Émilien Pitre,NYM,AAA,International League,23.0,18,77,14,3,1,1,9,5,8,0,12,3,2,1
 29592,681393,2026,Connor Norby,COL,AAA,Pacific Coast League,26.0,28,121,16,8,0,6,18,18,17,0,23,1,4,0
-31564,702176,2026,Alan Roden,MIN,AAA,International League,26.0,43,201,32,8,0,9,30,28,28,1,30,3,4,1
-807747,807747,2026,Rikuu Nishida,CWS,AAA,International League,25.0,97,455,94,6,2,1,80,30,78,0,83,4,24,8
-31567,702358,2026,Trey Lipscomb,WSH,AAA,International League,26.0,125,512,77,29,1,31,82,90,28,0,132,11,15,2
+694196,694196,2026,Diego Velasquez,SF,AAA,Pacific Coast League,22.0,30,121,19,10,1,0,16,3,15,0,24,4,1,0
+814409,814409,2026,Seaver King,WSH,AAA,International League,23.0,70,319,55,12,2,14,48,43,25,0,75,5,10,2
+823356,823356,2026,Payton Eeles,BAL,AAA,International League,26.0,59,230,48,5,0,2,20,19,34,1,45,4,6,7
+703448,703448,2026,Cam Cannarella,MIA,AAA,International League,22.0,41,186,29,13,0,3,27,11,28,0,46,3,11,3
+694991,694991,2026,Mitch Jebb,PIT,AAA,International League,24.0,48,214,36,5,5,8,38,24,25,1,36,4,5,2
+680636,680636,2026,Ramon Mendoza,STL,AAA,International League,25.0,108,434,71,28,2,9,63,48,46,0,83,7,2,1
 692368,692368,2026,Adrián Sugastey,SF,AAA,Pacific Coast League,23.0,24,95,19,2,0,3,15,12,8,0,9,4,0,0
 682276,682276,2026,Jose Cordova,COL,AAA,Pacific Coast League,26.0,51,190,35,12,1,2,28,27,12,0,33,8,5,4
 31545,687551,2026,Drew Gilbert,SF,AAA,Pacific Coast League,25.0,11,56,10,2,0,1,11,3,6,0,5,2,0,0
+31567,702358,2026,Trey Lipscomb,WSH,AAA,International League,26.0,127,521,79,29,1,31,83,90,28,0,137,11,15,3
 701394,701394,2026,Zach Ehrhard,LAD,AAA,Pacific Coast League,23.0,130,604,96,25,3,20,110,91,90,0,124,9,26,11
 814439,814439,2026,Ryan Waldschmidt,AZ,AAA,Pacific Coast League,23.0,51,234,31,15,3,6,43,29,31,0,53,1,6,2
-694230,694230,2026,Hendry Mendez,MIN,AAA,International League,22.0,72,309,57,11,0,8,37,42,39,1,53,7,4,2
-27573,669398,2026,Gage Workman,SD,AAA,Pacific Coast League,26.0,105,466,78,28,3,11,61,59,40,1,137,9,24,6
-811287,811287,2026,Carson Roccaforte,KC,AAA,International League,24.0,20,86,10,6,0,5,10,12,10,1,27,0,8,0
-682947,682947,2026,Jose Ramos,NYM,AAA,International League,25.0,26,101,16,4,2,3,19,11,10,0,20,4,2,1
+807747,807747,2026,Rikuu Nishida,CWS,AAA,International League,25.0,98,459,94,6,2,1,83,31,80,0,83,4,24,8
 683953,683953,2026,Travis Bazzana,CLE,AAA,International League,23.0,24,117,12,11,2,2,18,10,21,0,25,1,8,2
-29794,700932,2026,Kyle Manzardo,CLE,AAA,International League,25.0,28,125,17,9,0,5,19,28,14,0,32,1,1,0
-694991,694991,2026,Mitch Jebb,PIT,AAA,International League,24.0,46,206,35,5,4,7,36,22,25,1,34,4,5,2
 694025,694025,2026,Felix Reyes,PHI,AAA,International League,25.0,85,380,64,17,0,21,59,70,17,0,74,8,5,2
-803385,803385,2026,Jay Harry,TOR,AAA,International League,23.0,46,210,33,16,0,6,28,34,10,1,34,1,0,0
 691002,691002,2026,Yohandy Morales,WSH,AAA,International League,24.0,104,455,72,19,0,25,82,76,43,2,111,3,6,1
-688460,688460,2026,Josh Kasevich,TOR,AAA,International League,25.0,123,543,108,23,3,4,75,45,51,0,62,24,7,3
 31812,701350,2026,Roman Anthony,BOS,AAA,International League,22.0,4,16,2,1,0,1,2,4,2,0,4,1,0,0
-703680,703680,2026,Brandon Compton,MIA,AAA,International League,22.0,9,39,7,1,0,2,6,3,4,0,15,1,5,0
+691792,691792,2026,Roc Riggio,COL,AAA,Pacific Coast League,24.0,21,94,16,3,0,5,12,15,7,0,28,4,1,0
+683454,683454,2026,Brayan Buelvas,OAK,AAA,Pacific Coast League,24.0,94,374,53,22,4,17,59,67,35,0,98,11,5,0
+27573,669398,2026,Gage Workman,SD,AAA,Pacific Coast League,26.0,108,476,79,28,3,11,61,61,40,1,143,9,24,6
+811287,811287,2026,Carson Roccaforte,KC,AAA,International League,24.0,22,95,12,6,0,5,10,12,11,1,29,0,8,0
 800683,800683,2026,Blake Rambusch,SEA,AAA,Pacific Coast League,26.0,22,80,15,5,0,1,12,7,6,0,13,1,9,0
-814436,814436,2026,Ryan Galanie,CWS,AAA,International League,26.0,100,396,57,21,4,19,58,65,30,0,92,6,11,4
 687152,687152,2026,Darrien Miller,MIL,AAA,International League,25.0,23,86,10,5,2,2,7,13,14,0,14,0,1,0
+687282,687282,2026,Gabriel Rincones Jr.,PHI,AAA,International League,25.0,37,145,20,11,0,5,17,15,14,0,33,2,2,1
+814436,814436,2026,Ryan Galanie,CWS,AAA,International League,26.0,101,400,58,21,4,19,58,65,30,0,93,6,11,4
 28080,691176,2026,Jasson Domínguez,NYY,AAA,International League,23.0,54,238,45,8,0,7,33,30,25,1,45,3,14,2
 694815,694815,2026,Jack Hurley,AZ,AAA,Pacific Coast League,24.0,34,122,19,8,2,1,11,11,10,0,28,0,0,0
-695521,695521,2026,Gavin Conticello,AZ,AAA,Pacific Coast League,23.0,38,151,25,6,1,7,17,28,9,0,34,1,1,0
-686523,686523,2026,Peyton Wilson,KC,AAA,International League,26.0,82,339,52,28,0,5,44,31,36,0,86,8,17,3
-31793,689041,2026,Rhylan Thomas,TOR,AAA,International League,26.0,48,217,47,6,0,2,23,14,16,0,21,4,7,2
-683454,683454,2026,Brayan Buelvas,OAK,AAA,Pacific Coast League,24.0,92,365,52,21,4,16,57,63,34,0,98,11,5,0
-800387,800387,2026,Fernando Peguero,BAL,AAA,International League,21.0,25,80,15,2,1,2,10,5,8,1,22,0,5,0
-22530,671286,2026,Johnathan Rodríguez,OAK,AAA,Pacific Coast League,26.0,93,397,63,23,0,9,46,44,51,0,83,11,1,0
+688460,688460,2026,Josh Kasevich,TOR,AAA,International League,25.0,125,550,108,23,3,4,75,45,52,0,63,24,7,3
+803385,803385,2026,Jay Harry,TOR,AAA,International League,23.0,48,214,33,16,0,6,28,34,10,1,34,2,0,0
+694230,694230,2026,Hendry Mendez,MIN,AAA,International League,22.0,74,316,57,11,0,8,38,42,40,1,53,8,4,2
+31793,689041,2026,Rhylan Thomas,TOR,AAA,International League,26.0,50,221,48,6,0,2,23,14,16,0,22,4,7,2
+682947,682947,2026,Jose Ramos,NYM,AAA,International League,25.0,28,110,18,4,2,3,19,14,10,0,23,4,2,1
+27915,696030,2026,Alejandro Osuna,TEX,AAA,Pacific Coast League,23.0,48,214,37,11,0,2,29,25,28,1,23,1,10,3
+695521,695521,2026,Gavin Conticello,AZ,AAA,Pacific Coast League,23.0,40,159,26,7,1,7,17,29,9,0,36,1,1,0
+25616,682617,2026,Marco Luciano,NYY,AAA,International League,24.0,82,349,54,12,1,16,56,50,48,0,84,8,4,1
 806401,806401,2026,Dayson Croes,SF,AAA,Pacific Coast League,26.0,23,87,15,5,0,1,9,10,5,0,9,1,2,2
-27915,696030,2026,Alejandro Osuna,TEX,AAA,Pacific Coast League,23.0,47,209,36,11,0,2,27,24,26,1,23,1,9,3
-692150,692150,2026,Émilien Pitre,NYM,AAA,International League,23.0,17,72,12,3,1,1,7,4,7,0,11,3,2,1
-25616,682617,2026,Marco Luciano,NYY,AAA,International League,24.0,80,341,54,12,1,14,52,47,45,0,83,8,4,1
+686523,686523,2026,Peyton Wilson,KC,AAA,International League,26.0,84,347,53,28,0,5,44,31,36,0,88,8,17,3
+22530,671286,2026,Johnathan Rodríguez,OAK,AAA,Pacific Coast League,26.0,94,401,63,23,0,9,48,44,53,0,83,11,1,0
 699024,699024,2026,Leo Bernal,STL,AAA,International League,22.0,101,432,67,19,2,16,67,77,51,1,86,7,9,7
+696286,696286,2026,Davis Diaz,OAK,AAA,Pacific Coast League,23.0,15,60,12,1,0,2,10,12,6,0,12,3,2,1
 29622,686217,2026,Sal Frelick,MIL,AAA,International League,26.0,10,44,4,4,0,2,7,5,5,1,6,0,1,0
+700164,700164,2026,Bryant Betancourt,COL,AAA,Pacific Coast League,22.0,33,131,20,10,0,3,18,22,9,0,16,5,2,0
 703197,703197,2026,Michael Arroyo,SEA,AAA,Pacific Coast League,21.0,49,235,33,11,4,8,38,41,19,0,38,3,4,2
 691277,691277,2026,Deyvison De Los Santos,MIA,AAA,International League,23.0,102,421,65,18,1,21,51,70,34,0,82,12,18,4
 806252,806252,2026,Ralphy Velazquez,CLE,AAA,International League,21.0,81,352,49,12,1,22,51,60,38,0,74,2,1,0
 703601,703601,2026,Max Clark,DET,AAA,International League,21.0,90,418,67,20,2,11,65,42,50,2,66,1,21,2
-682674,682674,2026,Victor Bericoto,SF,AAA,Pacific Coast League,24.0,48,205,38,6,1,6,33,31,16,0,41,10,0,0
-689531,689531,2026,Brett Squires,KC,AAA,International League,26.0,92,385,44,22,3,25,53,71,34,0,99,7,13,0
+31564,702176,2026,Alan Roden,MIN,AAA,International League,26.0,45,211,32,8,0,9,30,29,29,1,31,3,4,1
 695508,695508,2026,Cam Cauley,TEX,AAA,Pacific Coast League,23.0,87,406,62,16,3,14,73,47,51,0,85,6,35,1
 693459,693459,2026,Kyler Fedko,MIN,AAA,International League,26.0,75,307,37,17,2,17,54,54,34,0,70,3,10,4
-809707,809707,2026,Charlie Condon,COL,AAA,Pacific Coast League,23.0,121,556,71,24,7,25,100,90,72,1,139,8,8,3
 703155,703155,2026,Lazaro Montes,SEA,AAA,Pacific Coast League,21.0,44,203,22,13,0,13,32,30,25,1,63,1,3,1
+805704,805704,2026,Keaton Anthony,PHI,AAA,International League,25.0,71,297,47,13,1,10,38,43,31,0,47,10,0,0
 699302,699302,2026,Héctor Rodríguez,CIN,AAA,International League,22.0,104,455,64,16,4,27,72,69,42,2,93,5,6,2
-675085,675085,2026,Jonathon Long,MIA,AAA,International League,24.0,127,570,82,35,2,15,90,78,71,0,123,14,3,0
 701546,701546,2026,Duce Gourson,PIT,AAA,International League,23.0,42,173,27,8,2,3,26,15,22,0,42,2,8,4
-805704,805704,2026,Keaton Anthony,PHI,AAA,International League,25.0,70,293,47,13,1,9,37,42,30,0,47,10,0,0
+675085,675085,2026,Jonathon Long,MIA,AAA,International League,24.0,129,579,83,35,2,16,91,79,72,1,126,14,3,0
 682987,682987,2026,Spencer Jones,NYY,AAA,International League,25.0,54,233,26,13,0,14,34,52,31,0,72,0,10,3
-691021,691021,2026,A.J. Vukovich,AZ,AAA,Pacific Coast League,24.0,55,222,35,11,1,9,28,30,15,0,56,7,0,1
-806534,806534,2026,Ben Gobbel,LAA,AAA,Pacific Coast League,26.0,60,241,42,9,0,8,34,37,17,1,57,9,5,1
+806534,806534,2026,Ben Gobbel,LAA,AAA,Pacific Coast League,26.0,61,246,43,9,0,8,34,37,18,1,58,9,5,1
 24878,681715,2026,Heriberto Hernández,MIA,AAA,International League,26.0,5,25,4,2,0,0,8,2,3,0,1,0,3,0
+28142,691373,2026,Jhostynxon Garcia,PIT,AAA,International League,23.0,64,262,44,12,0,8,40,31,21,0,63,6,5,1
+691021,691021,2026,A.J. Vukovich,AZ,AAA,Pacific Coast League,24.0,57,230,36,12,1,9,28,32,15,0,59,7,0,1
+809707,809707,2026,Charlie Condon,COL,AAA,Pacific Coast League,23.0,123,565,72,24,7,25,100,90,73,1,143,8,8,3
+689531,689531,2026,Brett Squires,KC,AAA,International League,26.0,94,393,45,22,3,25,53,72,34,0,105,7,13,0
 701785,701785,2026,Kaelen Culpepper,MIN,AAA,International League,23.0,74,343,49,15,2,14,63,46,39,0,63,6,17,3
+700032,700032,2026,Victor Labrada,SEA,AAA,Pacific Coast League,26.0,117,489,75,24,2,11,60,54,52,0,94,1,20,6
 677565,677565,2026,Kristian Robinson,AZ,AAA,Pacific Coast League,25.0,111,481,74,16,5,14,77,55,66,0,136,5,22,5
+682674,682674,2026,Victor Bericoto,SF,AAA,Pacific Coast League,24.0,50,212,39,6,1,6,34,31,16,0,43,11,0,0
 814430,814430,2026,Brett Callahan,DET,AAA,International League,24.0,36,151,29,6,0,1,15,17,12,0,39,2,9,2
 701298,701298,2026,Phillip Glasser,WSH,AAA,International League,26.0,107,415,77,15,1,2,52,44,53,0,57,11,12,3
-686912,686912,2026,Maxwell Romero Jr.,WSH,AAA,International League,25.0,35,143,19,5,0,9,22,23,18,0,53,3,0,0
 840570,840570,2026,Henry Kusiak,MIN,AAA,International League,25.0,11,43,5,5,0,0,10,8,4,0,11,0,0,1
+686912,686912,2026,Maxwell Romero Jr.,WSH,AAA,International League,25.0,36,147,20,5,0,9,22,23,18,0,56,3,0,0
 807742,807742,2026,Colton Ledbetter,STL,AAA,International League,24.0,105,439,68,23,3,12,70,53,38,0,126,3,25,5
-681333,681333,2026,Dru Baker,CWS,AAA,International League,26.0,90,321,56,12,3,8,44,43,19,0,84,5,17,4
-700164,700164,2026,Bryant Betancourt,COL,AAA,Pacific Coast League,22.0,32,127,18,10,0,3,18,21,9,0,16,5,2,0
-700032,700032,2026,Victor Labrada,SEA,AAA,Pacific Coast League,26.0,114,476,72,24,2,10,57,52,51,0,94,1,20,6
+25971,682634,2026,Kevin Alcántara,CHC,AAA,International League,23.0,77,338,44,15,0,20,47,58,42,0,100,4,6,2
 31431,687597,2026,Jordan Beck,COL,AAA,Pacific Coast League,25.0,26,114,13,7,1,7,15,20,8,0,26,1,4,2
+22896,672820,2026,Lenyn Sosa,TOR,AAA,International League,26.0,14,56,9,3,0,2,8,8,4,0,13,5,0,1
+699232,699232,2026,Anderdson Rojas,AZ,AAA,Pacific Coast League,22.0,107,436,79,16,2,5,44,42,34,0,74,5,13,4
 25980,683090,2026,Matthew Lugo,KC,AAA,International League,25.0,61,247,30,17,2,11,40,39,17,0,62,2,3,4
-687282,687282,2026,Gabriel Rincones Jr.,PHI,AAA,International League,25.0,35,136,19,10,0,3,15,12,13,0,32,1,2,1
 807727,807727,2026,Charles McAdoo,TOR,AAA,International League,24.0,89,385,58,13,2,16,57,57,48,0,86,7,12,4
-699232,699232,2026,Anderdson Rojas,AZ,AAA,Pacific Coast League,22.0,105,428,78,15,2,5,44,42,33,0,72,4,12,4
-28142,691373,2026,Jhostynxon Garcia,PIT,AAA,International League,23.0,62,254,42,12,0,7,38,30,21,0,61,5,5,1
-23698,677595,2026,Ronny Mauricio,NYM,AAA,International League,25.0,65,277,41,10,0,18,38,52,12,1,57,5,12,5
 23985,678545,2026,Osleivis Basabe,SF,AAA,Pacific Coast League,25.0,75,311,51,18,0,5,34,43,30,0,34,9,12,1
 683679,683679,2026,Jesus Rodriguez,SF,AAA,Pacific Coast League,24.0,50,225,37,10,0,5,29,28,24,0,26,4,7,0
 806146,806146,2026,George Lombard Jr.,NYY,AAA,International League,21.0,56,262,33,16,1,6,44,21,45,0,57,1,10,5
-681123,681123,2026,Luca Tresh,KC,AAA,International League,26.0,91,371,65,16,0,10,46,51,23,0,106,4,1,1
-25971,682634,2026,Kevin Alcántara,CHC,AAA,International League,23.0,75,328,42,15,0,19,45,54,41,0,97,4,5,2
-692371,692371,2026,Lizandro Espinoza,ATL,AAA,International League,23.0,20,84,13,4,0,2,11,12,11,0,20,3,9,2
+31354,699625,2026,Jimmy Crooks,STL,AAA,International League,24.0,46,208,24,6,0,15,41,32,34,2,60,1,1,0
+681333,681333,2026,Dru Baker,CWS,AAA,International League,26.0,91,324,56,12,3,8,44,43,20,0,85,5,17,4
+703185,703185,2026,Nelson Rada,LAA,AAA,Pacific Coast League,20.0,120,546,96,17,5,3,90,40,66,1,102,10,37,8
 687605,687605,2026,Andrew Pinckney,WSH,AAA,International League,25.0,99,402,69,11,1,14,66,52,41,0,125,8,20,7
-681357,681357,2026,Cody Morissette,MIN,AAA,International League,26.0,77,289,37,16,0,16,39,53,29,0,68,7,9,1
+702679,702679,2026,Demetrio Crisantes,AZ,AAA,Pacific Coast League,21.0,42,175,30,8,2,2,20,20,14,0,30,2,0,1
+681123,681123,2026,Luca Tresh,KC,AAA,International League,26.0,92,375,65,17,0,10,46,51,23,0,108,5,1,1
 691292,691292,2026,Angel Ortiz,AZ,AAA,Pacific Coast League,23.0,39,150,22,5,2,6,20,26,16,0,28,2,4,0
-800959,800959,2026,Nick Goodwin,TOR,AAA,International League,24.0,24,89,11,8,0,1,13,8,11,0,19,0,0,0
+23698,677595,2026,Ronny Mauricio,NYM,AAA,International League,25.0,67,287,43,10,0,18,41,54,13,1,59,5,12,5
+681357,681357,2026,Cody Morissette,MIN,AAA,International League,26.0,79,298,38,17,0,16,39,55,30,0,71,7,9,1
+684715,684715,2026,Nic Kent,COL,AAA,Pacific Coast League,26.0,87,343,43,19,4,14,61,60,36,0,89,3,6,3
+813852,813852,2026,Trey Paige,STL,AAA,International League,25.0,8,32,5,2,0,1,5,3,2,0,5,0,0,0
 30011,687952,2026,Christian Encarnacion-Strand,BAL,AAA,International League,26.0,71,297,37,15,2,19,40,56,14,0,91,11,2,0
 801464,801464,2026,Andrew Pintar,MIA,AAA,International League,25.0,90,364,57,14,2,10,55,48,41,0,83,2,27,7
-682818,682818,2026,Yohendrick Piñango,TOR,AAA,International League,24.0,63,280,41,16,0,8,30,38,30,2,72,5,5,0
+690961,690961,2026,Enrique Bradfield Jr.,BAL,AAA,International League,24.0,83,347,62,11,3,3,59,32,37,0,70,5,31,5
 680695,680695,2026,Brennen Davis,SEA,AAA,Pacific Coast League,26.0,47,205,21,15,0,9,29,31,24,0,46,5,1,0
 682003,682003,2026,Garrett Martin,NYY,AAA,International League,26.0,8,35,4,2,0,3,5,10,1,0,11,0,1,0
-684715,684715,2026,Nic Kent,COL,AAA,Pacific Coast League,26.0,85,338,41,19,4,14,61,59,36,0,88,3,6,3
+689196,689196,2026,Owen Ayers,CHC,AAA,International League,25.0,44,186,29,9,0,3,22,20,29,0,40,3,7,0
 27962,691182,2026,Adael Amador,COL,AAA,Pacific Coast League,23.0,94,434,62,21,3,11,67,62,61,0,48,11,11,7
-824028,824028,2026,Gage Miller,MIA,AAA,International League,23.0,48,173,21,9,0,7,24,23,27,0,32,1,7,4
-678760,678760,2026,Eddys Leonard,SF,AAA,Pacific Coast League,25.0,90,373,52,16,2,16,49,58,38,1,71,6,8,6
+687627,687627,2026,Kody Huff,CLE,AAA,International League,25.0,112,466,56,21,6,20,77,75,67,1,91,7,12,6
+678760,678760,2026,Eddys Leonard,SF,AAA,Pacific Coast League,25.0,91,377,53,16,2,16,50,58,38,1,71,6,8,6
 27647,683011,2026,Anthony Volpe,NYY,AAA,International League,25.0,37,169,18,9,1,11,28,26,16,0,40,0,10,4
-703185,703185,2026,Nelson Rada,LAA,AAA,Pacific Coast League,20.0,119,542,93,17,5,3,90,38,66,1,102,10,36,8
 27493,677956,2026,Rece Hinds,BAL,AAA,International League,25.0,76,326,43,14,2,15,51,51,36,1,85,3,14,2
-702679,702679,2026,Demetrio Crisantes,AZ,AAA,Pacific Coast League,21.0,40,166,30,7,1,2,17,19,10,0,30,2,0,1
 699115,699115,2026,Carlos Jorge,CIN,AAA,International League,22.0,29,124,22,5,1,2,15,11,8,0,25,0,10,1
-691792,691792,2026,Roc Riggio,COL,AAA,Pacific Coast League,24.0,19,86,13,3,0,4,10,14,7,0,27,4,1,0
-687627,687627,2026,Kody Huff,CLE,AAA,International League,25.0,111,460,54,21,6,20,76,74,67,1,88,7,12,6
-690961,690961,2026,Enrique Bradfield Jr.,BAL,AAA,International League,24.0,82,342,60,11,3,3,57,32,37,0,69,5,30,5
-804645,804645,2026,Caden Connor,CWS,AAA,International League,25.0,104,377,64,17,1,6,48,40,34,0,60,10,14,7
-31354,699625,2026,Jimmy Crooks,STL,AAA,International League,24.0,45,204,22,6,0,15,40,32,34,2,58,1,1,0
 680664,680664,2026,Eduardo Valencia,DET,AAA,International League,26.0,81,354,49,14,1,17,60,54,35,1,75,5,1,1
-28552,692585,2026,Yanquiel Fernández,NYY,AAA,International League,23.0,119,505,76,19,1,25,59,82,37,0,109,9,3,2
+682818,682818,2026,Yohendrick Piñango,TOR,AAA,International League,24.0,64,283,41,16,0,8,30,38,30,2,73,5,5,0
+703680,703680,2026,Brandon Compton,MIA,AAA,International League,22.0,11,48,7,2,0,2,6,3,6,0,20,1,5,0
 801126,801126,2026,Brock Rodden,SEA,AAA,Pacific Coast League,26.0,92,410,50,22,3,19,54,65,43,0,93,5,8,3
 23790,677943,2026,Will Banfield,CIN,AAA,International League,26.0,79,296,49,12,0,11,32,46,16,0,69,13,0,0
-701648,701648,2026,Aaron Zavala,TEX,AAA,Pacific Coast League,26.0,115,485,67,30,3,10,56,59,51,0,121,4,7,3
+28552,692585,2026,Yanquiel Fernández,NYY,AAA,International League,23.0,121,513,76,20,1,26,60,85,37,0,111,9,3,2
+691181,691181,2026,Emmanuel Rodriguez,MIN,AAA,International League,23.0,49,220,27,6,1,11,36,33,42,0,58,0,7,3
 23818,678225,2026,Jihwan Bae,MIL,AAA,International League,26.0,92,374,60,14,3,6,60,35,47,0,76,6,36,6
-22896,672820,2026,Lenyn Sosa,TOR,AAA,International League,26.0,12,50,7,3,0,2,8,8,4,0,13,5,0,1
+804645,804645,2026,Caden Connor,CWS,AAA,International League,25.0,106,384,64,18,1,6,49,41,34,0,61,10,14,7
+701648,701648,2026,Aaron Zavala,TEX,AAA,Pacific Coast League,26.0,116,486,67,30,3,10,56,59,51,0,122,4,7,3
 31665,690976,2026,Alex Freeland,LAD,AAA,Pacific Coast League,24.0,38,182,27,6,3,5,26,26,24,0,36,4,9,3
 702726,702726,2026,Luke Adams,MIL,AAA,International League,22.0,67,279,30,10,2,13,48,38,40,0,39,4,7,2
 691627,691627,2026,Ricardo Olivar,MIN,AAA,International League,24.0,7,27,3,2,0,2,3,11,0,0,6,1,1,0
-801406,801406,2026,Jared Dickey,OAK,AAA,Pacific Coast League,24.0,90,390,63,13,3,6,50,53,57,1,60,5,6,1
 27931,690984,2026,Petey Halpin,CLE,AAA,International League,24.0,42,193,30,7,3,5,29,25,16,0,40,0,10,0
-689196,689196,2026,Owen Ayers,CHC,AAA,International League,25.0,42,176,27,8,0,3,20,19,27,0,37,3,7,0
-29547,669208,2026,Ryan Bliss,SEA,AAA,Pacific Coast League,26.0,115,540,79,32,4,8,66,53,42,0,111,15,26,13
+22541,671655,2026,George Valera,CLE,AAA,International League,25.0,74,317,45,14,1,10,35,46,41,0,57,6,4,2
 27883,695336,2026,Thomas Saggese,STL,AAA,International League,24.0,55,249,35,10,0,10,35,33,26,0,56,3,9,1
 33541,686611,2026,Dylan Crews,WSH,AAA,International League,24.0,41,177,24,10,1,5,30,20,19,1,44,2,7,2
-26244,685744,2026,Kenedy Corona,NYY,AAA,International League,26.0,74,263,36,11,1,9,40,40,31,0,57,4,14,6
+683427,683427,2026,Omar Hernandez,KC,AAA,International League,24.0,8,32,8,0,0,0,2,0,0,0,4,0,0,1
+703766,703766,2026,Dakota Harris,STL,AAA,International League,24.0,13,42,4,4,0,1,3,3,5,1,9,1,1,1
+694224,694224,2026,Gabriel Gonzalez,MIN,AAA,International League,22.0,107,449,68,19,2,15,55,51,36,0,80,13,1,4
+700939,700939,2026,Bennett Lee,DET,AAA,International League,24.0,24,82,16,1,1,1,8,10,5,0,30,2,0,0
+801406,801406,2026,Jared Dickey,OAK,AAA,Pacific Coast League,24.0,92,397,64,13,3,6,50,53,57,1,62,5,6,1
+29547,669208,2026,Ryan Bliss,SEA,AAA,Pacific Coast League,26.0,117,550,79,32,5,8,68,54,44,0,111,15,27,13
+695735,695735,2026,Creed Willems,BAL,AAA,International League,23.0,105,428,72,4,0,17,51,62,48,3,96,7,0,0
 695491,695491,2026,Joshua Báez,STL,AAA,International League,23.0,103,461,46,22,3,34,79,90,37,3,136,6,21,3
+800959,800959,2026,Nick Goodwin,TOR,AAA,International League,24.0,26,96,12,8,0,1,13,8,11,0,19,0,0,0
 33644,692225,2026,Kristian Campbell,BOS,AAA,International League,24.0,109,462,65,22,0,8,46,51,73,0,126,9,8,1
-691181,691181,2026,Emmanuel Rodriguez,MIN,AAA,International League,23.0,48,215,25,6,1,11,36,32,41,0,57,0,7,2
+692238,692238,2026,Parks Harber,SF,AAA,Pacific Coast League,24.0,46,216,33,9,0,5,25,29,26,0,53,2,2,1
 699013,699013,2026,Esmerlyn Valdez,PIT,AAA,International League,22.0,56,237,23,13,0,13,33,38,41,0,51,5,0,1
 806068,806068,2026,Colt Emerson,SEA,AAA,Pacific Coast League,20.0,38,169,21,8,1,7,26,26,17,1,46,3,10,3
-695653,695653,2026,Noah Miller,LAD,AAA,Pacific Coast League,23.0,133,551,85,20,9,10,65,65,52,0,100,8,4,0
+26244,685744,2026,Kenedy Corona,NYY,AAA,International League,26.0,76,267,36,11,1,9,41,40,32,0,58,4,14,6
+804558,804558,2026,Raudi Rodriguez,LAA,AAA,Pacific Coast League,22.0,30,138,22,1,3,4,24,16,20,0,25,2,7,2
 669219,669219,2026,Je'Von Ward,TOR,AAA,International League,26.0,59,199,26,8,0,11,25,30,19,0,68,0,2,2
+24273,678894,2026,Liover Peguero,WSH,AAA,International League,25.0,90,347,48,24,1,3,38,48,43,0,95,9,9,1
 703492,703492,2026,Nick Morabito,NYM,AAA,International League,23.0,114,507,79,14,2,13,73,47,57,0,106,7,42,4
-694224,694224,2026,Gabriel Gonzalez,MIN,AAA,International League,22.0,106,444,66,19,2,15,54,51,35,0,80,13,1,4
+695653,695653,2026,Noah Miller,LAD,AAA,Pacific Coast League,23.0,134,555,85,20,9,10,65,65,53,0,101,8,4,0
 26546,682663,2026,Agustín Ramírez,MIA,AAA,International League,24.0,59,241,32,14,1,7,33,29,23,0,52,10,17,4
-24273,678894,2026,Liover Peguero,WSH,AAA,International League,25.0,88,339,46,24,1,3,38,47,42,0,93,9,9,1
+824028,824028,2026,Gage Miller,MIA,AAA,International League,23.0,50,179,21,9,0,7,24,23,27,0,33,1,7,4
 31661,689200,2026,Jacob Melton,TB,AAA,International League,25.0,45,186,20,12,1,7,26,26,22,0,62,5,26,1
-692238,692238,2026,Parks Harber,SF,AAA,Pacific Coast League,24.0,44,208,31,9,0,5,24,29,24,0,51,2,2,1
-695735,695735,2026,Creed Willems,BAL,AAA,International League,23.0,104,423,70,4,0,17,50,61,48,3,96,7,0,0
-695462,695462,2026,Cal Conley,ATL,AAA,International League,26.0,64,203,29,12,1,4,25,28,13,0,50,0,15,2
-691620,691620,2026,Jeferson Quero,MIL,AAA,International League,23.0,113,463,70,17,2,15,52,67,38,0,99,14,2,1
-804558,804558,2026,Raudi Rodriguez,LAA,AAA,Pacific Coast League,22.0,29,133,21,1,3,4,23,16,18,0,25,2,6,2
 694580,694580,2026,Kemp Alderman,MIA,AAA,International League,23.0,101,421,64,11,1,18,57,60,36,3,138,6,10,1
-22541,671655,2026,George Valera,CLE,AAA,International League,25.0,73,311,42,14,1,10,34,45,40,0,57,6,4,1
-694351,694351,2026,Jacob Berry,KC,AAA,International League,25.0,95,396,52,22,0,9,49,45,50,1,58,4,19,7
 669384,669384,2026,Raynel Delgado,HOU,AAA,Pacific Coast League,26.0,103,436,66,23,3,5,53,53,38,2,85,8,29,9
-696135,696135,2026,Kahlil Watson,CLE,AAA,International League,23.0,89,402,47,17,1,19,62,59,55,0,110,4,22,13
-692348,692348,2026,Aeverson Arteaga,SF,AAA,Pacific Coast League,23.0,70,270,45,11,1,3,25,35,18,0,61,4,1,2
-683609,683609,2026,Victor Duarte,SD,AAA,Pacific Coast League,25.0,12,41,6,1,0,2,4,4,2,0,15,0,2,0
-699912,699912,2026,Jose Fernandez,AZ,AAA,Pacific Coast League,22.0,55,252,35,12,3,7,39,43,19,0,62,3,11,2
-703766,703766,2026,Dakota Harris,STL,AAA,International League,24.0,12,38,4,3,0,1,3,3,4,1,8,1,1,0
+691620,691620,2026,Jeferson Quero,MIL,AAA,International League,23.0,114,467,70,17,2,15,52,67,39,0,99,15,2,1
+683609,683609,2026,Victor Duarte,SD,AAA,Pacific Coast League,25.0,13,45,7,1,0,2,4,4,2,0,16,1,2,0
+699912,699912,2026,Jose Fernandez,AZ,AAA,Pacific Coast League,22.0,57,258,35,13,3,7,40,45,21,0,62,3,12,2
 695078,695078,2026,Jean Walters,AZ,AAA,Pacific Coast League,24.0,29,109,16,7,0,1,17,3,10,0,21,4,0,0
-688457,688457,2026,Gavin Cross,KC,AAA,International League,25.0,112,448,62,18,5,17,65,52,31,0,138,5,25,5
-805346,805346,2026,Ben Ross,MIN,AAA,International League,25.0,102,418,47,23,3,15,56,55,56,0,114,5,12,7
+805346,805346,2026,Ben Ross,MIN,AAA,International League,25.0,103,423,48,23,3,15,57,55,58,0,114,5,12,7
+694351,694351,2026,Jacob Berry,KC,AAA,International League,25.0,96,399,52,22,0,9,49,45,50,1,59,4,19,7
+688457,688457,2026,Gavin Cross,KC,AAA,International League,25.0,113,452,63,18,5,17,66,52,31,0,138,5,25,5
 681047,681047,2026,Christian Franklin,WSH,AAA,International League,26.0,93,426,62,17,2,6,57,39,65,0,107,6,17,4
-702540,702540,2026,Mikey Romero,BOS,AAA,International League,22.0,106,460,69,18,3,12,51,61,39,0,93,6,2,0
-700939,700939,2026,Bennett Lee,DET,AAA,International League,24.0,23,81,15,1,1,1,7,10,5,0,30,2,0,0
-29949,672012,2026,Tyler Black,MIL,AAA,International League,25.0,95,399,53,15,5,7,55,43,62,0,90,4,23,4
-822966,822966,2026,John Taylor,TEX,AAA,Pacific Coast League,25.0,78,337,46,11,3,7,43,53,52,1,72,0,16,5
+696135,696135,2026,Kahlil Watson,CLE,AAA,International League,23.0,90,408,47,17,1,19,64,59,56,0,110,4,22,13
+702540,702540,2026,Mikey Romero,BOS,AAA,International League,22.0,108,468,71,18,3,12,51,61,39,0,96,6,2,0
+692348,692348,2026,Aeverson Arteaga,SF,AAA,Pacific Coast League,23.0,72,276,45,12,1,3,25,36,18,0,63,4,2,2
+803033,803033,2026,Matthew Etzel,MIA,AAA,International League,24.0,116,483,63,19,2,19,70,62,62,0,119,5,22,7
+29949,672012,2026,Tyler Black,MIL,AAA,International League,25.0,96,403,54,15,5,7,55,43,63,0,90,4,23,4
 28022,700337,2026,Edgar Quero,CWS,AAA,International League,23.0,26,113,21,3,0,1,7,10,9,0,18,2,0,0
-803033,803033,2026,Matthew Etzel,MIA,AAA,International League,24.0,114,474,62,19,2,17,68,59,61,0,117,5,21,7
 691788,691788,2026,Joe Mack,MIA,AAA,International League,23.0,24,103,15,2,0,3,10,9,20,0,22,2,1,0
 694673,694673,2026,Abimelec Ortiz,WSH,AAA,International League,24.0,85,365,33,25,0,18,55,74,43,3,71,5,0,1
-696140,696140,2026,Ethan Murray,MIL,AAA,International League,26.0,99,374,63,8,2,6,43,44,38,0,85,8,9,5
-692416,692416,2026,Christian Cerda,AZ,AAA,Pacific Coast League,23.0,66,230,31,11,0,5,26,37,26,0,51,6,0,0
-691369,691369,2026,Allan Castro,BOS,AAA,International League,23.0,111,469,75,15,1,9,57,60,49,1,88,9,20,6
+695462,695462,2026,Cal Conley,ATL,AAA,International League,26.0,66,211,29,12,1,4,25,28,13,0,52,1,15,2
+695763,695763,2026,Sam Petersen,WSH,AAA,International League,23.0,30,125,17,5,1,3,15,18,11,0,39,2,5,0
+692416,692416,2026,Christian Cerda,AZ,AAA,Pacific Coast League,23.0,67,234,32,11,0,5,26,37,27,0,52,6,0,0
+822966,822966,2026,John Taylor,TEX,AAA,Pacific Coast League,25.0,79,342,46,11,3,7,43,53,53,1,73,0,16,5
 21865,666310,2026,Bo Naylor,MIL,AAA,International League,26.0,59,257,26,15,1,11,35,41,35,0,62,2,4,0
 806198,806198,2026,Cooper Pratt,MIL,AAA,International League,21.0,58,261,37,6,4,6,34,32,34,0,37,9,17,1
 701496,701496,2026,Ben Cowles,CHC,AAA,International League,26.0,107,428,59,23,1,8,47,54,36,0,100,5,15,4
 802407,802407,2026,Joe Lampe,CLE,AAA,International League,25.0,16,57,8,4,0,1,7,6,2,0,10,0,2,1
+691369,691369,2026,Allan Castro,BOS,AAA,International League,23.0,113,478,76,15,1,10,58,62,49,1,91,9,20,6
+692371,692371,2026,Lizandro Espinoza,ATL,AAA,International League,23.0,22,93,13,4,0,2,12,12,12,0,21,3,10,2
 21730,665856,2026,Jair Camargo,ATL,AAA,International League,26.0,59,218,34,10,0,5,19,22,8,0,78,2,5,2
 685332,685332,2026,Carlos Mendoza,TOR,AAA,International League,26.0,107,410,57,15,0,7,45,42,68,0,69,6,7,7
+696140,696140,2026,Ethan Murray,MIL,AAA,International League,26.0,100,378,63,8,2,6,43,44,38,0,86,8,9,5
 33704,692216,2026,CJ Kayfus,CLE,AAA,International League,24.0,46,199,29,6,2,3,15,25,24,0,54,3,6,1
 678010,678010,2026,Nick Schnell,SD,AAA,Pacific Coast League,26.0,59,244,26,11,2,12,45,38,25,0,76,3,5,3
+670868,670868,2026,Abrahan Gutierrez,NYY,AAA,International League,26.0,18,52,7,1,0,3,7,4,5,0,8,0,0,0
 686540,686540,2026,Owen Cobb,NYY,AAA,International League,25.0,6,22,2,3,0,0,3,1,0,0,5,0,0,0
-695763,695763,2026,Sam Petersen,WSH,AAA,International League,23.0,28,118,15,5,1,3,15,16,10,0,38,2,5,0
 31349,687363,2026,Victor Scott II,STL,AAA,International League,25.0,57,249,36,11,3,2,45,17,22,0,47,3,23,2
 31363,688363,2026,Graham Pauley,MIA,AAA,International League,25.0,46,193,21,10,1,7,22,23,24,0,51,1,6,1
 701655,701655,2026,Reed Trimble,BAL,AAA,International League,26.0,15,64,4,3,1,5,13,16,7,1,24,0,3,0
 31765,805373,2026,Nacho Alvarez Jr.,ATL,AAA,International League,23.0,37,169,25,7,0,2,22,21,21,1,30,4,4,1
+28344,691907,2026,Tsung-Che Cheng,BOS,AAA,International League,24.0,91,336,44,12,4,7,46,28,45,0,81,3,10,7
 682877,682877,2026,Juan Brito,CIN,AAA,International League,24.0,105,470,59,22,2,11,51,59,64,1,84,10,8,3
-690914,690914,2026,Brody Moore,STL,AAA,International League,25.0,85,316,50,14,0,1,25,33,28,0,57,5,13,7
+690914,690914,2026,Brody Moore,STL,AAA,International League,25.0,86,317,50,14,0,1,25,33,29,0,57,5,13,7
 28820,694208,2026,Moisés Ballesteros,CHC,AAA,International League,22.0,32,145,18,8,0,2,18,23,22,1,21,3,2,0
 694939,694939,2026,Marcus Brown,HOU,AAA,Pacific Coast League,24.0,6,17,3,1,0,0,1,0,0,0,2,0,0,0
-31562,701305,2026,Zach Dezenzo,HOU,AAA,Pacific Coast League,26.0,48,211,30,5,1,4,24,16,36,0,44,2,11,1
 692232,692232,2026,Fernando Gonzalez,SF,AAA,Pacific Coast League,24.0,7,24,3,0,1,0,1,1,5,0,8,1,0,0
+23794,677954,2026,Jordan Groshans,ATL,AAA,International League,26.0,10,38,4,2,1,1,3,3,4,0,5,0,0,0
+815104,815104,2026,Graysen Tarlow,STL,AAA,International League,24.0,10,39,5,3,0,0,6,2,3,0,4,2,0,0
+691003,691003,2026,Tre' Morgan,TB,AAA,International League,23.0,52,221,31,7,0,9,23,25,13,0,68,3,0,1
 26467,682641,2026,Luis Matos,MIL,AAA,International League,24.0,67,277,40,11,2,5,31,36,23,0,28,3,10,6
-691003,691003,2026,Tre' Morgan,TB,AAA,International League,23.0,51,217,31,6,0,9,22,24,13,0,68,2,0,1
-815104,815104,2026,Graysen Tarlow,STL,AAA,International League,24.0,9,35,4,3,0,0,6,2,3,0,4,2,0,0
 692446,692446,2026,Miguel Villarroel,STL,AAA,International League,24.0,12,35,5,2,0,0,4,2,4,0,13,0,1,0
 805268,805268,2026,Peyton Williams,TOR,AAA,International League,25.0,18,63,9,2,0,3,6,8,3,0,18,0,0,0
 702518,702518,2026,Jett Williams,MIL,AAA,International League,22.0,81,359,48,9,5,9,60,41,47,0,79,3,21,4
 25690,687529,2026,Grant McCray,SF,AAA,Pacific Coast League,25.0,56,244,31,11,1,4,43,34,37,1,56,2,12,2
-802355,802355,2026,Tanner Schobel,MIN,AAA,International League,25.0,91,334,45,16,0,6,41,24,40,0,70,8,8,2
+31562,701305,2026,Zach Dezenzo,HOU,AAA,Pacific Coast League,26.0,49,215,30,5,1,4,25,16,37,0,44,2,11,1
 23695,677592,2026,Everson Pereira,CWS,AAA,International League,25.0,12,50,5,1,0,4,8,8,6,0,15,2,0,0
 692405,692405,2026,Jeremy Rivas,STL,AAA,International League,23.0,27,104,17,2,0,1,13,11,16,0,28,1,3,0
+699114,699114,2026,Leo Balcazar,CIN,AAA,International League,22.0,32,128,15,9,1,1,11,14,16,0,20,5,1,1
 701678,701678,2026,Hao-Yu Lee,DET,AAA,International League,23.0,14,63,8,2,0,3,8,12,6,0,13,3,0,1
-692046,692046,2026,Axel Sanchez,SEA,AAA,Pacific Coast League,23.0,21,65,10,1,0,2,14,8,7,0,17,0,3,0
+681439,681439,2026,Zach Morgan,SF,AAA,Pacific Coast League,26.0,36,123,18,6,0,1,15,19,12,0,16,5,0,0
+675455,675455,2026,Milan Tolentino,CLE,AAA,International League,24.0,123,476,43,25,4,21,71,73,64,1,147,3,18,5
+683344,683344,2026,Homer Bush Jr.,TB,AAA,International League,24.0,102,374,55,15,1,5,44,34,28,0,104,5,36,8
 26121,682626,2026,Francisco Alvarez,NYM,AAA,International League,24.0,4,14,1,2,0,0,1,1,1,0,4,0,0,0
-686551,686551,2026,Christian Cairo,PHI,AAA,International League,25.0,126,509,72,15,1,4,66,35,90,1,73,7,25,11
-30038,700246,2026,Carson Williams,TB,AAA,International League,23.0,104,446,59,13,5,12,60,60,55,0,148,8,23,8
-28344,691907,2026,Tsung-Che Cheng,BOS,AAA,International League,24.0,89,329,42,12,3,7,45,27,43,0,79,3,10,7
-699114,699114,2026,Leo Balcazar,CIN,AAA,International League,22.0,31,124,14,9,1,1,10,14,15,0,20,5,1,1
-683344,683344,2026,Homer Bush Jr.,TB,AAA,International League,24.0,101,372,54,15,1,5,44,34,28,0,104,5,36,8
+802355,802355,2026,Tanner Schobel,MIN,AAA,International League,25.0,93,343,45,17,0,6,42,28,41,0,71,8,8,2
 695692,695692,2026,Cooper Kinney,TB,AAA,International League,23.0,49,199,30,5,2,4,20,24,18,0,63,0,3,1
-675455,675455,2026,Milan Tolentino,CLE,AAA,International League,24.0,122,471,42,25,4,20,69,71,64,1,146,3,18,5
+30038,700246,2026,Carson Williams,TB,AAA,International League,23.0,105,450,59,13,5,12,60,60,56,0,149,8,23,8
+31792,805249,2026,Otto Kemp,PHI,AAA,International League,26.0,101,422,53,9,3,16,61,51,36,0,90,5,10,5
 31991,804668,2026,Rafael Flores Jr.,PIT,AAA,International League,25.0,65,276,36,10,2,4,33,38,46,0,69,4,0,0
-690971,690971,2026,Chase Davis,STL,AAA,International League,24.0,42,163,24,4,1,4,14,20,16,0,42,2,2,1
 677601,677601,2026,Keyber Rodriguez,TEX,AAA,Pacific Coast League,25.0,78,311,39,8,2,14,47,37,24,0,69,1,6,2
 691001,691001,2026,Robert Moore,PHI,AAA,International League,24.0,83,308,28,16,2,14,50,45,33,1,44,4,7,2
 691938,691938,2026,Willy Vasquez,BAL,AAA,International League,24.0,46,156,21,5,1,3,19,14,20,1,53,1,8,6
-31437,690291,2026,Jace Jung,DET,AAA,International League,25.0,124,531,57,24,0,20,69,77,80,1,111,10,2,1
+695501,695501,2026,Blake Burke,MIL,AAA,International League,23.0,25,112,14,3,1,4,17,9,11,0,38,0,0,1
 694181,694181,2026,Carlos Colmenarez,TB,AAA,International League,22.0,27,86,12,3,0,2,12,10,8,0,39,0,4,0
-700681,700681,2026,Nick Lorusso,NYM,AAA,International League,25.0,27,97,14,2,0,3,14,10,11,0,22,1,5,0
-801276,801276,2026,Juan Matheus,MIA,AAA,International League,22.0,9,38,5,2,0,0,4,2,6,0,6,1,4,1
+686551,686551,2026,Christian Cairo,PHI,AAA,International League,25.0,128,516,72,15,1,4,66,35,90,1,76,7,25,11
 23442,676679,2026,Luis Vázquez,BAL,AAA,International League,26.0,52,202,29,5,2,6,21,19,10,0,50,6,8,3
 807751,807751,2026,Ethan O'Donnell,MIA,AAA,International League,24.0,61,238,35,6,0,3,32,23,36,0,65,2,16,2
-31792,805249,2026,Otto Kemp,PHI,AAA,International League,26.0,99,413,51,9,3,15,60,48,35,0,90,5,10,4
-31855,687515,2026,Colby Thomas,PHI,AAA,International League,25.0,41,169,23,5,1,5,20,24,13,1,50,1,2,2
+31437,690291,2026,Jace Jung,DET,AAA,International League,25.0,126,541,58,24,0,20,71,77,82,1,112,10,2,1
 694689,694689,2026,Dominic Pitelli,CIN,AAA,International League,24.0,61,196,26,11,0,1,22,14,20,0,64,2,4,5
-702302,702302,2026,RJ Schreck,TOR,AAA,International League,25.0,58,236,25,9,1,7,34,36,41,2,44,3,4,2
 29958,695670,2026,Harry Ford,WSH,AAA,International League,23.0,58,257,31,11,0,4,34,22,45,0,65,4,0,3
+828599,828599,2026,Lucas Spence,HOU,AAA,Pacific Coast League,23.0,45,179,18,7,1,7,24,29,26,0,51,3,5,0
 26599,682729,2026,Jonatan Clase,TOR,AAA,International League,24.0,53,217,27,8,1,5,25,23,28,1,54,6,17,4
-683149,683149,2026,Julian Brock,TEX,AAA,Pacific Coast League,25.0,18,66,6,3,1,2,11,9,9,0,18,2,2,1
+702302,702302,2026,RJ Schreck,TOR,AAA,International League,25.0,60,242,26,9,1,7,34,36,42,2,45,3,4,2
 700731,700731,2026,Keiner Delgado,PIT,AAA,International League,22.0,17,75,11,2,0,1,12,4,10,0,14,1,4,0
-815152,815152,2026,Theo Hardy,TEX,AAA,Pacific Coast League,24.0,12,31,4,1,1,0,5,1,2,0,5,0,1,0
-683427,683427,2026,Omar Hernandez,KC,AAA,International League,24.0,7,28,6,0,0,0,2,0,0,0,3,0,0,1
-800957,800957,2026,Brendan Jones,MIA,AAA,International League,24.0,20,72,9,3,0,2,7,7,9,0,20,0,8,1
 678099,678099,2026,Gavin Logan,AZ,AAA,Pacific Coast League,26.0,4,10,1,1,0,0,0,2,1,0,3,0,0,0
 699471,699471,2026,Ivan Melendez,AZ,AAA,Pacific Coast League,26.0,12,50,7,1,0,2,4,8,3,0,16,2,0,0
-805672,805672,2026,Collin Price,HOU,AAA,Pacific Coast League,26.0,78,330,29,14,0,18,35,44,46,0,94,4,8,1
-27482,690987,2026,Robert Hassell III,PIT,AAA,International League,24.0,75,303,44,14,0,2,33,27,30,1,78,2,10,3
-681439,681439,2026,Zach Morgan,SF,AAA,Pacific Coast League,26.0,35,119,17,5,0,1,15,16,12,0,16,5,0,0
+690985,690985,2026,Colby Halter,OAK,AAA,Pacific Coast League,24.0,61,194,28,4,0,3,24,17,27,0,62,1,12,1
+690971,690971,2026,Chase Davis,STL,AAA,International League,24.0,43,167,24,4,1,4,14,20,16,0,43,2,2,1
 691858,691858,2026,Jared Serna,MIA,AAA,International League,24.0,91,336,43,10,0,12,40,48,32,0,59,10,14,4
 683079,683079,2026,Omar Martinez,LAA,AAA,Pacific Coast League,24.0,69,250,30,6,0,11,33,34,28,0,85,4,0,0
-690985,690985,2026,Colby Halter,OAK,AAA,Pacific Coast League,24.0,59,186,27,4,0,2,22,14,27,0,58,1,12,1
+701771,701771,2026,Billy Amick,NYM,AAA,International League,23.0,18,75,5,3,0,7,11,13,4,0,23,1,0,0
 802143,802143,2026,Dayne Leonard,CIN,AAA,International League,26.0,29,110,19,1,0,0,10,7,12,0,38,3,1,0
+27482,690987,2026,Robert Hassell III,PIT,AAA,International League,24.0,77,310,44,15,0,2,34,28,30,1,79,3,10,3
 690804,690804,2026,Ryan Nicholson,LAA,AAA,Pacific Coast League,25.0,20,81,9,4,0,3,7,18,6,0,22,0,1,0
-675394,675394,2026,Johnny Olmstead,MIA,AAA,International League,25.0,85,301,35,8,2,9,43,37,41,1,68,3,13,3
+675394,675394,2026,Johnny Olmstead,MIA,AAA,International League,25.0,87,305,35,9,2,9,43,37,41,1,70,3,13,3
+687394,687394,2026,Jack Brannigan,PIT,AAA,International League,25.0,43,180,19,10,1,3,27,24,23,0,44,1,2,0
+681132,681132,2026,Max Ferguson,BOS,AAA,International League,26.0,35,123,18,3,0,3,17,11,9,0,31,2,3,0
+805672,805672,2026,Collin Price,HOU,AAA,Pacific Coast League,26.0,79,335,29,14,0,18,35,44,46,0,96,4,8,1
+700681,700681,2026,Nick Lorusso,NYM,AAA,International League,25.0,29,105,15,2,0,3,14,10,11,0,24,1,5,0
 25332,682848,2026,Endy Rodríguez,PIT,AAA,International League,26.0,36,144,18,7,0,1,11,17,19,0,30,4,0,0
-687394,687394,2026,Jack Brannigan,PIT,AAA,International League,25.0,42,177,18,10,1,3,27,24,23,0,43,1,2,0
-678577,678577,2026,Junior Perez,CWS,AAA,International League,24.0,82,345,34,15,4,12,57,37,37,0,123,6,17,2
-695501,695501,2026,Blake Burke,MIL,AAA,International League,23.0,24,108,13,3,1,3,16,7,11,0,36,0,0,1
-670868,670868,2026,Abrahan Gutierrez,NYY,AAA,International League,26.0,16,48,5,1,0,3,7,4,5,0,7,0,0,0
+692046,692046,2026,Axel Sanchez,SEA,AAA,Pacific Coast League,23.0,22,69,10,1,0,2,14,8,7,0,18,0,3,0
+678577,678577,2026,Junior Perez,CWS,AAA,International League,24.0,83,348,34,15,4,12,57,37,38,0,124,6,18,2
 687069,687069,2026,Josh Rivera,TOR,AAA,International League,25.0,100,356,39,19,1,10,42,38,31,0,116,9,3,1
-687208,687208,2026,Nathan Hickey,BOS,AAA,International League,26.0,62,207,20,8,2,7,29,27,33,0,56,1,0,0
-681132,681132,2026,Max Ferguson,BOS,AAA,International League,26.0,33,116,16,3,0,3,15,11,9,0,30,2,3,0
-696286,696286,2026,Davis Diaz,OAK,AAA,Pacific Coast League,23.0,13,52,8,1,0,1,8,10,5,0,11,3,2,1
+31855,687515,2026,Colby Thomas,PHI,AAA,International League,25.0,43,177,23,5,1,5,20,24,14,1,51,1,2,2
 683494,683494,2026,Euribiel Angeles,OAK,AAA,Pacific Coast League,24.0,24,85,15,1,0,1,9,8,4,0,11,3,3,1
-27497,682997,2026,Tyler Callihan,PIT,AAA,International League,26.0,82,343,44,10,1,7,48,29,41,1,88,2,11,6
-682679,682679,2026,Dayan Frias,CLE,AAA,International League,24.0,91,311,37,12,2,7,40,33,31,0,77,5,20,6
-25621,682868,2026,Bryan Ramos,BAL,AAA,International League,24.0,94,348,44,12,0,4,35,22,43,0,76,3,9,7
+682679,682679,2026,Dayan Frias,CLE,AAA,International League,24.0,92,316,38,12,2,7,42,34,33,0,77,5,20,6
+27497,682997,2026,Tyler Callihan,PIT,AAA,International League,26.0,84,351,45,10,1,8,49,31,41,1,91,2,12,6
+25621,682868,2026,Bryan Ramos,BAL,AAA,International League,24.0,95,352,45,12,0,4,35,23,44,0,77,4,9,7
+695481,695481,2026,Jay Allen II,CIN,AAA,International League,23.0,23,88,13,3,0,0,12,6,7,0,31,1,6,0
+683149,683149,2026,Julian Brock,TEX,AAA,Pacific Coast League,25.0,19,70,6,3,1,2,11,9,10,0,19,2,2,1
+687208,687208,2026,Nathan Hickey,BOS,AAA,International League,26.0,63,211,20,8,2,7,29,27,33,0,58,1,0,0
 22239,669236,2026,Jeremiah Jackson,BAL,AAA,International League,26.0,16,69,9,1,0,4,7,15,0,0,20,0,2,0
-828599,828599,2026,Lucas Spence,HOU,AAA,Pacific Coast League,23.0,44,175,17,7,1,5,22,24,26,0,51,3,5,0
-701771,701771,2026,Billy Amick,NYM,AAA,International League,23.0,16,65,5,1,0,6,8,11,4,0,21,1,0,0
+815152,815152,2026,Theo Hardy,TEX,AAA,Pacific Coast League,24.0,13,35,4,1,1,0,5,2,4,0,6,0,1,0
 23788,677941,2026,Jordyn Adams,MIL,AAA,International League,26.0,15,54,7,1,2,0,7,6,3,0,20,1,4,0
 22857,672761,2026,Wenceel Pérez,DET,AAA,International League,26.0,13,62,6,3,0,2,9,5,7,0,12,3,3,1
+800957,800957,2026,Brendan Jones,MIA,AAA,International League,24.0,22,79,9,3,0,2,7,7,10,0,22,0,8,1
 701177,701177,2026,Nick Cimillo,PIT,AAA,International League,26.0,93,347,31,14,1,14,44,49,42,0,105,10,0,1
 677342,677342,2026,Brock Jones,TB,AAA,International League,25.0,54,183,20,3,3,4,27,13,21,0,76,0,15,4
-695481,695481,2026,Jay Allen II,CIN,AAA,International League,23.0,22,87,12,3,0,0,12,6,7,0,31,1,6,0
 681495,681495,2026,Cade Fergus,PHI,AAA,International League,25.0,8,28,4,1,0,0,2,3,2,0,14,0,1,0
-687201,687201,2026,Kevin Kilpatrick Jr.,ATL,AAA,International League,25.0,4,10,2,0,0,0,1,0,0,0,4,0,1,0
 29976,691783,2026,Jordan Lawlar,AZ,AAA,Pacific Coast League,23.0,5,23,1,2,1,0,3,2,2,0,7,0,0,0
+801276,801276,2026,Juan Matheus,MIA,AAA,International League,22.0,11,42,5,2,0,0,4,2,6,0,8,1,5,1
 703804,703804,2026,Romeo Sanabria,SD,AAA,Pacific Coast League,24.0,21,83,11,2,0,2,8,12,7,1,16,1,0,0
 687310,687310,2026,Will Simpson,TB,AAA,International League,24.0,6,21,2,0,0,1,6,3,6,0,4,0,1,0
 678218,678218,2026,Brandon Valenzuela,TOR,AAA,International League,25.0,4,17,2,0,0,1,2,4,2,0,3,0,0,0
 700845,700845,2026,Adam Zebrowski,ATL,AAA,International League,25.0,21,70,5,4,0,3,10,18,9,0,16,0,0,0
 702261,702261,2026,Termarr Johnson,PIT,AAA,International League,22.0,96,406,43,14,1,8,57,37,68,0,101,5,24,6
-822578,822578,2026,Brandon Butterworth,BAL,AAA,International League,23.0,21,80,9,0,1,4,11,9,9,1,25,3,2,0
+681433,681433,2026,Noah Cardenas,MIN,AAA,International League,26.0,73,265,25,4,0,13,37,31,38,0,67,5,2,1
 800522,800522,2026,Josue Briceño,DET,AAA,International League,21.0,15,59,6,4,0,0,6,7,8,0,19,1,0,0
-682983,682983,2026,Jud Fabian,BAL,AAA,International League,25.0,108,417,42,11,0,13,54,48,66,1,124,5,6,3
-681433,681433,2026,Noah Cardenas,MIN,AAA,International League,26.0,72,261,24,4,0,13,37,31,38,0,66,5,2,1
+682983,682983,2026,Jud Fabian,BAL,AAA,International League,25.0,109,422,42,11,0,14,55,50,66,1,126,5,6,3
+27504,694377,2026,Nick Yorke,PIT,AAA,International League,24.0,33,133,15,3,1,4,18,17,12,0,31,4,4,5
 694385,694385,2026,Brock Wilken,MIL,AAA,International League,24.0,122,508,40,23,2,16,58,77,77,0,144,5,6,0
 677319,677319,2026,Cameron Barstad,PIT,AAA,International League,25.0,20,72,7,2,0,3,7,9,4,0,31,0,0,0
-27504,694377,2026,Nick Yorke,PIT,AAA,International League,24.0,32,129,15,2,1,4,18,16,12,0,30,3,4,5
-682633,682633,2026,Eduardo Garcia,MIL,AAA,International League,23.0,56,190,25,2,0,5,19,16,18,0,63,5,7,0
+682633,682633,2026,Eduardo Garcia,MIL,AAA,International League,23.0,57,194,26,2,0,5,19,16,18,0,65,5,7,0
 681371,681371,2026,Dom Keegan,TB,AAA,International League,25.0,51,214,27,0,1,6,24,23,31,0,79,5,6,0
 31583,805904,2026,Zach Cole,HOU,AAA,Pacific Coast League,25.0,57,225,21,9,0,8,26,22,23,0,90,1,7,0
 811948,811948,2026,Tony Santa Maria,TB,AAA,International League,24.0,13,50,5,2,0,1,6,8,7,0,12,1,3,1
-695527,695527,2026,Ian Daugherty,MIN,AAA,International League,23.0,6,19,3,0,0,0,1,2,1,0,6,1,0,0
+694966,694966,2026,Brayden Taylor,MIA,AAA,International League,24.0,29,111,7,2,3,4,16,10,26,0,28,0,8,0
+822578,822578,2026,Brandon Butterworth,BAL,AAA,International League,23.0,22,85,9,0,1,4,11,9,10,1,26,3,2,0
+695527,695527,2026,Ian Daugherty,MIN,AAA,International League,23.0,7,20,3,0,0,0,1,2,2,0,6,1,0,0
 695048,695048,2026,Garret Guillemette,HOU,AAA,Pacific Coast League,24.0,19,72,8,3,0,1,9,9,5,0,23,2,2,0
-687284,687284,2026,Thomas Gavello,SF,AAA,Pacific Coast League,25.0,80,299,29,7,1,8,39,38,34,1,73,9,8,2
-694966,694966,2026,Brayden Taylor,MIA,AAA,International League,24.0,28,107,6,2,3,4,16,10,25,0,27,0,8,0
+683006,683006,2026,Chris Newell,LAD,AAA,Pacific Coast League,25.0,5,20,1,1,0,1,1,3,4,0,8,0,0,0
+686976,686976,2026,Silas Ardoin,BAL,AAA,International League,25.0,63,226,23,8,2,2,20,10,34,0,84,3,2,1
+687284,687284,2026,Thomas Gavello,SF,AAA,Pacific Coast League,25.0,82,306,30,7,1,8,39,38,35,1,74,9,8,2
 31781,702616,2026,Jackson Holliday,BAL,AAA,International League,22.0,17,67,7,2,1,1,4,4,6,1,20,0,1,0
-686976,686976,2026,Silas Ardoin,BAL,AAA,International League,25.0,62,222,22,8,2,2,20,10,32,0,84,3,2,1
 22263,669357,2026,Nolan Gorman,STL,AAA,International League,26.0,46,201,15,2,0,13,30,29,35,0,73,2,1,0
+815074,815074,2026,Derek Berg,PIT,AAA,International League,24.0,34,124,14,3,0,3,13,13,10,1,43,6,1,0
 690988,690988,2026,Austin Hendrick,CIN,AAA,International League,25.0,58,214,25,2,0,7,26,18,17,2,60,2,4,1
 815039,815039,2026,Dustin Dickerson,KC,AAA,International League,25.0,21,78,6,4,0,1,9,10,10,0,24,0,1,0
 691775,691775,2026,Ryan Clifford,NYM,AAA,International League,22.0,110,451,36,16,1,17,54,55,50,0,169,5,8,3
-815074,815074,2026,Derek Berg,PIT,AAA,International League,24.0,32,120,13,3,0,3,13,13,10,1,41,6,0,0
-807720,807720,2026,Garret Forrester,MIA,AAA,International League,24.0,28,103,4,7,0,2,17,8,25,1,31,3,1,0
-22557,672279,2026,Michael Siani,DET,AAA,International League,26.0,69,250,25,6,3,3,37,22,31,0,73,4,8,4
 681080,681080,2026,Caleb Ricketts,PHI,AAA,International League,26.0,43,175,13,12,0,4,15,25,6,0,46,1,1,0
-683001,683001,2026,Ethan Hearn,CHC,AAA,International League,25.0,17,62,4,3,0,3,5,12,3,0,25,3,1,1
+22557,672279,2026,Michael Siani,DET,AAA,International League,26.0,71,255,25,6,3,3,38,22,31,0,75,4,9,4
 691405,691405,2026,Juan Benjamin,CLE,AAA,International League,23.0,15,52,6,0,0,2,6,5,5,0,16,1,3,0
-691186,691186,2026,Arol Vera,LAA,AAA,Pacific Coast League,23.0,35,116,14,3,1,0,12,3,6,0,32,5,1,1
+807720,807720,2026,Garret Forrester,MIA,AAA,International League,24.0,29,106,4,7,0,2,17,8,25,1,34,3,1,0
 680753,680753,2026,Adam Hackenberg,TOR,AAA,International League,26.0,4,13,1,1,0,0,2,0,1,0,5,1,1,0
 680713,680713,2026,P.J. Hilson,PIT,AAA,International League,25.0,12,38,3,1,0,1,3,3,7,0,8,0,3,2
 29606,669234,2026,Justyn-Henry Malloy,TB,AAA,International League,26.0,65,230,19,7,0,5,23,19,36,0,55,5,7,2
@@ -67252,221 +67250,228 @@ PlayerId,MLBAM_ID,Season,Name,Team,Level,League,Age,G,PA,1B,2B,3B,HR,R,RBI,BB,IB
 687930,687930,2026,Tyresse Turner,CLE,AAA,International League,26.0,5,18,2,0,0,0,3,1,5,0,2,1,4,0
 27562,669224,2026,Austin Wells,NYY,AAA,International League,26.0,3,14,0,0,0,2,2,3,2,0,4,0,0,0
 33266,805779,2026,Jacob Wilson,OAK,AAA,Pacific Coast League,24.0,4,15,1,1,0,0,2,1,2,0,0,0,0,0
-676566,676566,2026,Shawn Ross,TOR,AAA,International League,26.0,50,174,9,11,0,4,19,13,23,0,66,3,3,1
+691186,691186,2026,Arol Vera,LAA,AAA,Pacific Coast League,23.0,36,120,14,3,1,0,12,3,7,0,34,5,1,1
+676566,676566,2026,Shawn Ross,TOR,AAA,International League,26.0,51,177,9,11,0,4,19,13,23,0,68,3,3,1
+683001,683001,2026,Ethan Hearn,CHC,AAA,International League,25.0,18,66,4,3,0,3,5,12,3,0,27,3,1,1
 687210,687210,2026,Nathan Martorella,MIA,AAA,International League,25.0,28,106,7,5,0,2,10,10,13,0,28,2,2,0
-683006,683006,2026,Chris Newell,LAD,AAA,Pacific Coast League,25.0,4,16,1,1,0,0,0,2,3,0,6,0,0,0
+809338,809338,2026,Trevor Austin,HOU,AAA,Pacific Coast League,24.0,6,16,1,1,0,0,0,0,3,0,7,0,0,0
+701682,701682,2026,Braedon Karpathios,SD,AAA,Pacific Coast League,23.0,5,18,2,0,0,0,2,0,4,0,6,0,0,0
 686683,686683,2026,Tevin Tucker,COL,AAA,Pacific Coast League,26.0,7,30,3,1,0,0,2,5,3,0,15,0,0,0
 688682,688682,2026,Cooper Bowman,TB,AAA,International League,26.0,20,70,5,4,0,0,7,7,7,0,27,1,6,1
 684976,684976,2026,Johnathon Thomas,WSH,AAA,International League,26.0,12,39,4,0,0,1,4,2,2,0,11,0,2,1
 27963,691185,2026,Maximo Acosta,MIA,AAA,International League,23.0,48,180,14,6,0,3,23,16,16,0,54,7,14,3
 807740,807740,2026,Luke Shliger,DET,AAA,International League,24.0,3,10,1,0,0,0,0,0,3,0,1,0,0,0
 688875,688875,2026,Trace Willhoite,NYM,AAA,International League,25.0,5,17,0,2,0,0,2,2,2,0,6,0,0,0
-813851,813851,2026,Colton Becker,KC,AAA,International League,25.0,16,50,6,0,0,0,5,3,4,0,11,0,3,0
 691422,691422,2026,Kevin Rivas,CLE,AAA,International League,23.0,4,16,2,0,0,0,2,1,1,0,4,1,0,0
 700243,700243,2026,Payton Green,MIA,AAA,International League,23.0,8,30,3,0,0,0,4,1,6,0,8,0,0,1
 690992,690992,2026,Ed Howard,CHC,AAA,International League,24.0,12,33,3,1,0,0,3,0,1,0,15,0,0,0
+687201,687201,2026,Kevin Kilpatrick Jr.,ATL,AAA,International League,25.0,6,17,2,0,0,0,1,0,1,0,7,0,1,0
 24257,678877,2026,Jhonkensy Noel,BAL,AAA,International League,24.0,30,120,6,4,0,3,10,14,10,0,36,4,0,0
-699130,699130,2026,Jadher Areinamo,TB,AAA,International League,22.0,5,18,1,1,0,0,1,2,0,0,0,0,0,0
+813851,813851,2026,Colton Becker,KC,AAA,International League,25.0,18,56,6,0,0,0,6,3,5,0,14,0,4,0
 683104,683104,2026,Trey Faltine,CIN,AAA,International League,25.0,5,10,0,0,0,1,1,1,1,0,7,0,0,0
 694204,694204,2026,Maikol Hernández,BAL,AAA,International League,22.0,5,22,2,0,0,0,2,0,2,0,9,0,0,0
 691621,691621,2026,Jheremy Vargas,MIL,AAA,International League,23.0,3,10,1,0,0,0,0,0,1,0,5,0,0,0
-696160,696160,2026,Jake Rucker,MIN,AAA,International League,26.0,7,25,1,0,0,1,3,1,6,0,7,0,0,1
+686960,686960,2026,Nate Baez,BOS,AAA,International League,25.0,11,43,2,2,0,0,2,4,3,0,11,0,0,0
 694294,694294,2026,Colton Vincent,SD,AAA,Pacific Coast League,26.0,4,10,1,0,0,0,1,0,0,0,2,1,0,0
+699130,699130,2026,Jadher Areinamo,TB,AAA,International League,22.0,6,22,1,1,0,0,2,2,0,0,0,0,0,0
 31695,687637,2026,Dylan Beavers,BAL,AAA,International League,24.0,3,12,1,0,0,0,0,0,1,0,2,0,0,0
 31357,701675,2026,Nathan Church,STL,AAA,International League,25.0,3,11,0,0,0,1,1,1,0,0,2,0,0,0
-805834,805834,2026,Javier Vaz,KC,AAA,International League,25.0,3,14,1,0,0,0,2,0,2,0,1,0,2,0
-686960,686960,2026,Nate Baez,BOS,AAA,International League,25.0,10,40,2,1,0,0,2,3,3,0,11,0,0,0
+696160,696160,2026,Jake Rucker,MIN,AAA,International League,26.0,8,29,1,0,0,1,4,1,7,0,9,0,0,1
 702025,702025,2026,Harry Genth,MIN,AAA,International League,23.0,8,15,0,1,0,0,3,3,1,0,6,0,1,0
 806275,806275,2026,Jack Goodman,DET,AAA,International League,22.0,5,13,0,0,0,1,3,2,1,0,7,0,0,0
+805834,805834,2026,Javier Vaz,KC,AAA,International League,25.0,4,16,1,0,0,0,2,0,2,0,3,0,2,0
 800139,800139,2026,Reylin Perez,HOU,AAA,Pacific Coast League,21.0,7,15,1,0,0,0,1,0,1,0,7,0,0,0
 677356,677356,2026,Carter Young,BAL,AAA,International League,25.0,17,43,1,1,0,0,3,0,9,0,17,0,1,0
 805301,805301,2026,Jordan Dissin,PHI,AAA,International League,24.0,5,18,1,0,0,0,0,1,0,0,5,1,0,0
-809338,809338,2026,Trevor Austin,HOU,AAA,Pacific Coast League,24.0,5,12,0,0,0,0,0,0,1,0,7,0,0,0
 31490,685133,2026,Wade Meckler,LAA,AAA,Pacific Coast League,26.0,5,17,0,0,0,0,1,1,7,1,3,0,0,0
 687248,687248,2026,Keshawn Ogans,ATL,AAA,International League,24.0,3,10,0,0,0,0,0,0,1,0,3,1,0,0
+828395,828395,2026,Jason Schiavone,HOU,AAA,Pacific Coast League,23.0,3,10,0,0,0,0,0,0,1,0,5,1,0,0
 805964,805964,2026,Stanley Tucker,BOS,AA,Eastern League,24.0,6,17,2,3,0,1,5,4,2,0,2,0,3,0
 805346,805346,2026,Ben Ross,MIN,AA,Texas League,25.0,16,72,13,7,0,5,15,16,12,0,10,0,8,1
 807740,807740,2026,Luke Shliger,DET,AA,Eastern League,24.0,16,66,12,6,1,5,12,17,6,0,13,0,2,1
 813841,813841,2026,Jonah Cox,SF,AA,Eastern League,24.0,44,183,42,11,5,6,31,35,16,0,31,1,27,7
 33252,691720,2026,Kyle Karros,COL,AA,Eastern League,23.0,4,17,4,1,0,1,2,3,2,0,3,1,1,0
-694380,694380,2026,Jack Moss,HOU,AA,Texas League,24.0,3,12,2,2,0,0,3,4,2,0,1,0,1,0
-703637,703637,2026,Max Williams,MIA,AA,Southern League,21.0,6,27,4,1,0,5,7,11,1,0,2,0,2,0
 31562,701305,2026,Zach Dezenzo,HOU,AA,Texas League,26.0,5,22,5,1,0,1,4,5,3,0,4,4,0,0
+701548,701548,2026,Ali Camarillo,OAK,AA,Texas League,23.0,22,98,23,9,0,1,11,19,13,0,15,6,1,2
 688367,688367,2026,Tucker Mitchell,TEX,AA,Texas League,25.0,9,34,8,4,0,0,5,6,3,1,2,1,0,1
 690914,690914,2026,Brody Moore,STL,AA,Texas League,25.0,23,95,27,5,0,2,17,12,5,0,14,2,8,0
-701548,701548,2026,Ali Camarillo,OAK,AA,Texas League,23.0,21,94,23,8,0,1,9,19,11,0,15,6,1,2
 694318,694318,2026,Austin St. Laurent,SEA,AA,Texas League,23.0,4,15,3,2,0,0,1,0,2,0,3,0,0,0
+703637,703637,2026,Max Williams,MIA,AA,Southern League,21.0,7,32,4,1,0,6,8,13,1,0,2,1,2,0
 801726,801726,2026,Santiago Gomez,NYY,AA,Eastern League,22.0,7,10,1,2,0,0,2,1,2,0,2,0,0,0
 814522,814522,2026,Caden Kendle,MIN,AA,Texas League,24.0,45,200,39,15,0,11,34,44,14,0,45,3,11,2
 801442,801442,2026,Jack Pineda,KC,AA,Texas League,26.0,59,239,58,10,3,7,34,25,20,1,31,3,16,4
 804603,804603,2026,Duncan Pastore,NYY,AA,Eastern League,26.0,11,31,7,3,0,0,5,1,4,0,5,1,1,1
 694565,694565,2026,Alex Stone,TOR,AA,Eastern League,24.0,5,21,5,2,0,0,1,4,1,0,1,2,0,0
 681439,681439,2026,Zach Morgan,SF,AA,Eastern League,26.0,10,35,7,1,0,1,8,5,7,0,7,0,1,0
-814410,814410,2026,Jacob Humphrey,COL,AA,Eastern League,23.0,16,72,19,4,0,0,9,3,6,0,14,1,6,0
-801938,801938,2026,Avery Owusu-Asiedu,AZ,AA,Texas League,23.0,27,127,16,6,2,13,23,36,17,0,32,1,6,1
-699213,699213,2026,Gleider Figuereo,TEX,AA,Texas League,22.0,7,31,7,2,0,1,7,5,2,0,8,2,1,0
-702491,702491,2026,Mitch Voit,NYM,AA,Eastern League,21.0,28,132,25,12,1,2,33,18,14,0,24,0,9,1
+816113,816113,2026,Eli Willits,WSH,AA,Eastern League,18.0,3,17,3,1,0,1,3,5,3,0,4,1,2,0
 695046,695046,2026,Drew Brutcher,HOU,AA,Texas League,24.0,29,128,20,10,1,4,24,31,26,0,27,1,5,0
 805999,805999,2026,A.J. Ewing,NYM,AA,Eastern League,21.0,18,81,13,6,1,2,16,7,17,0,15,1,12,1
+702491,702491,2026,Mitch Voit,NYM,AA,Eastern League,21.0,29,136,26,12,1,2,33,18,14,0,24,0,9,2
 31490,685133,2026,Wade Meckler,LAA,AA,Southern League,26.0,28,121,26,4,1,4,19,13,19,0,20,0,6,0
 703448,703448,2026,Cam Cannarella,MIA,AA,Southern League,22.0,34,150,28,5,0,9,29,23,23,0,20,0,8,4
 804114,804114,2026,Luke Pelzer,KC,AA,Texas League,23.0,40,179,45,7,2,0,31,10,19,1,34,2,14,4
-695780,695780,2026,Jake Fox,CLE,AA,Eastern League,23.0,42,166,31,9,3,1,27,24,33,0,24,2,6,4
-806191,806191,2026,Tai Peete,STL,AA,Texas League,20.0,19,91,20,5,1,3,24,16,6,0,20,0,4,2
+699213,699213,2026,Gleider Figuereo,TEX,AA,Texas League,22.0,8,35,7,3,0,1,7,5,2,0,10,2,1,0
+695780,695780,2026,Jake Fox,CLE,AA,Eastern League,23.0,43,169,32,9,3,1,27,24,33,0,24,2,6,4
+801938,801938,2026,Avery Owusu-Asiedu,AZ,AA,Texas League,23.0,28,132,16,6,2,13,23,36,17,0,34,1,6,1
 692562,692562,2026,Alexis Hernandez,TOR,AA,Eastern League,23.0,25,102,23,7,0,1,9,7,9,0,16,1,4,2
 683061,683061,2026,Alexander Vargas,CIN,AA,Southern League,24.0,16,62,17,1,1,0,14,8,4,0,7,0,2,2
+806191,806191,2026,Tai Peete,STL,AA,Texas League,20.0,20,95,21,5,1,3,24,16,6,0,21,0,4,2
 814409,814409,2026,Seaver King,WSH,AA,Eastern League,23.0,35,165,28,10,3,5,33,27,22,0,31,4,5,6
 692150,692150,2026,Émilien Pitre,NYM,AA,Eastern League,23.0,47,207,43,9,2,3,32,17,31,1,21,4,12,7
-682796,682796,2026,Eddinson Paulino,NYM,AA,Eastern League,23.0,3,10,2,0,0,0,0,2,2,0,2,0,1,1
 811312,811312,2026,Justin Riemer,OAK,AA,Texas League,24.0,31,119,27,2,0,1,18,9,21,0,18,2,6,0
 806077,806077,2026,Kendall George,LAD,AA,Texas League,21.0,55,257,61,11,2,0,63,20,31,0,49,2,33,5
 703680,703680,2026,Brandon Compton,MIA,AA,Southern League,22.0,50,216,25,15,1,21,38,54,27,2,68,1,5,2
 699115,699115,2026,Carlos Jorge,CIN,AA,Southern League,22.0,59,259,63,4,3,6,45,32,25,0,52,3,23,4
 801932,801932,2026,Alex McCoy,SD,AA,Texas League,24.0,23,103,24,4,0,3,12,14,8,0,29,1,3,3
-694218,694218,2026,Yeison Morrobel,TEX,AA,Texas League,22.0,42,180,37,13,2,3,23,23,9,0,33,5,4,1
+814410,814410,2026,Jacob Humphrey,COL,AA,Eastern League,23.0,18,81,20,4,0,0,9,4,6,0,17,1,6,0
 25616,682617,2026,Marco Luciano,NYY,AA,Eastern League,24.0,28,117,14,9,0,10,30,23,13,0,32,3,3,1
-823787,823787,2026,Rainiel Rodriguez,STL,AA,Texas League,19.0,85,393,67,22,0,21,71,64,40,0,75,6,7,6
+695494,695494,2026,Kevin Bazzell,WSH,AA,Eastern League,23.0,13,57,9,5,0,2,11,6,5,0,5,3,2,1
+823787,823787,2026,Rainiel Rodriguez,STL,AA,Texas League,19.0,86,397,67,22,0,22,72,65,41,0,75,6,7,6
 803385,803385,2026,Jay Harry,TOR,AA,Eastern League,23.0,48,179,32,11,4,8,29,39,7,0,42,2,1,1
 814154,814154,2026,Scott Bandura,SF,AA,Eastern League,24.0,37,174,32,9,2,3,33,32,25,1,30,1,10,2
-701689,701689,2026,Vance Honeycutt,BAL,AA,Eastern League,23.0,18,76,8,7,1,5,15,13,9,0,18,0,10,1
 805127,805127,2026,Devin Taylor,OAK,AA,Texas League,22.0,68,325,60,15,1,14,52,54,41,0,93,5,6,2
+806957,806957,2026,Alfredo Duno,CIN,AA,Southern League,20.0,32,138,26,9,1,3,20,14,17,0,23,1,3,0
+806964,806964,2026,Sebastian Walcott,TEX,AA,Texas League,20.0,36,168,26,13,0,9,43,20,17,0,39,0,11,0
 691392,691392,2026,Johnny Ascanio,CIN,AA,Southern League,22.0,40,140,32,4,0,1,19,11,19,0,28,0,3,0
 822966,822966,2026,John Taylor,TEX,AA,Texas League,25.0,40,183,31,8,1,6,34,29,32,0,41,0,3,1
 809945,809945,2026,Jonah Advincula,CLE,AA,Eastern League,25.0,9,33,3,3,0,3,10,7,4,0,4,0,4,0
-806957,806957,2026,Alfredo Duno,CIN,AA,Southern League,20.0,30,129,25,7,1,3,20,14,17,0,22,1,2,0
-808535,808535,2026,John Gil,ATL,AA,Southern League,20.0,33,152,34,4,3,2,22,12,15,0,25,2,17,4
+825927,825927,2026,Rafe Perich,TEX,AA,Texas League,24.0,78,346,53,27,1,16,71,58,39,0,70,4,7,3
 699293,699293,2026,Yohairo Cuevas,NYM,AA,Eastern League,22.0,8,26,4,4,0,0,6,2,1,0,4,1,1,0
-827719,827719,2026,Jake Munroe,LAA,AA,Southern League,22.0,60,268,49,15,1,7,44,35,28,0,47,3,6,2
+694218,694218,2026,Yeison Morrobel,TEX,AA,Texas League,22.0,43,184,37,13,2,3,23,23,9,0,34,5,4,1
+827719,827719,2026,Jake Munroe,LAA,AA,Southern League,22.0,61,272,49,15,1,8,45,38,28,0,48,3,6,2
 702679,702679,2026,Demetrio Crisantes,AZ,AA,Texas League,21.0,35,160,24,12,2,5,32,26,19,0,29,3,0,2
 692348,692348,2026,Aeverson Arteaga,SF,AA,Eastern League,23.0,23,77,14,4,1,2,13,12,6,0,22,1,2,0
 808265,808265,2026,Franklin Arias,BOS,AA,Eastern League,20.0,75,332,53,17,1,19,50,52,37,5,46,4,5,2
 677601,677601,2026,Keyber Rodriguez,TEX,AA,Texas League,25.0,41,189,35,13,2,5,27,19,11,1,46,0,5,3
 806252,806252,2026,Ralphy Velazquez,CLE,AA,Eastern League,21.0,36,169,27,9,3,7,24,30,22,0,31,2,1,0
-695494,695494,2026,Kevin Bazzell,WSH,AA,Eastern League,23.0,11,48,8,4,0,1,8,5,4,0,3,3,2,1
-825927,825927,2026,Rafe Perich,TEX,AA,Texas League,24.0,77,340,51,27,1,15,69,53,38,0,69,4,7,3
+808535,808535,2026,John Gil,ATL,AA,Southern League,20.0,34,157,35,4,3,2,22,13,15,0,27,2,17,4
+825761,825761,2026,Ryan Cesarini,CLE,AA,Eastern League,23.0,40,179,26,10,0,13,36,35,18,0,24,2,14,1
 805207,805207,2026,Caden Bodine,TB,AA,Southern League,22.0,37,179,38,5,0,5,25,33,20,0,12,2,4,1
-806964,806964,2026,Sebastian Walcott,TEX,AA,Texas League,20.0,35,162,23,13,0,9,41,20,17,0,38,0,9,0
-813715,813715,2026,Khadim Diaw,MIN,AA,Texas League,22.0,47,220,41,11,1,3,24,14,25,0,21,2,11,3
 700795,700795,2026,Mathieu Vallee,TOR,AA,Eastern League,25.0,22,78,19,3,0,0,7,5,7,0,14,1,12,0
-825761,825761,2026,Ryan Cesarini,CLE,AA,Eastern League,23.0,39,174,24,10,0,13,36,35,18,0,24,2,14,1
+813715,813715,2026,Khadim Diaw,MIN,AA,Texas League,22.0,49,229,42,11,1,4,26,16,26,0,24,3,11,3
 695731,695731,2026,Braden Montgomery,CWS,AA,Southern League,23.0,27,126,17,5,3,6,20,22,21,0,32,3,2,2
 675430,675430,2026,CJ Rodriguez,OAK,AA,Texas League,25.0,24,95,24,1,0,0,12,9,13,0,13,2,0,1
 806146,806146,2026,George Lombard Jr.,NYY,AA,Eastern League,21.0,20,90,12,8,0,4,18,10,12,0,19,0,4,3
 800305,800305,2026,Jesús  Báez,STL,AA,Texas League,21.0,57,248,37,9,0,24,47,67,10,0,38,8,3,2
+804995,804995,2026,Henry Godbout,BOS,AA,Eastern League,22.0,22,97,16,4,0,8,16,20,5,0,25,0,5,1
 694211,694211,2026,Manuel Pena,AZ,AA,Texas League,22.0,61,279,39,14,0,26,48,64,18,0,65,5,3,0
 801629,801629,2026,Cade McGee,STL,AA,Texas League,23.0,8,33,4,2,0,3,9,7,4,0,7,0,1,0
-702662,702662,2026,Dylan Dreiling,TEX,AA,Texas League,23.0,113,523,93,26,2,22,85,83,55,3,108,6,13,4
+805870,805870,2026,Hyungchan Um,KC,AA,Texas League,22.0,8,35,7,1,1,0,4,2,4,0,9,0,0,1
+823702,823702,2026,Alex Madera,CHC,AA,Southern League,25.0,74,259,58,8,1,0,43,22,39,0,55,2,14,3
+702662,702662,2026,Dylan Dreiling,TEX,AA,Texas League,23.0,115,533,96,26,2,22,88,84,55,3,110,6,14,4
 702556,702556,2026,Austin Overn,TB,AA,Southern League,23.0,61,282,48,8,5,15,54,41,30,1,89,0,48,4
-823702,823702,2026,Alex Madera,CHC,AA,Southern League,25.0,73,254,57,8,1,0,42,22,36,0,55,2,12,3
-702264,702264,2026,Gavin Kilen,SF,AA,Eastern League,22.0,31,135,23,10,3,1,14,16,11,0,19,2,1,1
 22715,672580,2026,Maikel Garcia,KC,AA,Texas League,26.0,4,16,3,1,0,0,5,0,3,0,2,1,1,0
-687766,687766,2026,Miguel Useche,CHC,AA,Southern League,25.0,45,173,29,12,0,6,21,23,18,0,35,2,3,1
-691411,691411,2026,Luis Durango,NYY,AA,Eastern League,23.0,23,70,17,1,1,0,10,7,5,0,10,0,9,3
-804995,804995,2026,Henry Godbout,BOS,AA,Eastern League,22.0,21,92,15,3,0,8,15,19,5,0,24,0,4,1
+694380,694380,2026,Jack Moss,HOU,AA,Texas League,24.0,4,17,2,2,0,0,3,4,4,0,2,1,1,0
+682796,682796,2026,Eddinson Paulino,NYM,AA,Eastern League,23.0,5,17,3,0,0,1,1,4,2,0,4,0,1,1
+702264,702264,2026,Gavin Kilen,SF,AA,Eastern League,22.0,32,139,23,10,3,2,15,17,11,0,20,3,1,1
+701906,701906,2026,Trevor Cohen,SF,AA,Eastern League,22.0,48,224,52,7,2,3,34,25,14,0,21,6,20,4
+687766,687766,2026,Miguel Useche,CHC,AA,Southern League,25.0,46,178,30,12,0,6,21,24,19,0,35,2,3,1
 670868,670868,2026,Abrahan Gutierrez,NYY,AA,Eastern League,26.0,16,61,14,4,0,0,7,7,2,0,10,1,0,0
 689196,689196,2026,Owen Ayers,CHC,AA,Southern League,25.0,65,278,37,16,1,16,42,48,42,1,69,3,3,1
+701689,701689,2026,Vance Honeycutt,BAL,AA,Eastern League,23.0,19,80,8,7,1,5,15,13,9,0,19,0,10,1
 800543,800543,2026,Josue De Paula,LAD,AA,Texas League,21.0,124,588,86,37,2,27,106,104,81,2,87,10,31,10
 823295,823295,2026,Jay Thomason,MIN,AA,Texas League,24.0,33,136,29,3,0,4,20,21,13,0,33,1,9,6
-701906,701906,2026,Trevor Cohen,SF,AA,Eastern League,22.0,47,220,50,7,2,3,34,25,14,0,21,6,20,4
 684081,684081,2026,Erick Brito,PHI,AA,Eastern League,24.0,26,104,19,6,0,1,16,10,12,0,21,2,11,2
-800281,800281,2026,Roynier Hernandez,COL,AA,Eastern League,21.0,12,48,12,1,0,0,2,7,2,0,10,0,0,0
 695692,695692,2026,Cooper Kinney,TB,AA,Southern League,23.0,55,249,40,13,1,11,45,44,26,0,58,1,2,3
-686984,686984,2026,Marcus Lee Sang,TEX,AA,Texas League,25.0,107,425,84,15,2,15,71,68,35,1,109,5,15,6
-808864,808864,2026,Raider Tello,PHI,AA,Eastern League,25.0,40,154,31,7,0,3,24,31,14,0,43,3,0,1
 801507,801507,2026,Jake Cunningham,SD,AA,Texas League,23.0,39,165,31,7,2,4,25,26,15,1,45,4,4,3
-822676,822676,2026,Alex Lodise,ATL,AA,Southern League,22.0,21,93,17,5,0,3,15,12,7,0,20,3,1,0
 695720,695720,2026,Tommy White,OAK,AA,Texas League,23.0,21,94,19,5,0,1,9,17,8,0,13,4,1,2
+686984,686984,2026,Marcus Lee Sang,TEX,AA,Texas League,25.0,109,434,86,15,2,15,73,70,36,1,110,5,15,6
 693073,693073,2026,Clayton Campbell,DET,AA,Eastern League,22.0,10,42,10,1,0,1,6,4,1,0,10,2,1,0
+800281,800281,2026,Roynier Hernandez,COL,AA,Eastern League,21.0,14,56,13,2,0,0,4,7,3,0,10,1,0,0
 812442,812442,2026,Stephen Hrustich,DET,AA,Eastern League,24.0,6,24,4,1,0,1,4,3,4,0,5,0,2,0
+808864,808864,2026,Raider Tello,PHI,AA,Eastern League,25.0,41,158,32,7,0,3,24,31,14,0,45,3,0,1
 691024,691024,2026,Cayden Wallace,WSH,AA,Eastern League,24.0,71,318,50,16,3,18,54,45,23,0,50,2,9,1
 702463,702463,2026,Aaron McKeithan,SEA,AA,Texas League,26.0,30,120,26,2,0,1,11,9,19,0,22,3,1,1
+691449,691449,2026,Roberto Campos,DET,AA,Eastern League,23.0,19,80,13,4,1,2,10,8,13,0,18,1,2,0
 800522,800522,2026,Josue Briceño,DET,AA,Eastern League,21.0,17,76,11,0,0,8,15,19,9,0,16,1,0,1
-701339,701339,2026,Marek Houston,MIN,AA,Texas League,22.0,57,271,48,14,1,7,43,36,27,0,56,4,26,7
+691411,691411,2026,Luis Durango,NYY,AA,Eastern League,23.0,24,74,17,1,1,0,11,7,6,0,10,1,9,3
+701339,701339,2026,Marek Houston,MIN,AA,Texas League,22.0,59,280,50,14,1,7,44,37,29,0,57,4,26,7
 828600,828600,2026,Hayden Gilliland,LAD,AA,Texas League,24.0,13,50,7,3,0,3,7,13,5,0,14,0,0,0
+822676,822676,2026,Alex Lodise,ATL,AA,Southern League,22.0,22,98,18,5,0,3,15,12,7,0,20,3,2,0
 694196,694196,2026,Diego Velasquez,SF,AA,Eastern League,22.0,85,334,60,19,0,4,55,40,37,0,55,3,21,4
-671748,671748,2026,Casey Yamauchi,OAK,AA,Texas League,25.0,55,247,51,9,1,5,39,28,9,0,24,8,20,3
 701527,701527,2026,Mike Sirota,LAD,AA,Texas League,23.0,70,328,47,16,2,10,60,40,64,0,73,3,5,0
 689531,689531,2026,Brett Squires,KC,AA,Texas League,26.0,32,139,18,11,0,6,22,29,18,0,33,2,9,1
+701618,701618,2026,Damon Keith,MIL,AA,Southern League,26.0,57,235,34,17,0,10,32,45,20,0,68,3,7,2
 696286,696286,2026,Davis Diaz,OAK,AA,Texas League,23.0,49,217,41,8,1,4,29,23,24,0,33,4,10,2
-691183,691183,2026,Kevin Made,WSH,AA,Eastern League,23.0,8,29,6,1,0,0,2,5,4,0,6,0,1,0
-687543,687543,2026,Andrew Jenkins,DET,AA,Eastern League,25.0,107,433,76,23,5,10,62,76,29,0,99,6,5,1
+801957,801957,2026,Dub Gleed,TOR,AA,Eastern League,23.0,68,289,47,14,2,11,41,34,28,1,48,6,2,2
+687543,687543,2026,Andrew Jenkins,DET,AA,Eastern League,25.0,108,436,77,23,5,10,62,76,29,0,99,6,5,1
+827636,827636,2026,Trent Youngblood,AZ,AA,Texas League,24.0,43,197,32,7,3,5,36,21,29,0,31,1,5,4
 815888,815888,2026,Leo De Vries,OAK,AA,Texas League,19.0,93,428,72,21,1,13,63,55,49,3,91,5,34,5
-689931,689931,2026,Peyton Graham,DET,AA,Eastern League,25.0,112,495,85,21,4,9,95,56,63,0,103,4,65,7
-703804,703804,2026,Romeo Sanabria,SD,AA,Texas League,24.0,90,393,68,21,0,8,44,47,49,3,89,4,6,2
+671748,671748,2026,Casey Yamauchi,OAK,AA,Texas League,25.0,56,252,51,9,1,5,39,28,10,0,26,8,20,3
+689931,689931,2026,Peyton Graham,DET,AA,Eastern League,25.0,113,500,86,21,4,9,95,56,64,0,104,4,66,7
 685716,685716,2026,Nelson Quiroz,LAD,AA,Texas League,24.0,14,57,9,5,0,1,7,4,4,0,10,5,0,0
 692446,692446,2026,Miguel Villarroel,WSH,AA,Eastern League,24.0,14,55,12,1,1,1,9,4,3,0,13,2,3,0
-703190,703190,2026,Johanfran Garcia,BOS,AA,Eastern League,21.0,79,344,60,13,0,18,45,55,22,0,101,6,4,1
 703197,703197,2026,Michael Arroyo,SEA,AA,Texas League,21.0,65,297,52,12,1,10,46,40,24,1,49,5,13,2
-702068,702068,2026,Cole Gabrielson,NYY,AA,Eastern League,25.0,34,126,19,7,0,5,24,14,13,0,28,1,10,1
 815394,815394,2026,Theo Gillen,TB,AA,Southern League,20.0,58,264,39,11,4,10,43,46,36,1,53,5,16,5
-680960,680960,2026,Caleb Bartolero,LAA,AA,Southern League,26.0,76,304,55,15,3,7,42,51,17,0,51,10,2,0
+815697,815697,2026,Arturo Disla,TEX,AA,Texas League,25.0,93,413,60,24,2,18,53,74,41,3,107,9,3,1
 814307,814307,2026,Zyhir Hope,DET,AA,Eastern League,21.0,122,554,88,20,2,28,84,108,61,3,140,7,26,6
-700321,700321,2026,Andy Perez,COL,AA,Eastern League,22.0,126,549,105,30,2,9,77,60,24,1,87,10,26,9
-701618,701618,2026,Damon Keith,MIL,AA,Southern League,26.0,56,230,32,17,0,9,31,43,20,0,68,3,7,2
+703804,703804,2026,Romeo Sanabria,SD,AA,Texas League,24.0,91,397,68,21,0,8,45,47,50,3,91,4,6,2
+700321,700321,2026,Andy Perez,COL,AA,Eastern League,22.0,127,554,106,30,2,9,77,60,25,1,88,10,26,9
+836055,836055,2026,Zach Daudet,HOU,AA,Texas League,23.0,3,11,2,0,0,0,3,0,4,0,3,0,1,0
 806956,806956,2026,Ethan Salas,SD,AA,Texas League,20.0,72,300,54,13,0,7,41,37,33,2,48,3,14,6
 695501,695501,2026,Blake Burke,MIL,AA,Southern League,23.0,96,431,50,25,2,30,68,88,44,3,102,6,28,7
 807726,807726,2026,John Peck,DET,AA,Eastern League,23.0,58,256,37,17,3,10,46,44,14,0,64,2,19,6
 815873,815873,2026,Sean Keys,TOR,AA,Eastern League,23.0,49,209,26,9,0,14,43,34,28,2,51,2,6,1
 811965,811965,2026,Joshua Kuroda-Grauer,OAK,AA,Texas League,23.0,33,150,23,11,1,6,27,18,5,0,15,9,11,3
-809372,809372,2026,Victor Figueroa,BAL,AA,Eastern League,22.0,34,142,26,5,1,5,20,19,11,0,46,1,3,1
-801957,801957,2026,Dub Gleed,TOR,AA,Eastern League,23.0,66,280,43,14,2,11,40,34,28,1,46,6,2,2
 691938,691938,2026,Willy Vasquez,BAL,AA,Eastern League,24.0,35,134,27,4,0,2,18,15,15,0,31,0,6,4
+703190,703190,2026,Johanfran Garcia,BOS,AA,Eastern League,21.0,80,348,60,13,0,18,45,55,22,0,103,6,4,1
 694966,694966,2026,Brayden Taylor,TB,AA,Southern League,24.0,88,380,55,16,3,17,59,56,51,0,87,2,20,6
 692238,692238,2026,Parks Harber,SF,AA,Eastern League,24.0,66,298,40,20,1,12,41,47,35,0,73,3,2,2
-680998,680998,2026,Branden Boissiere,WSH,AA,Eastern League,26.0,62,277,37,22,1,9,30,49,28,1,79,4,4,0
-815089,815089,2026,Coby Morales,NYY,AA,Eastern League,24.0,128,534,85,21,4,21,84,81,68,0,132,8,21,10
-815697,815697,2026,Arturo Disla,TEX,AA,Texas League,25.0,91,403,58,24,2,16,50,72,40,3,105,9,2,1
+800198,800198,2026,Cristofer Torin,AZ,AA,Texas League,21.0,116,546,94,23,4,16,91,60,45,1,61,9,12,6
 23794,677954,2026,Jordan Groshans,ATL,AA,Southern League,26.0,103,436,57,18,6,30,57,81,36,0,84,8,1,2
+804614,804614,2026,Marco Vargas,NYM,AA,Eastern League,21.0,53,237,43,9,4,3,28,29,27,1,68,2,28,1
+680960,680960,2026,Caleb Bartolero,LAA,AA,Southern League,26.0,78,312,55,16,3,7,43,51,17,0,53,10,2,0
 683454,683454,2026,Brayan Buelvas,OAK,AA,Texas League,24.0,13,47,6,1,1,3,5,7,8,0,13,0,1,0
+815089,815089,2026,Coby Morales,NYY,AA,Eastern League,24.0,130,541,86,21,4,21,86,81,69,0,133,8,21,10
 678173,678173,2026,David McCabe,ATL,AA,Southern League,26.0,53,220,29,8,0,16,32,45,29,0,54,3,0,1
 813833,813833,2026,Cole Conn,OAK,AA,Texas League,24.0,70,311,48,15,2,7,44,37,48,3,60,7,23,3
 802469,802469,2026,Travis Honeyman,STL,AA,Texas League,24.0,71,296,57,5,2,8,50,30,33,0,49,5,25,5
 693243,693243,2026,Garrett Pennington,DET,AA,Eastern League,25.0,24,106,17,5,1,4,14,20,8,0,29,2,0,1
-800198,800198,2026,Cristofer Torin,AZ,AA,Texas League,21.0,115,540,92,23,4,16,90,59,44,1,61,9,12,6
 694230,694230,2026,Hendry Mendez,MIN,AA,Texas League,22.0,24,102,15,5,1,4,18,21,9,0,20,1,1,0
-703477,703477,2026,Brooks Brannon,BOS,AA,Eastern League,22.0,91,390,45,28,2,21,49,68,39,0,114,7,2,1
+680998,680998,2026,Branden Boissiere,WSH,AA,Eastern League,26.0,64,287,38,22,1,10,31,52,28,1,82,4,4,0
+811289,811289,2026,Spencer Nivens,KC,AA,Texas League,24.0,102,441,65,28,4,9,57,58,54,0,75,1,17,4
 695481,695481,2026,Jay Allen II,CIN,AA,Southern League,23.0,90,377,56,18,1,15,62,45,35,0,80,1,17,5
-827636,827636,2026,Trent Youngblood,AZ,AA,Texas League,24.0,42,191,31,6,2,5,33,20,28,0,31,1,5,4
 693819,693819,2026,Kyle Nevin,LAD,AA,Texas League,24.0,66,293,55,11,0,6,42,43,26,0,56,6,11,2
-805870,805870,2026,Hyungchan Um,KC,AA,Texas League,22.0,7,31,5,1,1,0,4,2,4,0,8,0,0,0
+703477,703477,2026,Brooks Brannon,BOS,AA,Eastern League,22.0,93,398,46,28,2,22,50,70,39,0,115,7,2,1
+699712,699712,2026,Raylin Heredia,PHI,AA,Eastern League,22.0,134,576,92,35,1,23,83,74,25,0,147,5,25,7
+811765,811765,2026,Deniel Ortiz,STL,AA,Texas League,21.0,61,262,37,12,0,10,37,39,40,0,49,9,9,4
 701852,701852,2026,Drew Cavanaugh,SF,AA,Eastern League,24.0,22,90,9,7,0,3,22,12,17,1,21,2,3,2
 683427,683427,2026,Omar Hernandez,KC,AA,Texas League,24.0,73,283,55,8,1,5,44,33,17,0,62,5,20,5
-811289,811289,2026,Spencer Nivens,KC,AA,Texas League,24.0,101,437,64,28,4,9,57,58,52,0,75,1,16,4
+691267,691267,2026,Alex Ramírez,CHC,AA,Southern League,23.0,125,557,100,27,1,15,77,87,36,0,98,15,46,9
 801276,801276,2026,Juan Matheus,MIA,AA,Southern League,22.0,78,341,60,16,0,9,37,51,25,0,60,4,16,3
-807728,807728,2026,Carter Graham,CIN,AA,Southern League,24.0,58,251,33,14,1,11,42,30,34,0,61,7,5,2
-699712,699712,2026,Raylin Heredia,PHI,AA,Eastern League,22.0,133,572,92,33,1,23,83,74,25,0,147,5,25,7
-815304,815304,2026,Josh Adamczewski,MIL,AA,Southern League,21.0,64,274,40,15,1,9,42,34,35,0,53,2,8,1
-701831,701831,2026,Carson DeMartini,PHI,AA,Eastern League,23.0,52,221,30,10,2,8,38,27,39,0,53,2,17,5
+702068,702068,2026,Cole Gabrielson,NYY,AA,Eastern League,25.0,36,133,19,7,0,6,26,17,13,0,29,1,11,1
+809372,809372,2026,Victor Figueroa,BAL,AA,Eastern League,22.0,35,145,26,5,1,5,20,19,11,0,48,1,3,1
 692371,692371,2026,Lizandro Espinoza,ATL,AA,Southern League,23.0,37,156,20,7,3,5,33,19,22,1,38,4,26,5
 815074,815074,2026,Derek Berg,PIT,AA,Eastern League,24.0,60,253,41,13,1,8,31,30,21,0,77,2,2,1
-700845,700845,2026,Adam Zebrowski,ATL,AA,Southern League,25.0,60,232,29,9,1,19,33,43,19,0,75,3,1,0
+802506,802506,2026,Dylan O'Rae,MIL,AA,Southern League,22.0,104,424,75,12,6,3,78,28,67,0,77,2,60,9
+806401,806401,2026,Dayson Croes,SF,AA,Eastern League,26.0,66,303,57,14,3,2,38,28,21,0,37,6,6,4
 691627,691627,2026,Ricardo Olivar,MIN,AA,Texas League,24.0,32,137,13,10,0,10,23,31,16,0,26,0,2,2
-686638,686638,2026,Hunter Fitz-Gerald,SEA,AA,Texas League,25.0,130,569,74,37,3,28,78,98,42,0,171,6,13,4
-806401,806401,2026,Dayson Croes,SF,AA,Eastern League,26.0,65,299,56,14,3,2,38,28,20,0,37,5,6,4
+807728,807728,2026,Carter Graham,CIN,AA,Southern League,24.0,60,260,34,14,1,12,43,33,35,0,62,8,6,2
+701750,701750,2026,Bennett Thompson,CLE,AA,Eastern League,23.0,49,218,37,8,1,5,37,33,27,0,40,6,3,1
 702331,702331,2026,Noah Mendlinger,STL,AA,Texas League,25.0,43,199,32,10,0,2,25,26,32,0,18,7,2,4
 815589,815589,2026,Bo Davidson,SF,AA,Eastern League,23.0,73,315,47,12,0,19,49,53,28,2,74,3,14,2
+686638,686638,2026,Hunter Fitz-Gerald,SEA,AA,Texas League,25.0,131,573,75,37,3,28,78,98,42,0,171,6,14,4
 800406,800406,2026,Aron Estrada,BAL,AA,Eastern League,21.0,122,504,82,21,1,24,70,76,31,0,93,9,7,3
 685712,685712,2026,Geovanny Planchart,TOR,AA,Eastern League,24.0,12,37,8,0,0,0,2,6,6,0,11,1,0,0
-801670,801670,2026,Mike Boeve,MIL,AA,Southern League,24.0,122,495,88,20,1,9,56,59,62,0,95,7,13,1
-691267,691267,2026,Alex Ramírez,CHC,AA,Southern League,23.0,124,551,97,27,1,15,76,87,34,0,98,15,44,9
-811765,811765,2026,Deniel Ortiz,STL,AA,Texas League,21.0,60,258,35,12,0,10,37,38,40,0,48,9,9,4
 692368,692368,2026,Adrián Sugastey,SF,AA,Eastern League,23.0,36,135,23,8,0,2,15,22,8,0,16,4,2,1
-804614,804614,2026,Marco Vargas,NYM,AA,Eastern League,21.0,51,228,42,7,3,3,27,29,27,1,67,2,27,1
+801670,801670,2026,Mike Boeve,MIL,AA,Southern League,24.0,123,500,89,20,1,9,56,59,62,0,97,7,13,1
 824028,824028,2026,Gage Miller,MIA,AA,Southern League,23.0,29,106,18,3,0,4,10,22,13,0,19,1,3,3
 694977,694977,2026,Nate Nankil,OAK,AA,Texas League,23.0,22,102,19,3,0,3,14,13,8,0,17,4,1,0
-802506,802506,2026,Dylan O'Rae,MIL,AA,Southern League,22.0,103,419,73,12,6,3,77,27,65,0,77,2,59,9
+815304,815304,2026,Josh Adamczewski,MIL,AA,Southern League,21.0,65,279,40,15,1,9,42,34,37,0,55,2,8,1
 807720,807720,2026,Garret Forrester,MIA,AA,Southern League,24.0,25,96,9,5,0,6,18,12,21,0,14,3,5,0
-802219,802219,2026,Woody Hadeen,DET,AA,Eastern League,23.0,24,108,18,5,2,1,21,8,12,0,19,4,11,1
-828824,828824,2026,Josiah Ragsdale,STL,AA,Texas League,22.0,53,247,30,7,1,17,51,35,41,0,64,4,13,1
-803175,803175,2026,Ethan Anderson,BAL,AA,Eastern League,22.0,81,347,49,12,0,21,60,47,40,0,68,4,6,1
-804109,804109,2026,Aiva Arquette,MIA,AA,Southern League,22.0,49,223,40,6,0,10,36,33,14,2,43,5,16,1
+691285,691285,2026,Junior Franco,AZ,AA,Texas League,23.0,103,372,60,18,4,7,48,50,36,1,82,3,14,9
+700845,700845,2026,Adam Zebrowski,ATL,AA,Southern League,25.0,61,236,29,9,1,19,34,43,20,0,77,3,1,0
+701831,701831,2026,Carson DeMartini,PHI,AA,Eastern League,23.0,53,225,30,10,2,8,38,27,40,0,55,2,18,5
 31812,701350,2026,Roman Anthony,BOS,AA,Eastern League,22.0,4,14,1,1,0,1,1,3,2,0,4,0,0,0
 692390,692390,2026,Jose Cordoba,STL,AA,Texas League,23.0,9,36,4,1,0,4,8,7,2,0,6,0,2,0
-806988,806988,2026,Welbyn Francisca,CLE,AA,Eastern League,20.0,3,12,3,0,0,0,1,1,1,0,5,0,1,0
+692110,692110,2026,Core Jackson,NYY,AA,Eastern League,22.0,22,98,17,4,1,2,16,15,8,0,14,0,9,2
+805268,805268,2026,Peyton Williams,TOR,AA,Eastern League,25.0,4,15,0,2,0,1,1,2,3,0,5,0,0,0
 800473,800473,2026,Jefferson Rojas,NYM,AA,Eastern League,21.0,120,525,73,27,2,24,82,86,46,1,88,9,20,7
-691285,691285,2026,Junior Franco,AZ,AA,Texas League,23.0,102,367,58,18,4,7,47,49,36,1,81,3,14,8
 815520,815520,2026,Braylon Payne,MIL,AA,Southern League,19.0,23,99,14,6,2,3,16,7,6,0,30,1,3,0
+804109,804109,2026,Aiva Arquette,MIA,AA,Southern League,22.0,50,228,41,6,0,10,36,34,14,2,45,5,16,1
 699232,699232,2026,Anderdson Rojas,AZ,AA,Texas League,22.0,18,71,13,2,0,1,16,7,9,1,15,2,6,1
+800231,800231,2026,Won-Bin Cho,STL,AA,Texas League,22.0,53,216,29,8,0,12,33,34,34,0,44,3,7,3
+803175,803175,2026,Ethan Anderson,BAL,AA,Eastern League,22.0,82,351,49,12,0,21,60,47,41,0,69,4,6,1
 694197,694197,2026,Angel Genao,CLE,AA,Eastern League,22.0,24,110,17,3,0,3,17,11,22,0,20,2,2,0
 815908,815908,2026,Jesús Made,MIL,AA,Southern League,19.0,121,554,88,24,6,14,87,90,57,1,79,10,36,14
 691410,691410,2026,Jose Devers,CLE,AA,Eastern League,23.0,83,318,63,7,4,2,42,33,33,0,88,5,10,4
@@ -67474,433 +67479,436 @@ PlayerId,MLBAM_ID,Season,Name,Team,Level,League,Age,G,PA,1B,2B,3B,HR,R,RBI,BB,IB
 806210,806210,2026,Alfonsin Rosario,CLE,AA,Eastern League,22.0,66,283,28,20,3,16,43,52,26,1,90,4,12,0
 800306,800306,2026,Jansel Luis,AZ,AA,Texas League,21.0,109,486,80,20,5,16,75,71,24,0,122,9,26,4
 695521,695521,2026,Gavin Conticello,AZ,AA,Texas League,23.0,73,311,45,14,4,11,36,48,34,2,67,4,3,2
-693832,693832,2026,Tre Richardson III,STL,AA,Texas League,24.0,56,229,36,10,0,8,47,23,27,0,58,3,22,2
+802219,802219,2026,Woody Hadeen,DET,AA,Eastern League,23.0,25,113,19,5,2,1,21,10,12,0,23,4,11,1
 694552,694552,2026,Jack Payton,SF,AA,Eastern League,24.0,82,297,52,15,1,3,26,33,26,1,64,6,8,2
-691449,691449,2026,Roberto Campos,DET,AA,Eastern League,23.0,18,76,11,4,1,1,8,7,13,0,18,1,2,0
 691020,691020,2026,Carson Tucker,SD,AA,Texas League,24.0,75,310,55,16,2,2,35,28,27,0,86,3,15,4
-800231,800231,2026,Won-Bin Cho,STL,AA,Texas League,22.0,52,212,29,7,0,12,32,34,33,0,44,3,7,3
 822578,822578,2026,Brandon Butterworth,BAL,AA,Eastern League,23.0,52,231,30,10,2,10,31,23,30,1,53,0,12,1
-683546,683546,2026,Albert Fabian,SD,AA,Texas League,24.0,104,414,65,19,3,12,39,53,31,0,79,7,9,2
 828599,828599,2026,Lucas Spence,HOU,AA,Texas League,23.0,44,202,29,10,3,4,27,30,19,1,41,0,10,2
 700164,700164,2026,Bryant Betancourt,COL,AA,Eastern League,22.0,65,268,34,16,0,14,35,44,25,1,41,2,2,0
+702258,702258,2026,Druw Jones,AZ,AA,Texas League,22.0,114,501,88,17,3,7,77,54,60,0,145,5,37,11
+828824,828824,2026,Josiah Ragsdale,STL,AA,Texas League,22.0,54,251,30,7,1,17,51,35,41,0,66,5,13,1
 814430,814430,2026,Brett Callahan,DET,AA,Eastern League,24.0,60,265,33,13,2,12,48,39,34,0,55,2,20,4
 701682,701682,2026,Braedon Karpathios,SD,AA,Texas League,23.0,120,510,78,22,3,17,62,73,60,1,162,9,6,6
 821270,821270,2026,Luis Peña,MIL,AA,Southern League,19.0,16,61,13,1,0,1,5,3,4,0,11,1,6,0
 684222,684222,2026,Jorge Burgos,TOR,AA,Eastern League,23.0,79,292,40,20,1,7,36,40,34,1,51,5,2,2
-691385,691385,2026,Ronald Rosario,BOS,AA,Eastern League,23.0,77,309,44,16,1,15,42,48,21,0,68,8,2,1
+683546,683546,2026,Albert Fabian,SD,AA,Texas League,24.0,105,418,65,19,3,12,39,53,33,0,79,7,9,2
 813400,813400,2026,Jack Winnay,BOS,AA,Eastern League,23.0,45,181,27,9,0,6,26,15,19,0,36,3,0,0
-687554,687554,2026,DJ Gladney,NYY,AA,Eastern League,24.0,113,479,66,24,2,23,71,85,37,1,162,7,21,3
+691385,691385,2026,Ronald Rosario,BOS,AA,Eastern League,23.0,78,314,44,16,1,16,44,49,22,0,69,8,3,1
 681323,681323,2026,Alex Binelas,PHI,AA,Eastern League,26.0,116,479,64,15,2,26,73,78,72,2,140,8,5,0
+842249,842249,2026,Graham Brown,MIN,AA,Texas League,24.0,28,106,15,4,0,5,20,19,15,0,26,4,10,2
+806988,806988,2026,Welbyn Francisca,CLE,AA,Eastern League,20.0,4,16,4,0,0,0,1,2,1,0,6,0,2,0
 809860,809860,2026,Mason Lytle,HOU,AA,Texas League,25.0,11,32,6,2,0,0,4,6,1,0,7,0,3,1
-827504,827504,2026,Hector Salas,HOU,AA,Texas League,22.0,16,58,11,0,0,1,9,3,10,0,12,1,4,0
+801978,801978,2026,Callan Moss,PIT,AA,Eastern League,22.0,123,526,86,26,2,11,56,64,48,0,125,18,8,1
 699043,699043,2026,Yamal Encarnacion,HOU,AA,Texas League,22.0,95,395,66,18,4,5,61,48,37,0,72,7,48,10
-813860,813860,2026,Charlie Pagliarini,SEA,AA,Texas League,25.0,128,579,71,29,3,27,94,91,79,0,172,7,9,5
-821100,821100,2026,Justin Gonzales,BOS,AA,Eastern League,19.0,16,76,12,2,1,2,13,11,10,0,20,3,1,1
+805796,805796,2026,Arjun Nimmala,LAA,AA,Southern League,20.0,59,259,31,17,0,11,40,26,34,0,60,6,5,5
+827504,827504,2026,Hector Salas,HOU,AA,Texas League,22.0,17,62,12,0,0,1,10,3,10,0,14,1,4,0
 681400,681400,2026,Danny Serretti,AZ,AA,Texas League,26.0,72,294,36,11,2,12,40,37,53,1,66,3,10,4
-695372,695372,2026,Jake Gelof,LAD,AA,Texas League,24.0,121,508,54,23,0,33,87,100,80,1,140,7,10,1
+687554,687554,2026,DJ Gladney,NYY,AA,Eastern League,24.0,115,483,66,24,2,23,71,85,37,1,165,8,21,3
 813851,813851,2026,Colton Becker,KC,AA,Texas League,25.0,81,335,49,14,3,5,52,28,45,0,65,5,23,8
-702258,702258,2026,Druw Jones,AZ,AA,Texas League,22.0,113,496,85,17,3,7,75,52,60,0,145,5,36,11
+695372,695372,2026,Jake Gelof,LAD,AA,Texas League,24.0,122,512,55,23,0,33,88,100,80,1,140,7,10,1
+702693,702693,2026,Jaison Chourio,CLE,AA,Eastern League,21.0,92,415,66,18,3,7,66,48,56,1,87,7,32,5
+693832,693832,2026,Tre Richardson III,STL,AA,Texas League,24.0,57,233,36,10,0,8,47,23,27,0,60,3,22,2
 696160,696160,2026,Jake Rucker,MIN,AA,Texas League,26.0,52,205,23,11,1,10,32,32,27,0,40,5,7,2
+691398,691398,2026,Yerlin Confidan,CIN,AA,Southern League,23.0,53,206,33,8,1,8,23,28,15,0,51,6,3,2
 800959,800959,2026,Nick Goodwin,TOR,AA,Eastern League,24.0,80,312,35,21,3,10,50,42,40,0,64,8,2,3
-702693,702693,2026,Jaison Chourio,CLE,AA,Eastern League,21.0,91,412,65,18,3,7,65,47,56,1,86,7,31,5
-801978,801978,2026,Callan Moss,PIT,AA,Eastern League,22.0,121,519,84,26,2,10,55,60,48,0,124,18,8,1
-696145,696145,2026,Lonnie White Jr.,PIT,AA,Eastern League,23.0,90,377,48,16,2,19,55,48,50,0,121,9,12,2
-806053,806053,2026,Dean Curley,CLE,AA,Eastern League,22.0,44,189,28,9,0,6,29,24,23,0,63,4,3,4
+813860,813860,2026,Charlie Pagliarini,SEA,AA,Texas League,25.0,129,583,71,29,3,27,94,91,80,0,175,7,9,5
+691292,691292,2026,Angel Ortiz,AZ,AA,Texas League,23.0,76,326,37,21,4,13,56,50,32,0,81,1,14,3
+692633,692633,2026,Manuel Palencia,NYY,AA,Eastern League,23.0,85,317,60,9,0,7,32,33,24,0,48,8,1,1
 691408,691408,2026,Maick Collado,CLE,AA,Eastern League,23.0,29,111,19,4,0,2,14,21,9,0,15,1,1,0
 814413,814413,2026,Ian Petrutz,STL,AA,Texas League,23.0,5,19,2,0,1,2,4,7,0,0,3,0,0,0
+695930,695930,2026,Frederick Bencosme,BAL,AA,Eastern League,23.0,107,424,61,21,1,13,51,54,51,0,73,3,13,0
 814458,814458,2026,Fenwick Trimble,MIA,AA,Southern League,23.0,84,369,50,21,0,15,50,49,34,0,77,6,19,8
-683494,683494,2026,Euribiel Angeles,OAK,AA,Texas League,24.0,72,303,53,13,1,5,38,36,19,0,47,8,9,4
 814299,814299,2026,Pascanel Ferreras,HOU,AA,Texas League,24.0,30,119,18,5,0,3,14,16,14,0,25,2,4,3
-692110,692110,2026,Core Jackson,NYY,AA,Eastern League,22.0,20,89,15,4,1,1,14,11,7,0,13,0,8,2
-695930,695930,2026,Frederick Bencosme,BAL,AA,Eastern League,23.0,106,421,60,21,1,13,51,54,51,0,73,3,13,0
-814455,814455,2026,Nick Mitchell,WSH,AA,Eastern League,22.0,104,460,78,16,3,6,66,52,57,0,79,3,24,6
-842249,842249,2026,Graham Brown,MIN,AA,Texas League,24.0,26,99,13,4,0,5,19,18,14,0,26,4,10,1
+690991,690991,2026,Mac Horvath,TB,AA,Southern League,24.0,117,508,84,20,5,11,77,55,41,1,125,7,50,5
+696145,696145,2026,Lonnie White Jr.,PIT,AA,Eastern League,23.0,91,380,48,16,2,19,55,48,51,0,122,9,12,2
 800683,800683,2026,Blake Rambusch,SEA,AA,Texas League,26.0,66,251,49,5,0,1,37,32,35,0,38,4,34,9
 804858,804858,2026,Bryan Rincon,PHI,AA,Eastern League,22.0,117,529,60,24,2,24,90,62,94,1,110,7,29,4
-691292,691292,2026,Angel Ortiz,AZ,AA,Texas League,23.0,75,321,37,20,4,12,54,48,32,0,78,1,14,3
 696020,696020,2026,Raudelis Martinez,BOS,AA,Eastern League,24.0,25,68,12,4,0,1,6,10,2,0,17,2,0,1
 804558,804558,2026,Raudi Rodriguez,LAA,AA,Southern League,22.0,95,414,63,14,2,12,72,42,59,1,92,9,27,8
-805796,805796,2026,Arjun Nimmala,LAA,AA,Southern League,20.0,58,255,31,15,0,11,38,26,34,0,60,6,5,5
 802117,802117,2026,Patrick Clohisy,ATL,AA,Southern League,24.0,70,299,39,19,4,7,43,35,30,0,64,2,37,10
-701750,701750,2026,Bennett Thompson,CLE,AA,Eastern League,23.0,48,214,34,7,1,5,36,33,27,0,40,6,3,1
 694191,694191,2026,Pedro Pineda,OAK,AA,Texas League,22.0,6,27,6,0,0,0,0,1,1,0,9,1,2,0
-690991,690991,2026,Mac Horvath,TB,AA,Southern League,24.0,116,503,82,20,5,11,76,55,40,1,125,7,50,5
+814455,814455,2026,Nick Mitchell,WSH,AA,Eastern League,22.0,105,462,78,16,3,6,66,52,57,0,80,3,24,6
+815352,815352,2026,Caleb Bonemer,CWS,AA,Southern League,20.0,69,308,32,14,2,19,48,49,44,2,76,5,7,2
 834962,834962,2026,Anthony DePino,CWS,AA,Southern League,23.0,93,392,53,14,2,19,42,60,46,1,102,6,2,1
-814445,814445,2026,Jared Sprague-Lott,OAK,AA,Texas League,24.0,19,87,14,2,2,1,12,10,13,0,18,4,5,1
-815352,815352,2026,Caleb Bonemer,CWS,AA,Southern League,20.0,68,304,32,14,2,18,46,48,43,2,76,5,7,2
-694320,694320,2026,Jack Costello,SD,AA,Texas League,25.0,19,79,16,2,0,2,5,8,1,0,12,4,2,0
-691398,691398,2026,Yerlin Confidan,CIN,AA,Southern League,23.0,51,198,31,7,1,8,21,28,15,0,49,6,2,2
-692633,692633,2026,Manuel Palencia,NYY,AA,Eastern League,23.0,84,313,59,8,0,7,32,32,24,0,48,8,1,1
+808768,808768,2026,Ben McLaughlin,AZ,AA,Texas League,24.0,123,531,80,26,1,14,69,71,52,0,71,12,5,3
+814445,814445,2026,Jared Sprague-Lott,OAK,AA,Texas League,24.0,20,91,14,3,2,1,12,10,13,0,18,4,5,1
+695078,695078,2026,Jean Walters,AZ,AA,Texas League,24.0,50,183,26,5,3,6,26,31,18,0,42,5,4,1
 815734,815734,2026,Dylan Jasso,MIA,AA,Southern League,23.0,68,249,37,12,1,4,35,29,30,0,56,2,4,0
-701481,701481,2026,Ryan Campos,STL,AA,Texas League,23.0,109,468,70,18,0,12,67,60,68,0,108,7,16,2
-696513,696513,2026,Andy Garriola,CHC,AA,Southern League,26.0,112,472,68,17,1,22,57,82,30,0,111,14,1,1
-808768,808768,2026,Ben McLaughlin,AZ,AA,Texas League,24.0,122,526,79,25,1,14,66,71,51,0,71,12,5,3
-703149,703149,2026,Roderick Arias,NYY,AA,Eastern League,21.0,32,138,19,8,1,4,26,20,11,0,46,2,7,4
+691942,691942,2026,Jack O'Dowd,COL,AA,Eastern League,25.0,50,213,28,13,0,7,18,28,20,0,61,3,3,0
+683494,683494,2026,Euribiel Angeles,OAK,AA,Texas League,24.0,73,307,53,13,1,5,38,36,19,0,47,8,9,4
+694310,694310,2026,Bryson Ware,PHI,AA,Eastern League,25.0,77,292,38,12,2,15,41,42,28,0,91,3,10,5
+688394,688394,2026,Jordan Sprinkle,CWS,AA,Southern League,25.0,79,275,48,11,2,2,33,24,21,0,67,3,35,7
 25980,683090,2026,Matthew Lugo,LAA,AA,Southern League,25.0,39,159,22,6,2,3,19,26,23,0,40,1,11,3
-694310,694310,2026,Bryson Ware,PHI,AA,Eastern League,25.0,76,288,37,12,2,15,41,42,27,0,89,3,10,5
-681080,681080,2026,Caleb Ricketts,PHI,AA,Eastern League,26.0,52,214,31,8,0,11,30,32,14,0,49,7,1,0
-690970,690970,2026,Corey Collins,NYM,AA,Eastern League,24.0,42,162,18,5,1,10,29,28,26,1,42,3,1,1
 805865,805865,2026,Guy Lipscomb,CLE,AA,Eastern League,25.0,23,79,13,3,1,0,7,16,11,0,13,1,4,1
+806053,806053,2026,Dean Curley,CLE,AA,Eastern League,22.0,45,193,28,9,0,6,29,24,23,0,64,4,3,4
 699130,699130,2026,Jadher Areinamo,TB,AA,Southern League,22.0,71,303,46,13,0,13,35,44,18,0,58,4,9,3
-801590,801590,2026,Aaron Parker,TOR,AA,Eastern League,23.0,85,341,49,8,0,19,45,48,42,0,110,5,12,4
-702278,702278,2026,Nolan Schubart,CLE,AA,Eastern League,22.0,41,185,20,4,1,14,25,39,33,3,62,1,2,1
-700083,700083,2026,John Bay,NYM,AA,Eastern League,25.0,37,150,23,6,0,3,23,17,19,0,45,1,11,3
+683169,683169,2026,Sean McLain,LAD,AA,Texas League,25.0,53,202,29,7,3,7,36,28,16,0,63,4,10,0
+699126,699126,2026,Gregory Barrios,TB,AA,Southern League,22.0,111,434,86,11,4,3,59,48,19,0,57,7,41,7
+696513,696513,2026,Andy Garriola,CHC,AA,Southern League,26.0,113,477,68,17,1,22,57,83,30,0,111,14,1,1
+701481,701481,2026,Ryan Campos,STL,AA,Texas League,23.0,110,472,70,18,0,12,67,60,68,0,110,7,17,2
 687783,687783,2026,Matthew Wood,MIL,AA,Southern League,25.0,94,380,45,12,2,18,60,65,67,0,52,3,3,2
-687918,687918,2026,Braylen Wimmer,COL,AA,Eastern League,25.0,79,308,44,17,2,4,50,30,34,0,94,5,30,3
-683169,683169,2026,Sean McLain,LAD,AA,Texas League,25.0,52,198,28,7,3,7,36,27,15,0,62,4,10,0
 691792,691792,2026,Roc Riggio,COL,AA,Eastern League,24.0,89,380,40,23,2,16,50,51,58,1,101,6,20,8
+821296,821296,2026,Connor McGinnis,NYY,AA,Eastern League,23.0,82,312,47,12,1,10,41,42,26,0,73,5,6,1
 806534,806534,2026,Ben Gobbel,LAA,AA,Southern League,26.0,14,54,7,2,1,2,6,12,5,1,11,1,0,1
 800060,800060,2026,Xavier Isaac,TB,AA,Southern League,22.0,99,425,51,8,3,24,77,71,80,1,119,7,18,3
-703430,703430,2026,Anthony Scull,LAA,AA,Southern League,22.0,41,155,26,6,1,4,19,11,6,0,42,2,1,3
-824615,824615,2026,Connor Hujsak,TB,AA,Southern League,24.0,25,103,14,9,1,1,11,15,3,0,34,2,6,0
-687310,687310,2026,Will Simpson,TB,AA,Southern League,24.0,117,504,61,27,0,26,70,91,48,0,142,11,21,4
-699126,699126,2026,Gregory Barrios,TB,AA,Southern League,22.0,110,430,84,11,4,3,59,46,19,0,57,7,41,6
-823795,823795,2026,Nick Rodriguez,LAA,AA,Southern League,23.0,122,538,84,30,1,4,69,58,52,0,115,9,14,10
-688394,688394,2026,Jordan Sprinkle,CWS,AA,Southern League,25.0,78,271,47,11,1,2,33,23,21,0,65,3,35,6
-695722,695722,2026,Boston Smith,SEA,AA,Texas League,23.0,53,229,23,5,1,17,46,40,45,1,71,3,3,3
-22566,672359,2026,Tirso Ornelas,SD,AA,Texas League,26.0,119,507,63,33,1,17,58,54,47,4,90,11,2,1
+823795,823795,2026,Nick Rodriguez,LAA,AA,Southern League,23.0,124,546,85,31,1,4,70,58,52,0,118,9,14,10
+830239,830239,2026,Aaron Walton,CLE,AA,Eastern League,22.0,45,196,20,13,1,7,32,31,26,0,50,3,12,0
+695722,695722,2026,Boston Smith,SEA,AA,Texas League,23.0,54,233,24,5,1,17,47,40,45,1,72,3,3,3
 703766,703766,2026,Dakota Harris,STL,AA,Texas League,24.0,100,394,60,13,2,12,58,61,43,0,82,4,28,3
 702607,702607,2026,Dakota Jordan,SF,AA,Eastern League,23.0,20,84,12,6,0,1,12,8,9,1,24,3,6,0
+703430,703430,2026,Anthony Scull,LAA,AA,Southern League,22.0,42,160,26,7,1,4,19,11,6,0,43,2,1,3
+801590,801590,2026,Aaron Parker,TOR,AA,Eastern League,23.0,87,350,50,8,0,19,46,48,43,0,113,5,12,4
+694742,694742,2026,Josh Moylan,NYY,AA,Eastern League,23.0,67,253,30,12,0,16,39,45,21,0,74,4,2,1
 690957,690957,2026,Jace Bohrofen,TOR,AA,Eastern League,24.0,45,197,16,12,2,13,33,34,22,0,67,1,10,1
-823153,823153,2026,Matt King,PIT,AA,Eastern League,23.0,64,209,38,7,0,0,25,15,22,0,33,2,11,0
-703606,703606,2026,Jared Thomas,COL,AA,Eastern League,22.0,25,110,20,2,0,3,18,13,6,0,40,0,10,2
+687918,687918,2026,Braylen Wimmer,COL,AA,Eastern League,25.0,81,317,45,17,2,4,52,30,36,0,97,6,30,3
+22566,672359,2026,Tirso Ornelas,SD,AA,Texas League,26.0,120,509,63,33,1,17,58,54,47,4,90,11,2,1
+681080,681080,2026,Caleb Ricketts,PHI,AA,Eastern League,26.0,53,218,31,8,0,11,30,32,14,0,50,8,1,0
+703606,703606,2026,Jared Thomas,COL,AA,Eastern League,22.0,27,119,22,2,0,3,19,14,7,0,45,0,10,2
 805126,805126,2026,Charlie Szykowny,SF,AA,Eastern League,26.0,113,482,70,21,4,14,61,53,36,2,99,4,11,3
-702695,702695,2026,Easton Carmichael,PIT,AA,Eastern League,22.0,35,139,19,7,1,4,20,26,10,0,21,2,1,2
-814450,814450,2026,Wehiwa Aloy,BAL,AA,Eastern League,22.0,37,150,19,6,0,9,26,20,13,0,44,7,8,2
-694484,694484,2026,Max Wagner,TEX,AA,Texas League,24.0,82,311,35,13,0,21,46,53,30,0,110,4,3,2
-701778,701778,2026,Jace Avina,NYY,AA,Eastern League,23.0,116,518,62,28,3,20,81,66,58,0,123,10,16,5
+687310,687310,2026,Will Simpson,TB,AA,Southern League,24.0,118,508,61,27,0,26,70,91,48,0,143,11,21,4
+701778,701778,2026,Jace Avina,NYY,AA,Eastern League,23.0,118,527,62,29,3,21,84,68,60,0,124,10,16,6
+691913,691913,2026,Jesus Castillo,PIT,AA,Eastern League,22.0,66,261,47,5,2,5,28,27,20,0,59,4,7,2
+813668,813668,2026,Jack Gurevitch,STL,AA,Texas League,22.0,31,136,19,5,0,8,18,23,5,0,53,2,0,1
+703149,703149,2026,Roderick Arias,NYY,AA,Eastern League,21.0,34,147,20,8,1,4,27,21,12,0,47,2,8,4
+700083,700083,2026,John Bay,NYM,AA,Eastern League,25.0,39,157,24,6,0,3,23,17,20,0,48,1,11,3
+814450,814450,2026,Wehiwa Aloy,BAL,AA,Eastern League,22.0,38,154,20,6,0,9,26,20,13,0,45,7,8,2
+809092,809092,2026,Murf Gray,PIT,AA,Eastern League,22.0,44,191,22,7,0,9,32,27,29,0,42,5,2,0
+823153,823153,2026,Matt King,PIT,AA,Eastern League,23.0,66,211,38,7,0,0,26,15,23,0,33,2,11,0
 811287,811287,2026,Carson Roccaforte,KC,AA,Texas League,24.0,110,504,56,19,5,30,81,80,52,2,144,8,21,17
+702652,702652,2026,Andrew Fischer,MIL,AA,Southern League,22.0,70,304,24,7,2,27,53,63,56,2,101,2,5,4
+700731,700731,2026,Keiner Delgado,PIT,AA,Eastern League,22.0,102,448,66,19,0,10,60,56,53,0,90,7,26,8
 808094,808094,2026,Jhorvic Abreus,CLE,AA,Eastern League,20.0,3,10,2,0,0,0,2,1,2,0,4,0,0,0
 802541,802541,2026,Bryan Broecker,TB,AA,Southern League,24.0,6,22,4,0,0,0,4,1,6,0,6,0,1,0
-691913,691913,2026,Jesus Castillo,PIT,AA,Eastern League,22.0,64,254,46,4,2,5,28,27,20,0,55,4,7,2
+690970,690970,2026,Corey Collins,NYM,AA,Eastern League,24.0,43,166,18,5,1,10,29,28,26,1,43,3,1,1
 26244,685744,2026,Kenedy Corona,NYY,AA,Eastern League,26.0,22,87,13,3,0,3,12,12,8,0,21,2,7,0
-700731,700731,2026,Keiner Delgado,PIT,AA,Eastern League,22.0,100,441,64,19,0,10,58,56,53,0,90,7,25,8
+694320,694320,2026,Jack Costello,SD,AA,Texas League,25.0,20,83,16,2,0,2,5,8,1,0,13,4,2,0
+701136,701136,2026,Kerrington Cross,SD,AA,Texas League,24.0,3,12,2,1,0,0,0,0,0,0,2,1,0,0
 823658,823658,2026,Daniel Dickinson,MIL,AA,Southern League,22.0,3,13,3,0,0,0,1,0,1,0,2,0,1,1
 683103,683103,2026,Cade Doughty,TOR,AA,Eastern League,25.0,37,126,20,5,1,2,19,14,11,0,35,3,2,1
-702652,702652,2026,Andrew Fischer,MIL,AA,Southern League,22.0,69,299,23,7,2,27,52,63,54,2,99,2,5,4
 800840,800840,2026,Chase Heath,STL,AA,Texas League,22.0,6,21,5,0,0,0,2,0,1,0,7,2,1,0
-814528,814528,2026,Sam Kulasingam,KC,AA,Texas League,24.0,124,551,74,23,4,12,81,69,84,0,110,12,30,7
+814528,814528,2026,Sam Kulasingam,KC,AA,Texas League,24.0,125,555,74,24,4,12,82,69,84,0,112,12,30,7
 29976,691783,2026,Jordan Lawlar,AZ,AA,Texas League,23.0,9,37,4,0,0,5,7,7,1,0,13,0,2,0
+692021,692021,2026,Oswaldo Linares,SD,AA,Texas League,23.0,6,18,2,1,0,1,3,3,2,0,4,0,0,0
+691183,691183,2026,Kevin Made,WSH,AA,Eastern League,23.0,9,34,6,1,0,0,2,5,5,0,8,0,1,0
+29606,669234,2026,Justyn-Henry Malloy,TB,AA,Southern League,26.0,12,53,4,2,0,4,8,11,11,0,11,1,2,2
 815044,815044,2026,Sam Mongelli,LAD,AA,Texas League,25.0,10,41,5,0,1,3,7,10,3,0,13,0,1,1
-694742,694742,2026,Josh Moylan,NYY,AA,Eastern League,23.0,65,246,29,11,0,16,36,45,19,0,73,4,2,1
 807747,807747,2026,Rikuu Nishida,CWS,AA,Southern League,25.0,11,54,6,4,0,0,10,2,11,0,5,0,6,0
 800149,800149,2026,Carlos Pacheco,OAK,AA,Texas League,21.0,10,40,7,1,1,0,6,4,1,0,11,0,2,0
-702524,702524,2026,Logan Sauve,OAK,AA,Texas League,22.0,9,36,5,2,0,0,2,1,7,0,10,1,2,0
 669219,669219,2026,Je'Von Ward,TOR,AA,Eastern League,26.0,6,27,5,1,0,0,6,2,3,0,12,0,0,0
-806263,806263,2026,Brandon Winokur,MIN,AA,Texas League,21.0,50,229,36,2,2,11,30,35,15,0,64,2,11,3
-694848,694848,2026,Sam Brown,WSH,AA,Eastern League,24.0,86,362,49,19,0,9,34,34,48,0,82,3,0,1
+694484,694484,2026,Max Wagner,TEX,AA,Texas League,24.0,84,319,35,14,0,21,47,54,31,0,111,4,3,2
 815067,815067,2026,Aidan Longwell,COL,AA,Eastern League,24.0,94,385,53,24,1,10,34,49,20,0,89,2,1,1
-695078,695078,2026,Jean Walters,AZ,AA,Texas League,24.0,49,178,26,4,3,4,23,24,18,0,42,5,4,1
-809092,809092,2026,Murf Gray,PIT,AA,Eastern League,22.0,42,184,21,7,0,8,31,25,28,0,41,5,2,0
+694183,694183,2026,Cristian Hernández,MIA,AA,Southern League,22.0,115,480,64,28,0,13,63,47,52,0,120,8,34,8
 803745,803745,2026,Adrian Santana,MIA,AA,Southern League,20.0,29,137,22,8,0,0,23,12,14,0,19,2,6,0
 701734,701734,2026,Ryan McCrystal,CIN,AA,Southern League,23.0,30,123,19,6,1,2,16,13,9,0,28,1,0,1
 681132,681132,2026,Max Ferguson,BOS,AA,Eastern League,26.0,60,232,29,9,2,8,35,29,34,0,59,0,12,4
 813883,813883,2026,Ryan Ignoffo,MIA,AA,Southern League,25.0,76,305,46,15,3,3,33,38,26,0,48,11,15,4
+694848,694848,2026,Sam Brown,WSH,AA,Eastern League,24.0,88,371,50,19,0,9,34,34,50,0,85,3,0,1
+702278,702278,2026,Nolan Schubart,CLE,AA,Eastern League,22.0,43,192,20,4,1,14,25,39,34,3,66,1,2,1
 687751,687751,2026,Cortland Lawson,WSH,AA,Eastern League,26.0,94,360,51,18,1,6,35,35,42,0,108,2,2,1
-694187,694187,2026,Daniel Vazquez,KC,AA,Texas League,22.0,118,499,81,24,0,4,55,56,44,0,130,15,17,5
 692405,692405,2026,Jeremy Rivas,STL,AA,Texas League,23.0,37,143,20,5,0,5,20,22,16,0,31,3,11,1
 686540,686540,2026,Owen Cobb,NYY,AA,Eastern League,25.0,75,267,42,13,1,3,30,31,18,0,54,2,14,1
-694183,694183,2026,Cristian Hernández,MIA,AA,Southern League,22.0,114,475,64,27,0,12,61,45,51,0,119,8,33,8
 800643,800643,2026,Ty Hanchey,SF,AA,Eastern League,26.0,56,209,30,9,1,4,29,28,22,1,61,2,1,1
-691942,691942,2026,Jack O'Dowd,COL,AA,Eastern League,25.0,48,205,24,13,0,7,16,26,19,0,60,3,2,0
 695763,695763,2026,Sam Petersen,WSH,AA,Eastern League,23.0,95,419,49,17,3,13,60,51,61,1,117,7,30,5
-696142,696142,2026,Will Taylor,PIT,AA,Eastern League,23.0,109,444,63,17,3,11,61,47,46,0,114,9,24,8
-677605,677605,2026,Luis Verdugo,SD,AA,Texas League,25.0,98,385,61,10,0,9,47,34,45,0,98,10,5,0
-696521,696521,2026,Garrett Spain,MIN,AA,Texas League,25.0,115,486,57,20,3,22,75,56,57,0,134,6,23,7
+696142,696142,2026,Will Taylor,PIT,AA,Eastern League,23.0,111,449,64,17,3,11,62,47,47,0,116,9,24,8
+824615,824615,2026,Connor Hujsak,TB,AA,Southern League,24.0,26,107,14,9,1,1,11,15,3,0,35,2,7,0
 683490,683490,2026,J.J. D'Orazio,LAA,AA,Southern League,24.0,44,165,26,3,0,7,17,22,13,0,35,1,1,1
 684491,684491,2026,Frank Rodriguez,LAD,AA,Texas League,24.0,68,270,41,8,1,8,28,31,22,0,56,3,1,0
-821296,821296,2026,Connor McGinnis,NYY,AA,Eastern League,23.0,81,308,44,11,1,10,40,38,26,0,73,5,6,1
+822501,822501,2026,Jon Jon Gazdar,STL,AA,Texas League,24.0,89,390,59,13,0,8,48,45,42,0,50,13,13,0
+807276,807276,2026,Dante Nori,PHI,AA,Eastern League,21.0,66,301,45,13,5,3,34,25,28,0,50,4,17,7
+694974,694974,2026,Colby Shade,MIA,AA,Southern League,24.0,30,104,11,5,0,6,17,18,11,0,25,3,15,0
 701616,701616,2026,Caleb Lomavita,WSH,AA,Eastern League,23.0,85,347,42,17,3,14,36,51,30,0,79,8,2,0
-807276,807276,2026,Dante Nori,PHI,AA,Eastern League,21.0,65,297,45,12,5,3,34,25,28,0,50,4,17,7
-814431,814431,2026,Jackson Castillo,NYY,AA,Eastern League,23.0,108,455,68,17,1,9,60,43,58,0,87,4,12,2
-828335,828335,2026,Titus Dumitru,PIT,AA,Eastern League,23.0,115,484,60,25,3,15,58,66,50,0,110,15,6,9
-687072,687072,2026,Jamari Baylor,NYM,AA,Eastern League,25.0,14,49,7,1,1,1,10,5,5,0,13,0,3,0
+702695,702695,2026,Easton Carmichael,PIT,AA,Eastern League,22.0,36,143,19,7,1,4,20,26,10,0,21,2,2,2
+809944,809944,2026,Elijah Hainline,LAD,AA,Texas League,23.0,107,469,62,16,1,12,67,64,82,0,120,10,17,5
 804645,804645,2026,Caden Connor,CWS,AA,Southern League,25.0,10,46,7,2,0,1,5,10,4,0,10,1,0,0
 687930,687930,2026,Tyresse Turner,CLE,AA,Eastern League,26.0,26,97,15,3,1,1,11,8,14,0,28,2,10,1
-810838,810838,2026,Ryan Jackson,SD,AA,Texas League,24.0,118,502,88,14,3,4,51,42,41,1,123,8,12,10
-701062,701062,2026,Alec Briley,CWS,AA,Southern League,25.0,122,535,59,26,3,29,78,86,45,3,149,6,14,5
-29606,669234,2026,Justyn-Henry Malloy,TB,AA,Southern League,26.0,11,49,3,2,0,4,8,11,10,0,9,1,2,2
+694187,694187,2026,Daniel Vazquez,KC,AA,Texas League,22.0,119,503,81,24,0,4,55,56,44,0,131,15,17,5
+801887,801887,2026,Kole Myers,LAD,AA,Texas League,25.0,82,343,48,9,3,9,47,37,53,1,87,4,13,5
 700681,700681,2026,Nick Lorusso,NYM,AA,Eastern League,25.0,84,351,37,18,2,19,48,55,32,0,88,9,9,1
+810838,810838,2026,Ryan Jackson,SD,AA,Texas League,24.0,119,506,88,14,3,4,51,43,43,1,124,8,12,10
+701062,701062,2026,Alec Briley,CWS,AA,Southern League,25.0,123,539,59,26,3,29,79,86,47,3,150,6,14,6
+686445,686445,2026,Sammy Siani,SEA,AA,Texas League,25.0,67,225,34,6,2,7,34,35,19,0,49,4,17,5
 809338,809338,2026,Trevor Austin,HOU,AA,Texas League,24.0,113,483,56,21,2,17,66,54,66,1,104,11,13,8
-686445,686445,2026,Sammy Siani,SEA,AA,Texas League,25.0,66,221,34,6,2,6,33,32,19,0,47,4,17,4
+677605,677605,2026,Luis Verdugo,SD,AA,Texas League,25.0,99,389,61,10,0,9,47,34,45,0,98,10,5,0
+828335,828335,2026,Titus Dumitru,PIT,AA,Eastern League,23.0,117,487,60,25,3,15,58,66,50,0,110,15,6,9
+814431,814431,2026,Jackson Castillo,NYY,AA,Eastern League,23.0,109,458,68,17,1,9,60,43,58,0,88,4,12,2
 807714,807714,2026,Carter Trice,CHC,AA,Southern League,23.0,124,515,64,28,2,15,59,61,55,1,134,8,18,7
 686912,686912,2026,Maxwell Romero Jr.,WSH,AA,Eastern League,25.0,56,229,21,12,0,13,32,35,33,0,76,2,0,1
-801887,801887,2026,Kole Myers,LAD,AA,Texas League,25.0,81,339,47,9,3,9,46,37,53,1,85,4,13,5
 813664,813664,2026,Justin DeCriscio,SD,AA,Texas League,23.0,18,73,12,3,0,0,5,0,6,0,17,5,3,1
-830239,830239,2026,Aaron Walton,CLE,AA,Eastern League,22.0,43,188,18,11,1,7,31,29,26,0,48,2,10,0
 702708,702708,2026,Emaarion Boyd,MIA,AA,Southern League,22.0,64,208,33,7,1,3,29,13,10,0,54,4,18,9
+695524,695524,2026,Jacob Cozart,LAA,AA,Southern League,23.0,107,446,63,13,0,17,51,66,51,0,113,11,1,1
+690988,690988,2026,Austin Hendrick,CIN,AA,Southern League,25.0,57,225,31,9,0,10,28,44,16,0,66,1,2,2
 694281,694281,2026,Tomas Frick,NYY,AA,Eastern League,25.0,19,65,11,2,0,1,7,4,6,0,11,6,0,0
-694974,694974,2026,Colby Shade,MIA,AA,Southern League,24.0,29,100,11,5,0,5,16,16,10,0,24,2,15,0
 27647,683011,2026,Anthony Volpe,NYY,AA,Eastern League,25.0,9,34,7,0,0,0,5,3,4,0,5,3,2,0
-694170,694170,2026,Dyan Jorge,COL,AA,Eastern League,23.0,124,538,93,15,2,1,66,42,64,0,113,9,54,14
 687071,687071,2026,Shane Sasaki,CIN,AA,Southern League,25.0,53,198,29,4,6,2,24,19,24,0,57,2,9,3
 680868,680868,2026,Patrick Winkel,TOR,AA,Eastern League,26.0,36,124,17,7,0,3,11,13,11,0,39,2,0,1
 699114,699114,2026,Leo Balcazar,CIN,AA,Southern League,22.0,100,443,67,16,1,10,51,52,46,0,88,7,2,5
-682775,682775,2026,Kervin Pichardo,WSH,AA,Eastern League,24.0,106,424,64,11,0,12,61,41,56,1,102,10,8,1
-822501,822501,2026,Jon Jon Gazdar,STL,AA,Texas League,24.0,88,386,57,13,0,8,47,44,42,0,50,13,12,0
 687201,687201,2026,Kevin Kilpatrick Jr.,ATL,AA,Southern League,25.0,92,298,45,12,1,6,39,25,27,0,80,3,28,7
-809944,809944,2026,Elijah Hainline,LAD,AA,Texas League,23.0,106,465,61,15,1,12,67,64,81,0,120,10,17,4
-695524,695524,2026,Jacob Cozart,LAA,AA,Southern League,23.0,105,438,62,12,0,17,50,64,49,0,112,11,1,1
-804240,804240,2026,Jacob Burke,CWS,AA,Southern League,25.0,76,305,47,12,2,5,46,24,21,0,67,4,15,4
-690988,690988,2026,Austin Hendrick,CIN,AA,Southern League,25.0,55,218,31,8,0,9,26,42,16,0,64,1,2,2
+696521,696521,2026,Garrett Spain,MIN,AA,Texas League,25.0,117,495,57,20,3,22,75,56,58,0,137,6,23,7
+701860,701860,2026,Carter Cunningham,TOR,AA,Eastern League,25.0,74,280,31,14,2,10,47,39,33,0,95,2,15,1
+801592,801592,2026,Zander Darby,SF,AA,Eastern League,23.0,8,27,6,0,0,0,3,3,2,0,11,1,0,0
 691437,691437,2026,Adrian Pinto,TOR,AA,Eastern League,23.0,43,178,20,12,2,2,15,17,25,0,30,3,1,1
-701860,701860,2026,Carter Cunningham,TOR,AA,Eastern League,25.0,72,272,31,13,2,9,45,36,32,0,93,2,15,1
-702544,702544,2026,Jacob Reimer,NYM,AA,Eastern League,22.0,78,341,40,21,0,8,46,40,45,1,84,6,14,5
-700243,700243,2026,Payton Green,MIA,AA,Southern League,23.0,67,246,28,12,1,10,30,25,26,1,82,3,20,3
+821100,821100,2026,Justin Gonzales,BOS,AA,Eastern League,19.0,18,85,12,2,1,2,14,11,12,0,22,3,1,1
+806263,806263,2026,Brandon Winokur,MIN,AA,Texas League,21.0,52,238,36,2,2,11,30,35,15,0,65,2,11,3
+694170,694170,2026,Dyan Jorge,COL,AA,Eastern League,23.0,125,542,93,15,2,1,66,42,64,0,115,9,55,14
+699157,699157,2026,Ahbram Liendo,BOS,AA,Eastern League,22.0,105,355,51,11,2,8,53,55,43,0,107,5,25,7
+682775,682775,2026,Kervin Pichardo,WSH,AA,Eastern League,24.0,107,428,64,11,0,12,61,41,57,1,103,10,8,1
+827665,827665,2026,Dillon Lewis,MIA,AA,Southern League,23.0,87,360,46,12,4,17,42,47,28,0,110,4,19,3
+700243,700243,2026,Payton Green,MIA,AA,Southern League,23.0,68,250,29,12,1,10,30,26,26,1,83,3,21,3
 800421,800421,2026,Marvin Alcantara,BOS,AA,Eastern League,21.0,75,306,43,16,1,6,32,30,20,0,56,12,15,3
-698927,698927,2026,Edward Duran,TOR,AA,Eastern League,22.0,12,48,8,1,0,1,6,6,2,0,10,2,1,0
-702619,702619,2026,Luke Hill,CLE,AA,Eastern League,22.0,35,138,16,10,0,3,25,16,13,0,33,6,7,2
+807751,807751,2026,Ethan O'Donnell,MIA,AA,Southern League,24.0,43,173,23,6,0,6,28,15,21,0,41,0,15,2
+702520,702520,2026,Justin Thomas Jr.,HOU,AA,Texas League,22.0,19,86,11,2,0,2,13,8,16,0,21,1,7,1
 695462,695462,2026,Cal Conley,ATL,AA,Southern League,26.0,32,117,12,5,2,5,21,16,12,0,35,3,4,1
-694749,694749,2026,Dylan Campbell,CWS,AA,Southern League,23.0,127,526,62,29,4,15,74,62,55,0,120,3,34,9
 690985,690985,2026,Colby Halter,OAK,AA,Texas League,24.0,41,169,21,6,1,5,21,23,25,1,47,3,9,3
 805168,805168,2026,Alejandro Nuñez,HOU,AA,Texas League,21.0,33,129,22,4,0,2,13,7,8,0,31,2,5,2
 683610,683610,2026,Leandro Pineda,WSH,AA,Eastern League,24.0,66,270,37,12,4,3,32,23,28,0,48,8,4,3
-687272,687272,2026,Tucker Flint,LAA,AA,Southern League,25.0,126,528,66,22,1,14,81,69,77,3,142,7,20,3
-699157,699157,2026,Ahbram Liendo,BOS,AA,Eastern League,22.0,103,348,49,11,2,8,52,55,41,0,105,5,23,7
-681098,681098,2026,Bill Knight,SEA,AA,Texas League,26.0,83,312,46,11,4,3,48,29,27,0,66,4,23,4
-813668,813668,2026,Jack Gurevitch,STL,AA,Texas League,22.0,30,132,17,5,0,7,16,21,5,0,53,2,0,1
+803849,803849,2026,Devin Fitz-Gerald,WSH,AA,Eastern League,20.0,63,278,42,9,0,8,36,30,20,0,71,7,4,3
+804240,804240,2026,Jacob Burke,CWS,AA,Southern League,25.0,77,309,47,12,2,5,47,24,21,0,67,5,15,4
+681098,681098,2026,Bill Knight,SEA,AA,Texas League,26.0,84,316,47,11,4,3,48,29,27,0,69,4,23,4
+687272,687272,2026,Tucker Flint,LAA,AA,Southern League,25.0,127,532,66,22,1,14,81,69,79,3,144,7,20,3
+694749,694749,2026,Dylan Campbell,CWS,AA,Southern League,23.0,128,530,62,29,4,15,74,62,55,0,121,3,34,9
 694194,694194,2026,Miguel Bleis,BOS,AA,Eastern League,22.0,90,353,51,13,0,13,58,38,20,0,83,5,14,3
-827665,827665,2026,Dillon Lewis,MIA,AA,Southern League,23.0,86,356,45,11,4,17,42,47,28,0,109,4,19,3
 800449,800449,2026,Thomas Sosa,BAL,AA,Eastern League,21.0,105,442,55,22,2,14,49,53,38,1,120,4,3,4
-802991,802991,2026,E.J. Exposito,DET,AA,Eastern League,25.0,114,467,56,16,1,23,60,75,52,0,120,11,16,7
+808665,808665,2026,Angel Acosta,KC,AA,Texas League,23.0,14,57,10,1,0,1,6,5,3,0,9,3,3,1
 694943,694943,2026,Juan Gonzalez,CWS,AA,Southern League,25.0,5,20,3,1,0,0,1,1,1,0,6,1,1,1
 814408,814408,2026,Jackson Hornung,TOR,AA,Eastern League,25.0,62,241,34,12,2,4,37,28,19,0,71,7,5,0
+700931,700931,2026,Seth Stephenson,DET,AA,Eastern League,25.0,104,463,70,25,1,2,77,36,29,0,90,5,65,7
 678962,678962,2026,Daniel Vellojin,TB,AA,Southern League,26.0,29,113,16,6,0,1,15,7,12,0,25,1,1,0
-677338,677338,2026,GJ Hill,COL,AA,Eastern League,25.0,108,387,41,22,1,16,59,50,31,0,117,3,32,6
-804446,804446,2026,Eddie Micheletti Jr.,LAA,AA,Southern League,24.0,119,505,54,25,5,18,71,60,57,2,90,10,7,1
-807751,807751,2026,Ethan O'Donnell,MIA,AA,Southern League,24.0,42,169,22,6,0,6,27,15,19,0,41,0,15,2
+804446,804446,2026,Eddie Micheletti Jr.,LAA,AA,Southern League,24.0,120,509,55,25,5,18,71,60,57,2,92,10,7,1
 815039,815039,2026,Dustin Dickerson,KC,AA,Texas League,25.0,18,75,7,6,1,1,12,7,11,0,19,2,4,0
-700931,700931,2026,Seth Stephenson,DET,AA,Eastern League,25.0,103,459,69,25,1,2,76,36,28,0,90,5,63,7
 800957,800957,2026,Brendan Jones,MIA,AA,Southern League,24.0,81,352,38,13,7,12,51,35,46,1,81,2,36,8
 703155,703155,2026,Lazaro Montes,SEA,AA,Texas League,21.0,79,339,28,11,1,25,67,66,54,2,103,3,5,3
 681879,681879,2026,Nick Lucky,NYM,AA,Eastern League,26.0,24,84,18,0,0,0,6,7,7,0,29,1,3,2
-691789,691789,2026,Izaac Pacheco,DET,AA,Eastern League,23.0,90,366,36,13,2,21,42,58,51,3,124,2,5,0
-801075,801075,2026,Walker Janek,HOU,AA,Texas League,23.0,56,231,35,7,1,7,25,36,15,0,78,3,22,2
-702520,702520,2026,Justin Thomas Jr.,HOU,AA,Texas League,22.0,18,81,10,2,0,2,13,8,14,0,21,1,6,1
+802991,802991,2026,E.J. Exposito,DET,AA,Eastern League,25.0,115,472,56,16,1,23,61,75,53,0,121,11,16,7
 828395,828395,2026,Jason Schiavone,HOU,AA,Texas League,23.0,79,339,39,13,0,14,46,44,49,0,112,5,20,7
+687262,687262,2026,Jorge Corona,CWS,AA,Southern League,25.0,60,217,27,5,3,10,32,26,14,0,68,3,1,1
 686960,686960,2026,Nate Baez,BOS,AA,Eastern League,25.0,88,379,48,21,0,9,44,46,30,0,85,6,4,1
-813844,813844,2026,Will Bush,HOU,AA,Texas League,22.0,96,411,54,12,0,12,51,41,71,0,138,4,16,7
-687262,687262,2026,Jorge Corona,CWS,AA,Southern League,25.0,59,213,26,5,3,10,32,26,14,0,66,3,1,1
+694214,694214,2026,Samuel Zavala,CWS,AA,Southern League,21.0,116,476,58,17,0,13,65,41,91,0,111,8,12,8
+695634,695634,2026,Jaime Ferrer,MIN,AA,Texas League,23.0,76,308,43,14,1,6,33,32,19,0,76,4,9,1
 800569,800569,2026,Alberto Barriga,AZ,AA,Texas League,21.0,56,224,31,11,0,5,27,21,18,0,46,3,6,3
-803849,803849,2026,Devin Fitz-Gerald,WSH,AA,Eastern League,20.0,62,273,41,9,0,7,33,29,19,0,71,7,4,3
-695634,695634,2026,Jaime Ferrer,MIN,AA,Texas League,23.0,74,300,42,13,1,6,33,31,19,0,74,4,9,1
+677338,677338,2026,GJ Hill,COL,AA,Eastern League,25.0,109,391,41,22,1,16,60,51,31,0,119,3,32,6
+702544,702544,2026,Jacob Reimer,NYM,AA,Eastern League,22.0,80,349,40,21,0,8,46,40,45,1,87,6,14,5
+691789,691789,2026,Izaac Pacheco,DET,AA,Eastern League,23.0,91,368,36,13,2,21,42,58,51,3,125,2,5,0
 700784,700784,2026,Jeron Williams,HOU,AA,Texas League,25.0,18,63,8,4,0,1,8,6,5,0,17,0,7,2
 805763,805763,2026,Drake Logan,CWS,AA,Southern League,25.0,23,77,9,4,0,3,9,11,6,0,32,0,3,0
-701337,701337,2026,Ethan Petry,WSH,AA,Eastern League,22.0,65,267,29,13,0,15,25,41,18,0,93,6,2,0
 693850,693850,2026,Kala'i Rosario,MIN,AA,Texas League,23.0,58,251,31,5,0,11,31,32,42,0,78,4,9,3
-701805,701805,2026,Josh Caron,SEA,AA,Texas League,22.0,35,142,14,9,2,3,23,10,18,0,41,2,8,2
-686810,686810,2026,Brennan Milone,OAK,AA,Texas League,25.0,88,397,45,19,1,9,51,49,71,0,110,4,5,4
+686810,686810,2026,Brennan Milone,OAK,AA,Texas League,25.0,89,401,45,20,1,9,51,49,71,0,111,4,5,4
+686499,686499,2026,Clark Elliott,OAK,AA,Texas League,25.0,109,452,58,13,1,8,72,37,92,0,116,6,22,5
+813844,813844,2026,Will Bush,HOU,AA,Texas League,22.0,97,415,54,12,0,12,51,41,72,0,141,4,16,7
 690971,690971,2026,Chase Davis,STL,AA,Texas League,24.0,37,156,18,4,0,8,24,24,26,1,38,5,9,1
-812518,812518,2026,Camden Janik,PIT,AA,Eastern League,23.0,8,30,5,1,0,0,5,3,2,0,6,0,0,0
-692021,692021,2026,Oswaldo Linares,SD,AA,Texas League,23.0,5,15,1,1,0,1,3,3,2,0,4,0,0,0
-696264,696264,2026,Tyler Whitaker,HOU,AA,Texas League,23.0,109,417,55,14,2,10,56,51,49,0,119,11,21,8
-686499,686499,2026,Clark Elliott,OAK,AA,Texas League,25.0,108,448,57,13,1,8,72,36,91,0,115,6,22,5
+805365,805365,2026,Isaiah Jackson,BOS,AA,Eastern League,22.0,5,16,2,1,0,0,1,1,3,0,3,0,2,0
+702265,702265,2026,Paxton Kling,TEX,AA,Texas League,23.0,4,17,2,1,0,0,2,3,1,0,3,0,2,0
 680996,680996,2026,Luke Mann,OAK,AA,Texas League,26.0,71,281,34,10,0,14,32,46,25,2,93,2,2,0
-813666,813666,2026,Ariel Armas,CHC,AA,Southern League,23.0,106,428,61,18,1,6,50,36,43,0,88,9,7,2
-692478,692478,2026,Victor Arias,TOR,AA,Eastern League,22.0,85,342,46,14,3,10,42,43,21,0,79,5,9,8
-694214,694214,2026,Samuel Zavala,CWS,AA,Southern League,21.0,115,472,58,16,0,12,63,37,90,0,110,8,12,8
-808665,808665,2026,Angel Acosta,KC,AA,Texas League,23.0,13,54,10,1,0,0,5,4,3,0,8,3,3,1
-669002,669002,2026,Connor Scott,KC,AA,Texas League,26.0,85,341,44,13,3,11,41,48,24,0,97,1,8,3
+669002,669002,2026,Connor Scott,KC,AA,Texas League,26.0,86,345,45,13,3,11,41,49,24,0,98,1,8,3
+813666,813666,2026,Ariel Armas,CHC,AA,Southern League,23.0,107,433,61,18,1,7,51,38,43,0,89,10,7,2
+802018,802018,2026,Ryan Burrowes,CWS,AA,Southern League,21.0,37,154,26,1,1,2,14,13,18,0,35,1,11,2
+696264,696264,2026,Tyler Whitaker,HOU,AA,Texas League,23.0,110,421,55,14,2,10,58,51,50,0,121,11,21,8
 691006,691006,2026,Kevin Parada,NYM,AA,Eastern League,24.0,64,254,37,10,0,4,24,22,29,0,67,7,6,1
-805117,805117,2026,Jean Carlos Sió,SF,AA,Eastern League,22.0,70,257,32,7,1,11,36,34,21,0,62,4,8,3
 701771,701771,2026,Billy Amick,NYM,AA,Eastern League,23.0,98,433,37,15,0,30,74,94,56,0,127,7,3,2
-802018,802018,2026,Ryan Burrowes,CWS,AA,Southern League,21.0,36,150,26,1,0,2,13,13,18,0,34,1,11,2
+701337,701337,2026,Ethan Petry,WSH,AA,Eastern League,22.0,67,276,29,14,0,15,25,41,19,0,97,6,2,0
+801075,801075,2026,Walker Janek,HOU,AA,Texas League,23.0,57,236,35,7,1,7,25,36,15,0,81,4,22,2
 690958,690958,2026,Drew Bowser,CHC,AA,Southern League,24.0,30,100,17,0,1,3,12,13,5,0,35,1,2,0
-702526,702526,2026,Eric Snow,TOR,AA,Eastern League,22.0,26,113,15,7,0,1,11,9,10,1,21,2,6,2
+687553,687553,2026,Kamren James,TB,AA,Southern League,26.0,53,204,24,8,2,7,29,25,20,0,53,2,3,2
 695069,695069,2026,Keith Jones II,TEX,AA,Texas League,24.0,99,414,49,18,2,10,56,64,56,0,111,4,16,5
-801592,801592,2026,Zander Darby,SF,AA,Eastern League,23.0,7,24,5,0,0,0,3,3,2,0,10,1,0,0
-695604,695604,2026,T.J. White,WSH,AA,Eastern League,22.0,59,225,30,7,1,7,24,23,20,0,60,6,0,2
-691797,691797,2026,Ryan Spikes,TB,AA,Southern League,23.0,78,295,39,12,4,7,34,23,17,0,96,6,21,3
+698927,698927,2026,Edward Duran,TOR,AA,Eastern League,22.0,14,51,8,1,0,1,6,6,3,0,11,2,2,0
+695612,695612,2026,Alex Mooney,CLE,AA,Eastern League,23.0,114,459,57,19,4,10,76,59,45,0,100,9,30,6
+694757,694757,2026,Maui Ahuna,SF,AA,Eastern League,24.0,115,457,61,18,3,6,63,45,53,0,131,4,31,4
 701546,701546,2026,Duce Gourson,PIT,AA,Eastern League,23.0,79,337,40,14,0,7,50,39,54,2,83,5,29,4
+687192,687192,2026,Cade Hunter,CIN,AA,Southern League,25.0,83,316,41,13,0,7,41,40,35,1,97,3,5,5
 691616,691616,2026,Hedbert Perez,TOR,AA,Eastern League,23.0,45,175,17,11,0,6,17,18,24,0,51,5,6,3
+702619,702619,2026,Luke Hill,CLE,AA,Eastern League,22.0,37,145,16,10,0,3,25,16,14,0,34,6,7,2
 694991,694991,2026,Mitch Jebb,PIT,AA,Eastern League,24.0,14,62,11,0,1,0,7,3,9,0,9,2,4,1
-694757,694757,2026,Maui Ahuna,SF,AA,Eastern League,24.0,114,453,60,18,3,6,63,45,52,0,131,4,30,4
+692478,692478,2026,Victor Arias,TOR,AA,Eastern League,22.0,87,351,47,14,3,10,42,43,21,0,83,6,9,9
+701783,701783,2026,Cole Messina,COL,AA,Eastern League,23.0,95,364,42,21,0,8,45,46,42,1,99,12,21,3
 687394,687394,2026,Jack Brannigan,PIT,AA,Eastern League,25.0,33,141,11,8,1,8,22,18,15,0,53,2,1,0
-826928,826928,2026,Owen Carey,ATL,AA,Southern League,19.0,33,143,19,5,2,2,19,18,13,0,37,3,3,1
-695612,695612,2026,Alex Mooney,CLE,AA,Eastern League,23.0,112,452,55,19,4,10,75,59,44,0,100,9,30,6
+805117,805117,2026,Jean Carlos Sió,SF,AA,Eastern League,22.0,71,260,32,7,1,11,36,34,21,0,63,4,8,3
+687616,687616,2026,Jimmy Obertop,COL,AA,Eastern League,26.0,48,167,18,7,0,5,24,14,29,0,64,2,4,0
 692568,692568,2026,Miguel Ugueto,STL,AA,Texas League,23.0,78,334,41,20,3,5,43,37,15,0,66,10,24,6
 802407,802407,2026,Joe Lampe,CLE,AA,Eastern League,25.0,41,163,23,8,1,0,24,12,19,0,43,1,9,2
-701783,701783,2026,Cole Messina,COL,AA,Eastern League,23.0,94,360,41,21,0,8,45,46,41,1,97,12,21,3
-694754,694754,2026,Sabin Ceballos,SF,AA,Eastern League,23.0,118,496,58,16,0,18,69,56,70,1,89,13,11,2
-687616,687616,2026,Jimmy Obertop,COL,AA,Eastern League,26.0,47,163,18,7,0,4,23,12,29,0,62,2,4,0
-800169,800169,2026,Aroon Escobar,PHI,AA,Eastern League,21.0,129,558,80,15,2,10,77,65,67,0,91,11,26,7
+800169,800169,2026,Aroon Escobar,PHI,AA,Eastern League,21.0,130,562,80,15,2,11,78,66,67,0,92,11,26,7
 682692,682692,2026,Miguel Palma,NYY,AA,Eastern League,24.0,55,201,27,4,0,9,30,33,19,0,42,5,0,0
 684976,684976,2026,Johnathon Thomas,WSH,AA,Eastern League,26.0,81,290,41,10,2,4,43,30,20,0,75,4,24,6
-687192,687192,2026,Cade Hunter,CIN,AA,Southern League,25.0,81,309,41,12,0,6,39,36,34,1,96,2,5,5
+701805,701805,2026,Josh Caron,SEA,AA,Texas League,22.0,36,146,14,9,2,3,23,10,18,0,43,2,8,2
+694754,694754,2026,Sabin Ceballos,SF,AA,Eastern League,23.0,119,500,58,16,0,18,69,56,72,1,90,13,11,2
+691797,691797,2026,Ryan Spikes,TB,AA,Southern League,23.0,79,299,39,12,4,7,35,23,17,0,99,6,21,3
 683569,683569,2026,Jose Colmenares,CWS,AA,Southern League,24.0,24,88,9,5,0,3,9,11,8,0,23,2,3,1
+695604,695604,2026,T.J. White,WSH,AA,Eastern League,22.0,61,234,31,7,1,7,24,23,21,0,64,6,0,2
 682633,682633,2026,Eduardo Garcia,MIL,AA,Southern League,23.0,52,197,29,5,0,4,22,21,20,0,50,2,14,5
 27482,690987,2026,Robert Hassell III,PIT,AA,Eastern League,24.0,5,24,3,1,0,0,3,2,6,0,4,0,1,0
 691186,691186,2026,Arol Vera,LAA,AA,Southern League,23.0,4,13,1,1,0,0,3,1,4,0,3,0,1,0
 800387,800387,2026,Fernando Peguero,BAL,AA,Eastern League,21.0,65,199,29,7,0,3,22,21,19,0,55,0,23,2
+810891,810891,2026,Jay Beshears,MIA,AA,Southern League,24.0,75,284,24,17,2,11,50,37,32,0,72,6,11,0
 813896,813896,2026,Joseph Sullivan,HOU,AA,Texas League,23.0,80,343,39,13,2,11,47,38,41,1,107,3,20,8
-802474,802474,2026,Cameron Leary,OAK,AA,Texas League,24.0,114,476,56,19,4,12,57,65,59,0,134,5,46,8
+689302,689302,2026,Karson Simas,CHC,AA,Southern League,25.0,115,463,68,13,5,5,60,37,41,0,131,9,46,6
 683341,683341,2026,David Calabrese,LAA,AA,Southern League,23.0,74,261,32,13,1,5,31,21,24,0,51,2,7,2
-689302,689302,2026,Karson Simas,CHC,AA,Southern League,25.0,114,458,67,13,5,5,59,36,40,0,131,9,44,6
-698945,698945,2026,Anderson De Los Santos,BAL,AA,Eastern League,22.0,114,470,52,21,1,12,58,57,73,0,113,7,9,5
+815268,815268,2026,Patrick Lee,DET,AA,Eastern League,26.0,39,147,17,6,0,5,21,13,17,0,52,1,18,2
 698973,698973,2026,Jose Astudillo,SF,AA,Eastern League,22.0,17,66,11,2,0,0,7,8,5,0,8,2,4,2
-687553,687553,2026,Kamren James,TB,AA,Southern League,26.0,52,200,22,8,2,7,28,25,19,0,52,2,3,2
-691922,691922,2026,Javier Rivas,PIT,AA,Eastern League,23.0,80,306,38,12,3,10,32,30,15,0,82,9,3,1
-806071,806071,2026,Jonny Farmelo,SEA,AA,Texas League,21.0,44,205,24,8,2,3,24,24,34,0,57,3,15,1
 681286,681286,2026,JT Schwartz,NYM,AA,Eastern League,26.0,72,296,32,14,1,10,28,35,30,0,77,3,2,1
+803172,803172,2026,Griff O'Ferrall,BAL,AA,Eastern League,23.0,115,477,67,16,0,7,60,40,49,0,102,9,32,5
 694444,694444,2026,Tavian Josenberger,BAL,AA,Eastern League,24.0,113,422,49,15,3,10,66,43,63,0,101,3,38,5
 804241,804241,2026,Zach Levenson,STL,AA,Texas League,24.0,86,343,38,15,0,11,39,41,44,0,88,11,3,2
+802474,802474,2026,Cameron Leary,OAK,AA,Texas League,24.0,115,480,56,19,4,12,57,65,61,0,135,5,46,9
 814436,814436,2026,Ryan Galanie,CWS,AA,Southern League,26.0,12,54,6,2,0,1,8,6,11,0,12,0,0,0
 701800,701800,2026,Carlos Linarez,STL,AA,Texas League,24.0,13,44,6,3,0,0,5,5,2,0,17,1,3,0
-803172,803172,2026,Griff O'Ferrall,BAL,AA,Eastern League,23.0,114,473,66,16,0,7,60,40,48,0,101,9,31,5
-814414,814414,2026,Kyle DeBarge,MIN,AA,Texas League,22.0,117,520,63,22,1,12,71,46,62,0,137,8,36,13
+823807,823807,2026,Kane Kepley,CHC,AA,Southern League,22.0,30,136,14,4,2,3,22,16,24,0,21,1,20,1
+698945,698945,2026,Anderson De Los Santos,BAL,AA,Eastern League,22.0,115,473,52,21,1,12,58,57,73,0,114,7,9,5
 805957,805957,2026,Caleb Farmer,WSH,AA,Eastern League,26.0,12,37,4,0,1,2,5,5,4,0,7,0,0,0
+702524,702524,2026,Logan Sauve,OAK,AA,Texas League,22.0,10,40,5,2,0,0,2,2,7,0,12,1,2,0
 691442,691442,2026,Wilfred Veras,CWS,AA,Southern League,23.0,45,178,26,3,0,6,26,25,14,0,55,0,4,0
-703483,703483,2026,Dixon Williams,ATL,AA,Southern League,22.0,9,36,2,2,1,2,6,3,3,0,11,0,2,1
+814414,814414,2026,Kyle DeBarge,MIN,AA,Texas League,22.0,119,528,64,22,1,12,72,48,65,0,138,8,37,13
 815133,815133,2026,Cameron Sisneros,HOU,AA,Texas League,25.0,46,190,22,7,0,4,25,25,33,0,39,5,2,0
 682947,682947,2026,Jose Ramos,NYM,AA,Eastern League,25.0,91,387,45,12,0,15,52,54,52,0,123,13,8,4
-702517,702517,2026,Mason White,BOS,AA,Eastern League,22.0,31,122,13,4,1,4,18,13,18,0,38,2,2,0
+691922,691922,2026,Javier Rivas,PIT,AA,Eastern League,23.0,81,309,38,12,3,10,32,30,15,0,82,9,3,1
+702270,702270,2026,Malcolm Moore,TEX,AA,Texas League,22.0,49,206,21,9,1,8,23,24,17,0,50,0,0,2
 691941,691941,2026,Calvin Harris,CWS,AA,Southern League,24.0,37,144,19,4,0,4,15,22,18,0,27,0,1,2
-815268,815268,2026,Patrick Lee,DET,AA,Eastern League,26.0,38,143,17,5,0,5,20,13,16,0,51,1,18,2
 677319,677319,2026,Cameron Barstad,CLE,AA,Eastern League,25.0,36,138,16,7,0,2,17,13,18,0,49,2,0,0
+687072,687072,2026,Jamari Baylor,NYM,AA,Eastern League,25.0,16,56,7,1,1,1,11,5,7,0,15,0,3,0
 694185,694185,2026,Danny De Andrade,MIN,AA,Texas League,22.0,6,23,5,0,0,0,2,2,0,0,8,1,0,0
-702270,702270,2026,Malcolm Moore,TEX,AA,Texas League,22.0,48,202,21,8,1,8,23,24,17,0,49,0,0,2
+826928,826928,2026,Owen Carey,ATL,AA,Southern League,19.0,34,148,19,5,2,2,19,18,13,0,38,3,3,1
+702526,702526,2026,Eric Snow,TOR,AA,Eastern League,22.0,28,118,15,7,0,1,11,9,10,1,22,2,6,2
 827637,827637,2026,Dalton McIntyre,ATL,AA,Southern League,22.0,48,170,24,3,2,2,27,8,20,0,50,0,9,2
-810891,810891,2026,Jay Beshears,MIA,AA,Southern League,24.0,74,280,23,16,2,11,48,37,32,0,71,6,11,0
+806071,806071,2026,Jonny Farmelo,SEA,AA,Texas League,21.0,45,209,24,8,2,3,24,24,35,0,59,3,15,1
+683353,683353,2026,Connor Caskenette,MIA,AA,Southern League,24.0,52,192,26,5,1,6,23,18,13,0,50,6,8,0
 683233,683233,2026,Douglas Hodo III,BAL,AA,Eastern League,25.0,48,192,19,9,2,8,28,28,14,0,59,1,13,1
 801406,801406,2026,Jared Dickey,OAK,AA,Texas League,24.0,20,69,7,4,0,3,9,15,4,0,15,1,2,0
 703198,703198,2026,Kenni Gomez,HOU,AA,Texas League,21.0,23,68,9,4,1,0,9,7,1,0,22,1,1,1
+812518,812518,2026,Camden Janik,PIT,AA,Eastern League,23.0,9,32,5,1,0,0,5,3,2,0,7,0,0,0
 701100,701100,2026,Ben McCabe,COL,AA,Eastern League,26.0,6,15,2,1,0,0,2,0,0,0,7,1,0,0
 676560,676560,2026,Hemmanuel Rosario,HOU,AA,Texas League,25.0,4,15,1,1,0,1,1,4,1,0,8,0,0,0
 814411,814411,2026,Matt Scannell,ATL,AA,Southern League,24.0,10,33,4,2,0,0,0,4,4,1,12,0,0,0
-702283,702283,2026,Tucker Toman,TOR,AA,Eastern League,22.0,20,81,10,4,0,1,7,4,10,0,19,2,1,1
-683353,683353,2026,Connor Caskenette,MIA,AA,Southern League,24.0,51,188,25,5,1,6,22,18,12,0,48,6,7,0
+702690,702690,2026,Cutter Coffey,TOR,AA,Eastern League,22.0,98,373,50,12,4,4,36,40,38,0,124,7,8,4
 814269,814269,2026,Kevin Verde,NYY,AA,Eastern League,20.0,40,111,14,4,0,4,10,14,6,0,29,3,0,1
 687521,687521,2026,Eric Brown Jr.,MIL,AA,Southern League,25.0,54,212,26,6,1,5,26,27,31,0,52,7,7,3
 694815,694815,2026,Jack Hurley,AZ,AA,Texas League,24.0,21,82,11,1,0,4,11,13,5,0,25,2,0,1
-804119,804119,2026,Bobby Boser,OAK,AA,Texas League,23.0,77,324,37,10,1,11,38,32,36,0,118,4,14,1
-702690,702690,2026,Cutter Coffey,TOR,AA,Eastern League,22.0,97,369,49,12,4,4,35,40,38,0,122,7,8,4
+814194,814194,2026,Quinn McDaniel,MIN,AA,Texas League,23.0,30,118,17,2,0,1,15,7,23,0,25,0,4,1
 813852,813852,2026,Trey Paige,STL,AA,Texas League,25.0,62,250,28,10,1,5,26,29,37,0,59,1,15,3
-687152,687152,2026,Darrien Miller,MIL,AA,Southern League,25.0,56,214,16,8,1,9,32,25,36,0,47,0,1,0
-815151,815151,2026,Mac McCroskey,LAA,AA,Southern League,26.0,98,325,45,9,1,3,44,22,43,0,102,3,16,6
 677356,677356,2026,Carter Young,BAL,AA,Eastern League,25.0,61,228,29,7,1,4,26,30,31,0,83,3,3,1
 694266,694266,2026,D'Andre Smith,NYM,AA,Eastern League,25.0,31,129,13,7,2,2,16,18,10,0,29,0,7,2
 815104,815104,2026,Graysen Tarlow,STL,AA,Texas League,24.0,35,135,14,6,0,4,14,15,16,0,36,3,4,0
+694896,694896,2026,Caden Rose,BOS,AA,Eastern League,24.0,72,251,29,12,1,3,30,21,31,0,73,3,12,1
 696281,696281,2026,Wyatt Young,NYM,AA,Eastern League,26.0,88,322,49,9,0,1,29,20,38,1,71,1,16,3
-694896,694896,2026,Caden Rose,BOS,AA,Eastern League,24.0,70,247,28,12,1,3,30,21,31,0,71,3,12,1
-701333,701333,2026,Colby Shelton,CWS,AA,Southern League,23.0,94,386,32,21,2,17,48,53,35,1,96,9,8,3
+804119,804119,2026,Bobby Boser,OAK,AA,Texas League,23.0,78,328,37,10,1,11,38,32,37,0,120,4,14,1
 681357,681357,2026,Cody Morissette,MIN,AA,Texas League,26.0,4,22,2,1,0,1,5,3,2,0,6,1,0,0
 676566,676566,2026,Shawn Ross,PIT,AA,Eastern League,26.0,22,77,3,2,0,7,14,16,18,0,29,2,0,0
-823807,823807,2026,Kane Kepley,CHC,AA,Southern League,22.0,29,130,12,4,2,3,20,16,23,0,21,1,16,1
+815151,815151,2026,Mac McCroskey,LAA,AA,Southern League,26.0,99,329,45,9,1,3,44,22,44,0,103,3,16,6
+687152,687152,2026,Darrien Miller,MIL,AA,Southern League,25.0,57,219,16,8,1,9,33,25,39,0,48,0,1,0
 805782,805782,2026,Ryan Lasko,OAK,AA,Texas League,24.0,73,281,32,10,5,6,36,34,13,0,79,4,5,3
-694304,694304,2026,Cole Fontenelle,LAA,AA,Southern League,24.0,76,282,30,15,2,6,28,39,22,0,93,6,11,1
+701333,701333,2026,Colby Shelton,CWS,AA,Southern League,23.0,95,390,32,21,2,17,48,53,36,1,97,9,8,3
 691588,691588,2026,Ian Lewis Jr.,MIA,AA,Southern League,23.0,66,268,33,5,1,10,38,37,25,1,43,2,26,6
-800176,800176,2026,Carlos Sanchez,CIN,AA,Southern League,21.0,56,245,29,6,2,6,36,14,38,0,69,3,5,2
+702283,702283,2026,Tucker Toman,TOR,AA,Eastern League,22.0,22,88,11,4,0,1,7,5,10,0,22,2,1,1
+702517,702517,2026,Mason White,BOS,AA,Eastern League,22.0,33,129,13,4,1,4,18,13,20,0,39,2,2,0
 678099,678099,2026,Gavin Logan,AZ,AA,Texas League,26.0,67,229,22,4,0,13,33,31,33,0,57,4,3,1
 683006,683006,2026,Chris Newell,LAD,AA,Texas League,25.0,97,418,43,8,1,22,58,68,55,1,144,1,22,5
-681377,681377,2026,Josh Hood,SEA,AA,Texas League,25.0,75,287,27,10,3,13,42,43,27,0,100,8,6,1
 692366,692366,2026,Onil Perez,SF,AA,Eastern League,23.0,12,34,4,2,0,0,0,2,3,0,5,0,0,0
 814791,814791,2026,Jared Sundstrom,SEA,AA,Texas League,25.0,89,347,35,14,1,13,47,45,31,0,101,5,12,5
+702253,702253,2026,Cam Collier,CIN,AA,Southern League,21.0,134,571,60,26,1,18,64,83,49,0,149,7,1,0
 687625,687625,2026,Kai Murphy,SD,AA,Texas League,25.0,50,183,27,4,0,3,17,14,14,0,37,3,9,3
-702253,702253,2026,Cam Collier,CIN,AA,Southern League,21.0,132,562,60,24,1,18,63,83,49,0,147,7,1,0
 805834,805834,2026,Javier Vaz,KC,AA,Texas League,25.0,18,85,4,9,0,1,13,9,13,0,16,0,6,0
 692944,692944,2026,Kevin Villavicencio,NYM,AA,Eastern League,22.0,29,109,17,2,0,2,9,10,4,0,25,0,3,2
 823185,823185,2026,Zane Zielinski,SF,AA,Eastern League,24.0,42,146,19,7,0,2,17,14,7,0,51,3,3,0
-702239,702239,2026,Colin Tuft,BAL,AA,Eastern League,23.0,17,46,4,1,0,3,5,8,7,0,15,1,2,0
+694304,694304,2026,Cole Fontenelle,LAA,AA,Southern League,24.0,77,286,30,15,2,6,28,39,22,0,94,6,11,1
+800176,800176,2026,Carlos Sanchez,CIN,AA,Southern League,21.0,57,249,29,6,2,6,36,14,39,0,70,4,5,2
 689688,689688,2026,Ethan Workinger,ATL,AA,Southern League,24.0,41,149,19,3,0,4,10,18,19,0,35,4,5,0
-827294,827294,2026,Edgar Alvarez,CHC,AA,Southern League,25.0,108,422,38,20,1,11,55,47,71,0,114,6,1,1
+681377,681377,2026,Josh Hood,SEA,AA,Texas League,25.0,76,291,27,10,3,13,42,43,28,0,102,8,6,1
+827294,827294,2026,Edgar Alvarez,CHC,AA,Southern League,25.0,109,422,38,20,1,11,55,47,71,0,114,6,1,1
+678854,678854,2026,Viandel Pena,DET,AA,Eastern League,25.0,30,116,13,6,0,2,16,11,12,0,32,3,4,0
 815299,815299,2026,Will Verdung,ATL,AA,Southern League,23.0,49,184,24,6,1,2,19,12,19,0,39,3,7,2
-801523,801523,2026,Chris Suero,NYM,AA,Eastern League,22.0,112,494,41,20,2,18,75,51,79,0,142,4,37,8
+802959,802959,2026,Max Holy,HOU,AA,Texas League,23.0,89,367,44,10,0,7,48,34,56,2,110,1,24,8
 695603,695603,2026,Benny Montgomery,COL,AA,Eastern League,23.0,41,162,20,2,1,7,19,22,14,0,60,4,0,0
-814194,814194,2026,Quinn McDaniel,MIN,AA,Texas League,23.0,28,111,15,2,0,1,15,7,21,0,23,0,4,1
-701540,701540,2026,J.R. Freethy,TOR,AA,Eastern League,23.0,31,109,15,3,0,1,10,8,11,0,22,1,2,2
 800516,800516,2026,Alberto Hernandez,HOU,AA,Texas League,22.0,30,107,11,6,0,2,10,11,10,0,22,4,0,0
-692657,692657,2026,Omar Alfonzo,NYY,AA,Eastern League,22.0,85,346,39,12,0,10,38,45,35,0,118,7,0,0
-813386,813386,2026,Justin Johnson,KC,AA,Texas League,26.0,94,350,32,17,0,13,46,45,32,0,84,9,11,6
-806611,806611,2026,Jancel Villarroel,SF,AA,Eastern League,21.0,33,132,15,5,1,2,12,15,12,0,24,5,3,0
-687730,687730,2026,Caleb Cali,SEA,AA,Texas League,25.0,121,506,48,21,0,20,69,64,58,1,170,3,20,1
-695744,695744,2026,Ian Moller,TEX,AA,Texas League,23.0,68,279,29,10,0,8,43,43,40,0,90,2,4,2
+691621,691621,2026,Jheremy Vargas,MIL,AA,Southern League,23.0,54,172,21,7,0,1,19,11,20,0,29,9,1,4
+801523,801523,2026,Chris Suero,NYM,AA,Eastern League,22.0,114,499,41,20,2,18,75,51,80,0,145,4,37,9
+687730,687730,2026,Caleb Cali,SEA,AA,Texas League,25.0,122,510,48,21,0,20,70,64,59,1,172,3,20,1
+692657,692657,2026,Omar Alfonzo,NYY,AA,Eastern League,22.0,86,350,39,12,0,10,38,45,36,0,119,7,0,0
 686404,686404,2026,Wuilfredo Antunez,PHI,AA,Eastern League,24.0,81,330,30,13,3,14,37,47,26,0,108,9,5,3
-800724,800724,2026,Eric Bitonti,MIL,AA,Southern League,20.0,3,13,1,1,0,0,1,3,1,0,4,0,0,0
 672018,672018,2026,Dasan Brown,MIL,AA,Southern League,24.0,51,168,23,3,0,1,21,7,27,0,49,1,13,6
-696501,696501,2026,Mark Coley II,MIL,AA,Southern League,25.0,84,282,34,5,1,9,44,40,28,0,95,2,17,6
 25629,683227,2026,Cody Freeman,TEX,AA,Texas League,25.0,3,12,2,0,0,0,2,2,0,0,1,1,0,0
 686944,686944,2026,Grant Magill,CWS,AA,Southern League,25.0,41,156,18,6,1,3,11,21,12,0,57,2,1,0
 26420,677347,2026,Kyren Paris,LAA,AA,Southern League,24.0,31,120,17,3,1,0,12,12,12,0,39,4,8,3
-678854,678854,2026,Viandel Pena,DET,AA,Eastern League,25.0,29,112,12,6,0,2,16,10,12,0,32,3,4,0
 701980,701980,2026,Nestor Rios,MIA,AA,Southern League,21.0,4,10,1,1,0,0,0,2,0,0,2,1,0,0
-802959,802959,2026,Max Holy,HOU,AA,Texas League,23.0,88,363,42,10,0,7,47,32,56,2,108,1,24,8
-808129,808129,2026,Juan Flores,LAA,AA,Southern League,20.0,47,190,23,7,0,5,20,24,5,0,60,2,0,0
-699073,699073,2026,Thayron Liranzo,DET,AA,Eastern League,22.0,77,340,25,13,1,17,48,56,49,0,98,4,2,2
+703483,703483,2026,Dixon Williams,ATL,AA,Southern League,22.0,10,40,2,2,1,2,6,3,3,0,12,0,2,1
+813386,813386,2026,Justin Johnson,KC,AA,Texas League,26.0,95,354,32,17,0,13,46,45,32,0,86,9,11,6
+699073,699073,2026,Thayron Liranzo,DET,AA,Eastern League,22.0,78,345,25,13,1,18,49,58,49,0,99,4,2,2
+805956,805956,2026,Kai Roberts,SD,AA,Texas League,25.0,109,326,43,6,1,5,47,25,30,0,111,4,40,3
 694939,694939,2026,Marcus Brown,HOU,AA,Texas League,24.0,47,142,18,5,1,1,11,11,11,0,37,3,2,1
 683001,683001,2026,Ethan Hearn,CHC,AA,Southern League,25.0,33,112,13,4,0,4,12,14,4,0,42,1,4,0
-681355,681355,2026,Andrew Cossetti,MIN,AA,Texas League,26.0,108,453,42,10,1,18,53,56,77,0,127,9,3,3
+701540,701540,2026,J.R. Freethy,TOR,AA,Eastern League,23.0,33,116,16,3,0,1,10,8,11,0,24,1,2,2
 683149,683149,2026,Julian Brock,TEX,AA,Texas League,25.0,48,204,24,6,0,5,22,28,24,0,67,5,2,2
-695000,695000,2026,Poncho Ruiz,MIN,AA,Texas League,24.0,26,93,11,2,1,2,5,8,10,0,17,3,3,0
+696501,696501,2026,Mark Coley II,MIL,AA,Southern League,25.0,85,286,34,5,1,9,44,40,29,0,97,2,17,6
+681371,681371,2026,Dom Keegan,BAL,AA,Eastern League,25.0,41,163,17,3,1,6,16,13,22,0,41,6,0,1
+681355,681355,2026,Andrew Cossetti,MIN,AA,Texas League,26.0,109,457,42,10,1,18,54,56,79,0,128,9,3,3
+695744,695744,2026,Ian Moller,TEX,AA,Texas League,23.0,69,285,29,10,0,8,43,44,41,0,91,2,4,2
+806611,806611,2026,Jancel Villarroel,SF,AA,Eastern League,21.0,34,135,15,5,1,2,12,15,12,0,25,5,3,0
 701401,701401,2026,Canyon Brown,KC,AA,Texas League,22.0,83,313,40,9,1,6,34,33,20,0,86,3,11,3
 694689,694689,2026,Dominic Pitelli,CIN,AA,Southern League,24.0,40,130,12,6,0,4,17,16,12,0,42,0,6,2
 823173,823173,2026,James Taussig,CWS,AA,Southern League,23.0,14,60,7,2,0,2,4,6,3,0,21,0,0,0
-805956,805956,2026,Kai Roberts,SD,AA,Texas League,25.0,108,324,42,6,1,5,47,25,30,0,111,4,40,3
+696510,696510,2026,Peyton Stovall,CIN,AA,Southern League,23.0,29,115,13,3,0,4,7,14,10,0,29,1,1,0
 681134,681134,2026,Caleb Roberts,MIN,AA,Texas League,26.0,32,134,12,3,0,3,23,9,30,0,24,1,7,2
-681371,681371,2026,Dom Keegan,BAL,AA,Eastern League,25.0,40,159,16,3,1,6,16,13,22,0,40,6,0,1
 686541,686541,2026,Drew Compton,ATL,AA,Southern League,25.0,61,228,31,2,3,4,17,23,18,0,44,4,1,1
 680713,680713,2026,P.J. Hilson,PIT,AA,Eastern League,25.0,47,144,19,4,0,1,13,10,12,0,40,1,11,1
+702239,702239,2026,Colin Tuft,BAL,AA,Eastern League,23.0,18,49,4,1,0,3,5,8,7,0,16,1,2,0
 694838,694838,2026,Joe Vetrano,LAD,AA,Texas League,24.0,86,344,37,10,1,12,44,44,31,1,118,3,7,4
 672696,672696,2026,Francisco Acuna,SD,AA,Texas League,26.0,85,331,28,16,1,6,39,27,50,0,78,9,11,1
+814444,814444,2026,Will Turner,BOS,AA,Eastern League,23.0,99,414,28,14,2,18,68,41,84,1,103,4,18,7
 690996,690996,2026,T.J. McCants,CWS,AA,Southern League,25.0,17,62,8,2,0,1,5,7,4,0,27,0,4,0
-691621,691621,2026,Jheremy Vargas,MIL,AA,Southern League,23.0,53,168,19,7,0,1,19,11,20,0,27,9,1,3
 681941,681941,2026,Jaylen Palmer,NYM,AA,Eastern League,25.0,42,153,11,13,0,1,14,15,20,0,55,1,8,0
 814435,814435,2026,Jacob Sharp,TOR,AA,Eastern League,24.0,10,28,2,3,0,0,2,1,2,0,7,1,0,0
 681114,681114,2026,Michael Trautwein,CIN,AA,Southern League,26.0,17,69,7,0,0,3,15,7,13,0,25,1,2,0
 824742,824742,2026,Logan Braunschweig,ATL,AA,Southern League,23.0,39,140,21,2,1,0,9,9,12,0,42,2,5,4
-692222,692222,2026,Jose Izarra,LAD,AA,Texas League,24.0,41,165,19,8,0,1,21,12,16,0,39,8,6,2
 800607,800607,2026,Kehden Hettiger,PHI,AA,Eastern League,22.0,61,246,23,8,0,8,32,20,39,1,86,1,6,3
 23788,677941,2026,Jordyn Adams,MIL,AA,Southern League,26.0,12,51,4,1,0,3,8,10,7,0,14,1,3,0
-814444,814444,2026,Will Turner,BOS,AA,Eastern League,23.0,97,406,28,14,2,16,66,38,82,1,102,4,18,6
+695000,695000,2026,Poncho Ruiz,MIN,AA,Texas League,24.0,27,97,11,2,1,2,6,8,11,0,19,3,3,0
+808129,808129,2026,Juan Flores,LAA,AA,Southern League,20.0,49,198,23,7,0,5,20,24,5,0,61,2,0,0
+702501,702501,2026,Eli Serrano III,NYM,AA,Eastern League,23.0,68,287,22,15,3,6,28,27,35,0,75,3,8,2
 806985,806985,2026,Yoeilin Cespedes,BOS,AA,Eastern League,20.0,25,108,12,5,0,2,9,10,7,0,29,2,2,0
-679754,679754,2026,Alberto Rodriguez,KC,AA,Texas League,25.0,48,185,25,3,0,2,20,22,17,0,56,4,1,2
-694842,694842,2026,JT Benson,NYM,AA,Eastern League,24.0,27,81,10,1,0,2,10,10,5,0,18,1,5,0
-702488,702488,2026,Logan Wagner,LAD,AA,Texas League,22.0,30,122,9,4,0,6,15,19,20,0,38,1,1,0
+692222,692222,2026,Jose Izarra,LAD,AA,Texas League,24.0,42,169,19,8,0,1,21,13,17,0,40,8,6,2
 695048,695048,2026,Garret Guillemette,HOU,AA,Texas League,24.0,48,188,25,3,1,1,21,21,20,0,50,6,6,0
-702593,702593,2026,Jace LaViolette,CLE,AA,Eastern League,22.0,24,111,8,3,0,7,21,18,14,0,43,0,5,0
+807080,807080,2026,Eric Hartman,ATL,AA,Southern League,20.0,33,153,18,3,1,2,21,10,22,0,47,2,18,2
 815874,815874,2026,Nick Roselli,NYM,AA,Eastern League,23.0,16,52,8,1,0,0,3,4,4,0,15,1,0,0
 807511,807511,2026,Nelly Taylor,BOS,AA,Eastern League,23.0,99,380,33,18,1,8,57,26,51,1,116,5,23,5
-807080,807080,2026,Eric Hartman,ATL,AA,Southern League,20.0,32,148,17,3,1,2,21,9,22,0,45,2,18,2
+679734,679734,2026,Julio Carreras,CIN,AA,Southern League,26.0,39,143,15,5,0,3,15,16,14,0,43,0,6,1
 691191,691191,2026,Jose Salas,MIN,AA,Texas League,23.0,53,188,19,5,0,7,21,17,14,0,63,2,15,2
 686981,686981,2026,Brenden Dixon,CWS,AA,Southern League,25.0,27,97,7,4,0,5,13,12,8,0,26,1,1,1
 691276,691276,2026,Luis Caicuto,PHI,AA,Eastern League,23.0,9,31,4,1,0,0,2,4,3,0,5,0,0,0
-815464,815464,2026,Lisbel Diaz,SF,AA,Eastern League,20.0,20,87,12,1,0,2,5,16,2,0,23,0,7,0
 671272,671272,2026,David García,MIL,AA,Southern League,26.0,16,58,7,1,0,2,7,9,4,0,15,1,1,0
-679734,679734,2026,Julio Carreras,CIN,AA,Southern League,26.0,38,138,14,5,0,3,14,16,13,0,43,0,6,1
+702593,702593,2026,Jace LaViolette,CLE,AA,Eastern League,22.0,26,119,8,3,1,7,21,19,15,0,44,0,5,0
+694842,694842,2026,JT Benson,NYM,AA,Eastern League,24.0,29,88,11,1,0,2,10,10,5,0,22,2,5,0
 805301,805301,2026,Jordan Dissin,PHI,AA,Eastern League,24.0,37,125,14,6,0,1,11,12,9,0,37,2,0,0
+679754,679754,2026,Alberto Rodriguez,KC,AA,Texas League,25.0,49,189,25,3,0,2,20,22,17,0,56,4,1,2
 694206,694206,2026,Daniel Guilarte,MIL,AA,Southern League,22.0,16,57,5,1,1,2,5,4,7,0,10,2,1,0
 700939,700939,2026,Bennett Lee,DET,AA,Eastern League,24.0,48,180,18,6,2,2,15,12,20,0,53,1,0,0
-691710,691710,2026,Vincent Perozo,NYM,AA,Eastern League,23.0,58,229,23,7,0,8,19,26,9,0,82,2,0,0
-702501,702501,2026,Eli Serrano III,NYM,AA,Eastern League,23.0,66,280,21,14,3,5,27,26,34,0,75,3,7,2
 803475,803475,2026,Colby Jones,ATL,AA,Southern League,22.0,4,13,0,1,1,0,1,1,2,0,6,0,3,0
+687069,687069,2026,Josh Rivera,TOR,AA,Eastern League,25.0,3,12,2,0,0,0,0,0,0,0,3,1,0,0
 691405,691405,2026,Juan Benjamin,CLE,AA,Eastern League,23.0,47,158,15,7,1,2,23,13,16,0,31,4,8,2
 690992,690992,2026,Ed Howard,CHC,AA,Southern League,24.0,40,116,13,4,0,2,13,8,9,0,43,2,2,0
+691710,691710,2026,Vincent Perozo,NYM,AA,Eastern League,23.0,59,231,23,7,0,8,19,26,9,0,83,2,0,0
+702488,702488,2026,Logan Wagner,LAD,AA,Texas League,22.0,31,126,9,4,0,6,15,19,20,0,42,1,1,0
 694222,694222,2026,Ambioris Tavarez,ATL,AA,Southern League,22.0,83,289,29,9,0,7,40,29,35,0,101,7,16,6
 800419,800419,2026,Jeral Perez,CWS,AA,Southern League,21.0,60,248,25,10,0,4,25,25,28,0,69,6,4,1
 680846,680846,2026,Pablo Aliendo,CIN,AA,Southern League,25.0,42,146,9,10,0,4,11,13,9,0,51,1,0,0
-696510,696510,2026,Peyton Stovall,CIN,AA,Southern League,23.0,27,106,12,2,0,3,5,12,8,0,28,1,1,0
-814442,814442,2026,Ivan Brethowr,PIT,AA,Eastern League,23.0,54,217,20,8,1,3,21,14,30,0,68,7,6,1
+815464,815464,2026,Lisbel Diaz,SF,AA,Eastern League,20.0,21,90,12,1,0,2,5,16,2,0,25,0,7,0
 694186,694186,2026,Shalin Polanco,PIT,AA,Eastern League,22.0,18,64,8,1,1,0,2,7,6,0,26,0,0,1
 686958,686958,2026,Jose Torres,COL,AA,Eastern League,26.0,62,216,22,4,0,7,27,19,20,0,68,6,10,4
+703194,703194,2026,Randy De Jesus,LAA,AA,Southern League,21.0,16,48,5,2,0,1,4,4,3,0,21,1,0,0
 806273,806273,2026,Adam Retzbach,BAL,AA,Eastern League,25.0,68,255,24,9,1,4,30,31,28,0,89,2,1,0
 800232,800232,2026,Luis Baez,HOU,AA,Texas League,22.0,27,104,13,4,0,0,8,6,6,0,25,2,2,3
 801187,801187,2026,Chase Adkison,STL,AA,Texas League,26.0,5,18,0,2,0,1,2,2,0,0,3,0,0,0
 694227,694227,2026,Danyer Cueva,TEX,AA,Texas League,22.0,5,18,3,0,0,0,1,1,1,0,4,1,0,0
 702597,702597,2026,Dom Krupinski,CHC,AA,Southern League,22.0,22,84,6,3,1,2,11,5,11,0,28,1,6,0
+814442,814442,2026,Ivan Brethowr,PIT,AA,Eastern League,23.0,55,220,20,8,1,3,21,14,30,0,70,8,6,1
+813842,813842,2026,Chase Call,HOU,AA,Texas League,24.0,43,151,14,3,0,6,12,26,13,0,63,1,5,2
 815152,815152,2026,Theo Hardy,TEX,AA,Texas League,24.0,24,80,9,2,0,1,11,6,8,0,28,0,3,0
+677342,677342,2026,Brock Jones,TB,AA,Southern League,25.0,20,76,6,3,0,3,11,7,7,0,34,0,4,1
 809844,809844,2026,Kien Vu,CIN,AA,Southern League,22.0,48,179,16,5,1,5,22,21,17,1,55,1,5,2
 694563,694563,2026,Harold Coll,LAA,AA,Southern League,24.0,61,234,23,7,2,3,16,28,20,0,60,6,12,6
 806958,806958,2026,Felnin Celesten,SEA,AA,Texas League,20.0,31,134,15,3,0,3,11,12,9,0,45,4,7,3
-703194,703194,2026,Randy De Jesus,LAA,AA,Southern League,21.0,15,44,5,1,0,1,4,3,3,0,21,1,0,0
-813842,813842,2026,Chase Call,HOU,AA,Texas League,24.0,42,147,14,2,0,6,12,24,12,0,63,1,5,2
-701327,701327,2026,Elijah Green,WSH,AA,Eastern League,22.0,27,111,7,6,1,2,19,8,15,0,43,4,1,0
-677342,677342,2026,Brock Jones,TB,AA,Southern League,25.0,19,72,6,3,0,2,10,5,7,0,32,0,4,1
+701327,701327,2026,Elijah Green,WSH,AA,Eastern League,22.0,29,119,8,6,1,2,19,9,17,0,46,4,1,0
 690053,690053,2026,Chris Sargent,SD,AA,Texas League,25.0,38,116,11,3,0,3,9,11,9,0,30,1,0,0
 691252,691252,2026,Jhon Diaz,TB,AA,Southern League,23.0,42,160,13,5,2,4,20,16,15,0,50,1,2,3
 800621,800621,2026,Logun Clark,CLE,AA,Eastern League,23.0,6,23,3,0,0,0,1,1,4,0,8,0,0,0
 699305,699305,2026,Diego Mosquera,NYM,AA,Eastern League,22.0,18,58,8,0,0,0,5,1,8,0,19,0,3,0
 687248,687248,2026,Keshawn Ogans,ATL,AA,Southern League,24.0,22,66,9,1,0,0,4,5,4,0,21,2,1,1
-694387,694387,2026,Christian Knapczyk,CLE,AA,Eastern League,24.0,70,269,25,8,2,2,27,20,29,0,76,2,4,0
 700369,700369,2026,Adrian De Leon,AZ,AA,Texas League,22.0,24,86,9,2,0,1,7,4,8,0,35,3,1,0
+694387,694387,2026,Christian Knapczyk,CLE,AA,Eastern League,24.0,71,272,25,8,2,2,28,20,30,0,76,2,4,0
 801039,801039,2026,John Garcia,HOU,AA,Texas League,25.0,17,61,6,1,0,2,5,5,5,0,21,2,2,0
 681172,681172,2026,Tyler Tolve,ATL,AA,Southern League,25.0,19,57,4,4,0,1,3,9,2,0,21,2,0,0
 802355,802355,2026,Tanner Schobel,MIN,AA,Texas League,25.0,5,22,3,0,0,0,3,0,3,0,8,1,1,0
@@ -67912,17 +67920,18 @@ PlayerId,MLBAM_ID,Season,Name,Team,Level,League,Age,G,PA,1B,2B,3B,HR,R,RBI,BB,IB
 687567,687567,2026,Jorel Ortega,MIN,AA,Texas League,25.0,49,176,17,2,0,4,14,17,15,0,65,1,7,0
 671956,671956,2026,Noah Myers,TB,AA,Southern League,26.0,23,85,9,1,0,1,6,7,9,0,31,2,2,1
 702333,702333,2026,Haydn McGeary,CHC,AA,Southern League,26.0,10,38,4,1,0,0,1,1,3,0,14,0,0,0
-691422,691422,2026,Kevin Rivas,CLE,AA,Eastern League,23.0,6,15,1,0,0,1,2,2,1,0,6,0,1,0
 822162,822162,2026,Brandon Forrester,HOU,AA,Texas League,22.0,8,26,3,0,0,0,3,1,3,0,11,0,1,0
 701392,701392,2026,Marco Dinges,MIL,AA,Southern League,22.0,15,58,4,2,0,1,3,4,6,0,18,4,2,0
+800724,800724,2026,Eric Bitonti,MIL,AA,Southern League,20.0,4,18,1,1,0,0,1,4,1,0,8,0,0,0
 694399,694399,2026,Elijah Nunez,WSH,AA,Eastern League,24.0,17,54,4,2,0,0,2,2,5,0,14,0,0,1
-702630,702630,2026,Luke Hanson,TEX,AA,Texas League,22.0,14,56,5,0,0,1,4,8,4,0,11,3,0,0
+702630,702630,2026,Luke Hanson,TEX,AA,Texas League,22.0,16,64,6,0,0,1,5,10,5,0,13,3,0,0
 687526,687526,2026,Marcus Smith,CIN,AA,Southern League,25.0,6,20,2,0,0,0,1,1,4,0,11,0,2,0
-816113,816113,2026,Eli Willits,WSH,AA,Eastern League,18.0,2,11,1,0,0,0,1,2,3,0,3,1,0,0
 699167,699167,2026,Samuel Escudero,PIT,AA,Eastern League,22.0,21,57,5,0,0,1,3,5,3,0,14,1,0,0
 801346,801346,2026,Luis Hernandez,MIN,AA,Texas League,23.0,11,38,3,0,0,1,5,2,3,0,15,0,2,0
+691422,691422,2026,Kevin Rivas,CLE,AA,Eastern League,23.0,7,18,1,0,0,1,2,2,1,0,6,0,1,0
 683104,683104,2026,Trey Faltine,CIN,AA,Southern League,25.0,38,83,3,5,0,1,8,1,5,0,42,1,0,1
 686976,686976,2026,Silas Ardoin,BAL,AA,Eastern League,25.0,3,13,1,0,0,0,0,1,4,0,6,0,1,0
+680994,680994,2026,Nick Biddison,PHI,AA,Eastern League,25.0,11,34,1,1,0,1,3,5,4,0,13,0,1,1
 800444,800444,2026,Nikau Pouaka-Grego,PHI,AA,Eastern League,21.0,11,35,3,0,0,0,3,1,4,0,16,1,0,0
 800414,800414,2026,Alfredo Velásquez,BAL,AA,Eastern League,21.0,14,34,3,0,0,0,2,3,1,0,7,1,0,1
 681495,681495,2026,Cade Fergus,PHI,AA,Eastern League,25.0,21,72,6,1,0,0,4,3,4,0,34,2,4,0
@@ -67933,7 +67942,6 @@ PlayerId,MLBAM_ID,Season,Name,Team,Level,League,Age,G,PA,1B,2B,3B,HR,R,RBI,BB,IB
 691558,691558,2026,Yeiner Fernandez,LAD,AA,Texas League,23.0,7,23,1,1,0,0,4,3,2,0,4,0,0,0
 702025,702025,2026,Harry Genth,MIN,AA,Texas League,23.0,4,15,0,1,0,0,2,1,2,0,5,0,1,0
 702461,702461,2026,Kay-Lan Nicasia,MIL,AA,Southern League,24.0,12,42,3,0,0,0,5,1,6,0,19,1,5,0
-680994,680994,2026,Nick Biddison,PHI,AA,Eastern League,25.0,10,31,1,1,0,0,2,3,4,0,13,0,1,1
 805953,805953,2026,Anthony Huezo,HOU,AA,Texas League,20.0,3,14,0,1,0,0,1,1,1,0,5,0,1,0
 31695,687637,2026,Dylan Beavers,BAL,AA,Eastern League,24.0,3,13,0,0,0,0,1,0,4,0,0,0,0,0
 814261,814261,2026,Carlos Caro,PIT,AA,Eastern League,21.0,3,10,0,0,0,0,3,0,3,0,3,0,1,0
@@ -67942,6 +67950,7 @@ PlayerId,MLBAM_ID,Season,Name,Team,Level,League,Age,G,PA,1B,2B,3B,HR,R,RBI,BB,IB
 831240,831240,2026,Colin Hynek,CHC,AA,Southern League,23.0,7,13,0,0,0,0,1,0,1,0,7,0,0,0
 687084,687084,2026,Joshua Mears,SD,AA,Texas League,25.0,3,10,0,0,0,0,1,0,0,0,6,0,0,0
 695023,695023,2026,Eddie Park,CWS,AA,Southern League,24.0,5,16,0,0,0,0,0,0,1,0,7,0,0,0
+811278,811278,2026,Connor Rasmussen,KC,AA,Texas League,22.0,3,10,0,0,0,0,0,0,1,0,6,0,0,0
 814362,814362,2026,Alberto Rios,LAA,AA,Southern League,24.0,4,11,0,0,0,0,1,0,2,0,6,1,0,0
 691793,691793,2026,Charlie Saum,TOR,AA,Eastern League,22.0,4,12,0,0,0,0,1,2,2,0,5,0,0,0
 686683,686683,2026,Tevin Tucker,COL,AA,Eastern League,26.0,12,33,0,0,0,0,1,2,2,0,12,0,4,0

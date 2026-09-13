@@ -15,12 +15,13 @@ Age adjustment (AGE_ALPHA = 0.20):
   A player 2 SD younger than peers gets a ~40% boost; 2 SD older gets a ~40% cut.
 
 Discipline sub-weights:
-  Full tier (AAA 2023+, Chase% + Z-Contact% available):
+  Full tier (Chase% + Z-Contact% available — AAA 2023+, all levels 2026 via ProspectSavant):
     -Chase%_adj     40%   lower chase = better plate discipline
     ZContact%_adj   35%   higher z-contact = better in-zone contact
     -Whiff%_adj     25%   lower whiff = better overall contact
-  Fallback (all other rows):
-    -Whiff%_adj    100%
+  Fallback (all other rows — no Chase%/Z-Contact% data):
+    -Whiff%_adj     60%   contact avoidance
+    BB%_adj         40%   pitch recognition (walk rate, era+level adjusted)
 
 Power sub-weights:
   Full tier (ProspectSavant rows: MaxEV + EV90 available):
@@ -123,7 +124,12 @@ def build_discipline(df: pd.DataFrame) -> pd.Series:
         & df["ZContact%_adj"].notna()
         & df["Whiff%_adj"].notna()
     )
-    whiff_only = ~full & df["Whiff%_adj"].notna()
+    fallback = ~full & df["Whiff%_adj"].notna()
+    bb_adj   = df["BB%_adj"]
+
+    # Fallback sub-masks: blend Whiff%+BB% where both available, else Whiff% only
+    fallback_blend    = fallback & bb_adj.notna()
+    fallback_whiff    = fallback & bb_adj.isna()
 
     score = pd.Series(np.nan, index=df.index, dtype=float)
     score[full] = (
@@ -131,7 +137,8 @@ def build_discipline(df: pd.DataFrame) -> pd.Series:
         + WD["zcontact"] * z_contact[full]
         + WD["whiff"]    * inv_whiff[full]
     )
-    score[whiff_only] = inv_whiff[whiff_only]
+    score[fallback_blend] = 0.60 * inv_whiff[fallback_blend] + 0.40 * bb_adj[fallback_blend]
+    score[fallback_whiff] = inv_whiff[fallback_whiff]
     return score
 
 
@@ -230,6 +237,7 @@ def main() -> None:
     out["Whiff%_adj"]   = df["Whiff%_adj"]
     out["Chase%_adj"]   = df["Chase%_adj"]
     out["ZContact%_adj"]= df["ZContact%_adj"]
+    out["BB%_adj"]      = df["BB%_adj"]
     out["HRFB_adj"]        = df["HRFB_adj"]
     out["career_FBs_est"]  = df["career_FBs_est"]
     out["prior_FBs_est"]   = df["prior_FBs_est"]

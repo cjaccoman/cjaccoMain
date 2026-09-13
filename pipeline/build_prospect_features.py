@@ -77,6 +77,13 @@ def load_ps() -> pd.DataFrame:
         if col in ps.columns:
             ps[col] = ps[col].where(ps[col] > 0)
 
+    # PS exports Chase%, Z-Contact%, Whiff% in percent form (0-100).
+    # Game-feed values in prospect_features are decimal (0-1).  Divide here
+    # so both sources land on the same scale before the fill-null merge.
+    for col in ["Chase%", "Z-Contact%", "Whiff%"]:
+        if col in ps.columns:
+            ps[col] = ps[col] / 100.0
+
     return ps
 
 
