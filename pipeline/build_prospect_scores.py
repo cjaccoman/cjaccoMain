@@ -31,9 +31,8 @@ Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
     (all three standardized to 50±10 within current pool)
   Age_Score = −Age_Z_SL standardized to 50±10 (younger than peers = higher score).
     Uses most-recent season Age_Z_SL. Age enters the model twice: here as a
-    standalone 20% component, and inside TOOLS/ABILITY via AGE_ALPHA=0.20
-    per-component multiplier (a player 2 SD older takes a ~40% cut to each
-    component before blending).
+    standalone 20% component, and inside TOOLS/ABILITY via a piecewise
+    multiplier (global linear 0.077/SD + youth kink 0.192/SD below −1.5 SD).
   OVR_Score = Combined_Score from prospect_scores_ovr.csv
     (0.40 × TOOLS + 0.40 × ABILITY + 0.20 × Slope_Score, standardized
     within the full historical pool; Slope_Score is the PA-weighted
@@ -82,6 +81,12 @@ MIN_SEASON        = 2025
 MLB_PA_EXCL       = 50
 
 LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
+
+# Piecewise age multiplier constants (empirically derived from career PPPA_Z regression):
+#   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
+AGE_LINEAR      = 0.077
+AGE_KINK        = 0.192
+AGE_KINK_THRESH = 1.5
 
 # Raw-PA shrinkage thresholds per level.
 # Higher thresholds at lower levels reflect shorter seasons and noisier stats.
@@ -317,7 +322,11 @@ def main() -> None:
         .set_index("PlayerId")["Age_Z_SL"]
     )
     pool["Age_Z_SL"] = pool["PlayerId"].map(recent_age_z)
-    pool["Age_Score"] = to_50_10((-pool["Age_Z_SL"]).fillna(0))  # invert: younger = higher
+    # Piecewise age score: global linear + youth kink below −1.5 SD.
+    # Mirrors the per-component multiplier in build_tools_score / build_ability_score.
+    age_z_raw  = (-pool["Age_Z_SL"]).fillna(0.0).clip(-3.0, 3.0)
+    age_pw     = AGE_LINEAR * age_z_raw + AGE_KINK * (age_z_raw - AGE_KINK_THRESH).clip(lower=0)
+    pool["Age_Score"] = to_50_10(age_pw)
 
     # Current model score (TOOLS + ABILITY + Age blend)
     pool["Current_Score"] = (
