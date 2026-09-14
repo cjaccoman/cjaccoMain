@@ -259,6 +259,11 @@ def main() -> None:
     expected_ageonly          = knn_out["p_grad_knn"] * knn_out["cond_pppa_z_ageonly"]
     knn_out["implied_mult_2tier"] = (expected_ageonly / knn_out["level_base_expected"]).round(3)
 
+    # p_grad_vs_baseline clipped to a usable multiplier range.
+    # Floor 0.20: prevents extreme old-age profiles from zeroing out ABILITY.
+    # Ceiling 4.0: prevents extreme youth from dominating; can tune down later.
+    knn_out["age_mult_pgvb"] = knn_out["p_grad_vs_baseline"].clip(lower=0.20, upper=4.0).round(4)
+
     # current piecewise multiplier for comparison
     knn_out["current_mult"] = (
         1.0 + 0.0054 * knn_out["age_z_pos"] + 0.192 * knn_out["age_kink"]
@@ -276,7 +281,7 @@ def main() -> None:
         "p_grad_knn", "n_neighbors", "level_base_p_grad", "p_grad_vs_baseline",
         "pppa_disc", "cond_pppa_z_ageonly", "cond_pppa_z",
         "level_base_expected", "expected_pppa_z",
-        "implied_mult_2tier", "current_mult",
+        "implied_mult_2tier", "age_mult_pgvb", "current_mult",
         "Combined_Rank", "Combined_Score", "ABILITY_Score", "TOOLS_Score",
     ]
     out_path = DATA_DIR / "computed" / "age_grad_model.csv"
@@ -300,10 +305,19 @@ def main() -> None:
     print("\n=== Top 30 Prospects ===")
     print(out.head(30)[[
         "Combined_Rank", "Name", "Level", "Age",
-        "current_age_z", "age_z_slope", "has_slope",
+        "current_age_z", "age_z_slope",
         "p_grad_knn", "level_base_p_grad", "p_grad_vs_baseline",
-        "implied_mult_2tier", "current_mult",
+        "age_mult_pgvb", "current_mult",
     ]].to_string(index=False))
+
+    # Distribution of age_mult_pgvb by level
+    print("\n=== age_mult_pgvb distribution by level ===")
+    for lvl in [l for l in LEVEL_ORDER if l in out["Level"].values]:
+        g = out[out["Level"] == lvl]["age_mult_pgvb"]
+        print(f"{lvl:4s}  p10={g.quantile(.10):.2f}  p25={g.quantile(.25):.2f}  "
+              f"p50={g.quantile(.50):.2f}  p75={g.quantile(.75):.2f}  "
+              f"p90={g.quantile(.90):.2f}  clipped_at_floor={( g == 0.20).sum()}"
+              f"  clipped_at_ceil={(g == 4.0).sum()}")
 
 
 if __name__ == "__main__":
