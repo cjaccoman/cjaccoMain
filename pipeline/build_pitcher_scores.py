@@ -9,7 +9,7 @@ STUFF_Score (raw physical skills — pitcher analog of TOOLS):
   K%_adj + Whiff%_adj composite : 45%
   -BB%_adj                       : 35%
   GB%_adj                        : 20%
-  Age adjustment: each component × (1 + 0.20 × -Age_Z_SL), clipped ±2 SD
+  Age adjustment: piecewise multiplier per component (same as hitter ABILITY_Score).
 
 PERFORMANCE_Score (demonstrated production — pitcher analog of ABILITY):
   ERA_adj                        : 40%
@@ -24,7 +24,7 @@ Career aggregation:
 
 Combined_Score:
   0.50 × Current_Score + 0.50 × OVR_Score
-  Current_Score = 0.30 × STUFF + 0.50 × PERFORMANCE + 0.20 × Age_Score
+  Current_Score = 0.40 × STUFF + 0.60 × PERFORMANCE
   OVR_Score     = 0.40 × STUFF + 0.40 × PERFORMANCE + 0.20 × PPI_Slope_Score
 
 Separate SP and RP rankings (Role determined by most recent qualifying season).
@@ -54,9 +54,8 @@ AGE_LINEAR      = 0.077   # global linear slope (empirically derived, career PPP
 AGE_KINK        = 0.192   # extra slope per SD below -1.5 SD (youth kink, p=0.0000)
 AGE_KINK_THRESH = 1.5
 
-W_STUFF   = 0.30
-W_PERF    = 0.50
-W_AGE     = 0.20
+W_STUFF   = 0.40
+W_PERF    = 0.60
 
 
 def to_50_10(s: pd.Series) -> pd.Series:
@@ -234,19 +233,15 @@ def main() -> None:
     stuff_curr = wt_avg_shrunk(curr, "STUFF_Score",       STUFF_IP_THRESH)
     perf_curr  = wt_avg_shrunk(curr, "PERFORMANCE_Score", PERFORMANCE_IP_THRESH)
 
-    # Age_Score (current pool): age_z is in z-score units, convert to 50±10
-    age_z_curr = age_at_last.loc[eligible_pids, "Age_Z_SL"]
-
     pool_idx = pd.Index(eligible_pids)
 
     # Career averages are already on 50±10 scale from per-row standardization.
-    # Avoid pool re-standardization here — it would double-standardize and
-    # amplify outliers whose career averages are compressed by shrinkage.
+    # Age signal lives inside the per-component piecewise multiplier in STUFF and
+    # PERFORMANCE — no standalone Age_Score to avoid double-counting.
     stuff_s = stuff_curr.reindex(pool_idx).fillna(50)
     perf_s  = perf_curr.reindex(pool_idx).fillna(50)
-    age_s   = to_50_10(-age_z_curr.dropna()).reindex(pool_idx).fillna(50)
 
-    current_score = W_STUFF * stuff_s + W_PERF * perf_s + W_AGE * age_s
+    current_score = W_STUFF * stuff_s + W_PERF * perf_s
 
     # OVR_Score for pool members
     ovr_s = player_ovr.loc[player_ovr.index.isin(eligible_pids), "OVR_Score"].reindex(pool_idx).fillna(50)
@@ -273,7 +268,6 @@ def main() -> None:
         "Career_GS":        career_gs.values,
         "STUFF_Score":      stuff_s.values,
         "PERFORMANCE_Score": perf_s.values,
-        "Age_Score":        age_s.values,
         "Current_Score":    current_score.values,
         "OVR_Score":        ovr_s.values,
         "Combined_Score":   combined.values,

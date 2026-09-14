@@ -29,7 +29,7 @@ for c in ["Total_Weighted_PA", "TOOLS_Score", "ABILITY_Score",
 
 ps["Pos_Adj_Score"] = ps["Pos_Adj_Score"].round(1)
 cols = ["Combined_Rank", "Pos_Adj_Rank", "Name", "Pos", "Team", "Level", "Age", "Last_Season",
-        "Career_PA", "TOOLS_Score", "ABILITY_Score", "Age_Score", "Current_Score",
+        "Career_PA", "TOOLS_Score", "ABILITY_Score", "Current_Score",
         "OVR_Score", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag"]
 raw = json.dumps(ps[cols].to_dict(orient="records"), separators=(",", ":"))
@@ -74,7 +74,7 @@ print(f"AAA 2026: {len(aaa_records)} players")
 _pitcher_path = DATA_DIR / "rankings" / "pitcher_scores.csv"
 if _pitcher_path.exists():
     pit = pd.read_csv(_pitcher_path, dtype={"PlayerId": str})
-    for c in ["STUFF_Score", "PERFORMANCE_Score", "Age_Score",
+    for c in ["STUFF_Score", "PERFORMANCE_Score",
               "Current_Score", "OVR_Score", "Combined_Score"]:
         if c in pit.columns:
             pit[c] = pit[c].round(1)
@@ -82,7 +82,7 @@ if _pitcher_path.exists():
     pit["Career_IP"] = pit["Career_IP"].round(1)
     pit_cols = ["Combined_Rank", "SP_Rank", "RP_Rank", "Name", "Team", "Level", "Age", "Role",
                 "Career_IP", "Career_G", "Career_GS",
-                "STUFF_Score", "PERFORMANCE_Score", "Age_Score",
+                "STUFF_Score", "PERFORMANCE_Score",
                 "Current_Score", "OVR_Score", "Combined_Score"]
     pit_cols = [c for c in pit_cols if c in pit.columns]
     sp_df = pit[pit["Role"] == "SP"].copy()
@@ -384,7 +384,6 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-col="Career_PA" data-type="num">Career PA</th>
         <th class="num" data-col="TOOLS_Score" data-type="num">TOOLS</th>
         <th class="num" data-col="ABILITY_Score" data-type="num">ABILITY</th>
-        <th class="num" data-col="Age_Score" data-type="num">Age</th>
         <th class="num" data-col="Current_Score" data-type="num">Current</th>
         <th class="num" data-col="OVR_Score" data-type="num">OVR</th>
         <th class="num" data-col="Combined_Score" data-type="num">Combined</th>
@@ -422,7 +421,6 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-sp-col="Career_IP" data-type="num">Career IP</th>
         <th class="num" data-sp-col="STUFF_Score" data-type="num">STUFF</th>
         <th class="num" data-sp-col="PERFORMANCE_Score" data-type="num">PERF</th>
-        <th class="num" data-sp-col="Age_Score" data-type="num">Age</th>
         <th class="num" data-sp-col="Current_Score" data-type="num">Current</th>
         <th class="num" data-sp-col="OVR_Score" data-type="num">OVR</th>
         <th class="num" data-sp-col="Combined_Score" data-type="num">Combined</th>
@@ -458,7 +456,6 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-rp-col="Career_IP" data-type="num">Career IP</th>
         <th class="num" data-rp-col="STUFF_Score" data-type="num">STUFF</th>
         <th class="num" data-rp-col="PERFORMANCE_Score" data-type="num">PERF</th>
-        <th class="num" data-rp-col="Age_Score" data-type="num">Age</th>
         <th class="num" data-rp-col="Current_Score" data-type="num">Current</th>
         <th class="num" data-rp-col="OVR_Score" data-type="num">OVR</th>
         <th class="num" data-rp-col="Combined_Score" data-type="num">Combined</th>
@@ -636,7 +633,6 @@ function render(){
     <td class="num">${r.Career_PA.toLocaleString()}</td>
     <td class="num">${bar(r.TOOLS_Score)}</td>
     <td class="num">${bar(r.ABILITY_Score)}</td>
-    <td class="num">${bar(r.Age_Score)}</td>
     <td class="num">${bar(r.Current_Score)}</td>
     <td class="num">${bar(r.OVR_Score)}</td>
     <td class="num">${scoreCell}</td>
@@ -750,7 +746,6 @@ function makePitcherTab(RAW, prefix, rankCol){
       <td class="num">${r.Career_IP!=null?(+r.Career_IP).toFixed(1):'—'}</td>
       <td class="num">${r.STUFF_Score!=null?bar(r.STUFF_Score):''}</td>
       <td class="num">${r.PERFORMANCE_Score!=null?bar(r.PERFORMANCE_Score):''}</td>
-      <td class="num">${r.Age_Score!=null?bar(r.Age_Score):''}</td>
       <td class="num">${r.Current_Score!=null?bar(r.Current_Score):''}</td>
       <td class="num">${r.OVR_Score!=null?bar(r.OVR_Score):''}</td>
       <td class="num">${r.Combined_Score!=null?bar(r.Combined_Score):''}</td>

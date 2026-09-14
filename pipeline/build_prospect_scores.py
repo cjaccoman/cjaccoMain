@@ -27,12 +27,12 @@ Methodology:
   A-ball level weight (0.23×) in the career average blend.
 
 Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
-  Current_Score  = 0.30 × TOOLS_Score + 0.50 × ABILITY_Score + 0.20 × Age_Score
-    (all three standardized to 50±10 within current pool)
-  Age_Score = −Age_Z_SL standardized to 50±10 (younger than peers = higher score).
-    Uses most-recent season Age_Z_SL. Age enters the model twice: here as a
-    standalone 20% component, and inside TOOLS/ABILITY via a piecewise
-    multiplier (global linear 0.077/SD + youth kink 0.192/SD below −1.5 SD).
+  Current_Score  = 0.40 × TOOLS_Score + 0.60 × ABILITY_Score
+    (both standardized to 50±10 within current pool)
+  Age enters via the piecewise multiplier inside ABILITY_Score only
+    (global linear 0.077/SD + youth kink 0.192/SD below −1.5 SD applied
+    per component per row before career averaging). No standalone Age_Score —
+    that would double-count the age signal already baked into ABILITY.
   OVR_Score = Combined_Score from prospect_scores_ovr.csv
     (0.40 × TOOLS + 0.40 × ABILITY + 0.20 × Slope_Score, standardized
     within the full historical pool; Slope_Score is the PA-weighted
@@ -102,9 +102,8 @@ TOOLS_PA_THRESH   = PA_THRESH_BY_LEVEL   # kept for backward-compat reference
 ABILITY_PA_THRESH = PA_THRESH_BY_LEVEL
 ARCHETYPE_PATH     = DATA_DIR / "rankings" / "archetype_labels.csv"
 
-W_TOOLS   = 0.30
-W_ABILITY = 0.50
-W_AGE     = 0.20
+W_TOOLS   = 0.40
+W_ABILITY = 0.60
 
 
 # ---------------------------------------------------------------------------
@@ -314,31 +313,11 @@ def main() -> None:
     pool["TOOLS_Score"]   = to_50_10(pool["TOOLS_Score"].fillna(50))
     pool["ABILITY_Score"] = to_50_10(pool["ABILITY_Score"].fillna(50))
 
-    # Age_Score: Age_Z_SL inverted (younger than peers = positive), standardized to 50±10.
-    # Uses most-recent season, highest level row per player — break ties by level so a
-    # player with both an AAA row and an R-ball rehab row in the same season gets the
-    # AAA Age_Z_SL rather than the R-ball one (which would read as "old for R-ball").
-    _level_order = {"AAA": 5, "AA": 4, "A+": 3, "A": 2, "R": 1}
-    _scores_lvl = scores.copy()
-    _scores_lvl["_lvl_num"] = _scores_lvl["Level"].map(_level_order).fillna(0)
-    recent_age_z = (
-        _scores_lvl
-        .sort_values(["Season", "_lvl_num"], ascending=[False, False])
-        .drop_duplicates("PlayerId")
-        .set_index("PlayerId")["Age_Z_SL"]
-    )
-    pool["Age_Z_SL"] = pool["PlayerId"].map(recent_age_z)
-    # Piecewise age score: global linear + youth kink below −1.5 SD.
-    # Mirrors the per-component multiplier in build_tools_score / build_ability_score.
-    age_z_raw  = (-pool["Age_Z_SL"]).fillna(0.0).clip(-3.0, 3.0)
-    age_pw     = AGE_LINEAR * age_z_raw + AGE_KINK * (age_z_raw - AGE_KINK_THRESH).clip(lower=0)
-    pool["Age_Score"] = to_50_10(age_pw)
-
-    # Current model score (TOOLS + ABILITY + Age blend)
+    # Current model score — age signal lives entirely inside ABILITY_Score
+    # via the per-component piecewise multiplier; no standalone Age_Score.
     pool["Current_Score"] = (
         W_TOOLS   * pool["TOOLS_Score"]
         + W_ABILITY * pool["ABILITY_Score"]
-        + W_AGE    * pool["Age_Score"]
     ).round(2)
 
     # OVR score — career arc relative to all historical prospects
@@ -472,7 +451,7 @@ def main() -> None:
         "Combined_Rank", "Pos_Adj_Rank", "PlayerId", "Name", "Pos", "FantasyPos",
         "Team", "Level", "Age",
         "Last_Season", "Career_PA", "Total_Weighted_PA",
-        "TOOLS_Score", "ABILITY_Score", "Age_Score", "Current_Score", "OVR_Score",
+        "TOOLS_Score", "ABILITY_Score", "Current_Score", "OVR_Score",
         "Archetype", "Archetype_Adj", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag",
         "Disc_Composite_Z", "Disc_Slope",
@@ -487,7 +466,7 @@ def main() -> None:
     print(f"\nTop 25:")
     print(out.head(25)[["Combined_Rank","Name","Pos","Team","Level","Age",
                          "Last_Season","Career_PA","TOOLS_Score","ABILITY_Score",
-                         "Age_Score","Current_Score","OVR_Score","Combined_Score"]].to_string(index=False))
+                         "Current_Score","OVR_Score","Combined_Score"]].to_string(index=False))
 
 
 if __name__ == "__main__":
