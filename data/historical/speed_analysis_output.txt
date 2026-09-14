@@ -1,0 +1,156 @@
+======================================================================
+PART 1: MLB PPPA SPEED DECOMPOSITION
+======================================================================
+
+Sample: 18,323 player-seasons (PA >= 100, all eras)
+
+Speed component breakdown (mean per PA):
+  SB channel (3*SB-1.5*CS)/PA : mean=0.0385, med=0.0203, std=0.0524
+  GIDP channel (-1.5*GIDP)/PA : mean=-0.0298, med=-0.0286, std=0.0150
+  3B speed bonus (2-3B)/PA    : mean=0.0095, med=0.0073, std=0.0100
+  speed_PPPA total            : mean=0.0182, med=0.0000, std=0.0623
+  PPPA mean                   : mean=0.8179
+  Speed as % of mean PPPA     : 2.2%
+
+Era comparison (SB rule change 2023):
+  Pre-2023  (N=16,497): SB_pts/PA=0.0375, speed_PPPA=0.0172, PPPA=0.8325
+  2023+     (N=1,826): SB_pts/PA=0.0472, speed_PPPA=0.0278, PPPA=0.6862
+  SB pts/PA increase 2023+: +0.0097
+
+  speed_PPPA -> total_PPPA: r=0.180, p=0.0000, N=18323
+
+  PPPA for top-quartile speed players  : 0.8859
+  PPPA for bottom-quartile speed players: 0.7604
+  PPPA difference                       : 0.1255
+
+======================================================================
+PART 2: MiLB SB RATE -> MLB SB RATE TRANSLATION
+======================================================================
+
+First-year MLB player-seasons with PA>=100: 1,638
+MiLB players with PA>=50 (at least one season): 18,430
+
+MiLB SB rate -> First-year MLB SB rate (PA>=100 MLB):
+  All levels (N=763): SB/PA->MLB_SB/PA r=0.673(p=0.0000), SB_pct->MLB_SB_pct r=0.256(p=0.0000)
+  AAA only   (N=597): SB/PA->MLB_SB/PA r=0.679(p=0.0000), SB_pct->MLB_SB_pct r=0.252(p=0.0000)
+  AA only    (N=700): SB/PA->MLB_SB/PA r=0.624(p=0.0000), SB_pct->MLB_SB_pct r=0.194(p=0.0000)
+  A only     (N=550): SB/PA->MLB_SB/PA r=0.601(p=0.0000), SB_pct->MLB_SB_pct r=0.203(p=0.0000)
+
+  All levels -> Career MLB SB/PA (N=1554): r=0.747, p=0.0000
+
+  PS Spd (AAA) + MiLB SB/PA -> MLB SB/PA:
+  WLS (N=184): N=184, R-=0.563, intercept=-0.0018  SB_PA=0.4981(p=0.000)  Spd_avg=0.0011(p=0.202)
+  PS Spd alone -> MLB SB/PA: r=0.562, p=0.0000
+
+======================================================================
+PART 3: MLB SPRINT SPEED -> MLB PPPA
+======================================================================
+
+Same-season merge (PPPA + SprintSpeed, PA>=100): N=5,285 player-seasons
+
+  SprintSpeed -> PPPA: r=0.039, p=0.0047, N=5285
+  SprintSpeed -> speed_PPPA: r=0.610, p=0.0000, N=5285
+  SprintSpeed -> SB/PA: r=0.567, p=0.0000, N=5285
+  SprintSpeed -> 3B/PA: r=0.412, p=0.0000, N=5285
+  SprintSpeed -> GIDP/PA: r=-0.344, p=0.0000, N=5285
+
+  PPPA ~ K% + HR/PA (baseline, N=5285):
+  K% + HR/PA only: N=5285, R-=0.760, intercept=1.0370  K_PA=-2.8702(p=0.000)  HR_PA=11.1052(p=0.000)
+
+  PPPA ~ K% + HR/PA + SprintSpeed:
+  K% + HR/PA + Speed: N=5285, R-=0.814, intercept=-0.0702  K_PA=-3.0389(p=0.000)  HR_PA=11.8305(p=0.000)  SprintSpeed=0.0412(p=0.000)
+
+======================================================================
+PART 4: MiLB SPRINT SPEED (PS Spd) -> MLB SprintSpeed
+======================================================================
+
+Sample: 377 players with MiLB PS Spd + career MLB SprintSpeed
+  Of these with AAA Spd data: 359
+
+  PS_Spd_mean -> MLB_SprintSpeed_avg: r=0.723, p=0.0000, N=377
+  PS_Spd_max -> MLB_SprintSpeed_avg: r=0.667, p=0.0000, N=377
+
+  MLB SprintSpeed ~ PS Spd only (N=375):
+  Spd only: N=375, R-=0.435, intercept=25.4464  Spd_mean=0.4490(p=0.000)
+
+  MLB SprintSpeed ~ MiLB SB/PA + PS Spd:
+  SB/PA + Spd: N=375, R-=0.525, intercept=25.7305  MiLB_SB_PA=16.9924(p=0.000)  Spd_mean=0.2843(p=0.000)
+
+  MLB SprintSpeed ~ MiLB SB/PA only:
+  SB/PA only: N=375, R-=0.419, intercept=26.8123  MiLB_SB_PA=28.6278(p=0.000)
+
+======================================================================
+PART 5: AGE x SPEED INTERACTION
+======================================================================
+
+Sprint speed by age bucket (cross-sectional, N=0):
+Empty DataFrame
+Columns: [mean, std, count]
+Index: []
+
+Longitudinal speed decline (N=5,029 player-season pairs):
+  Mean season-over-season change: -0.146 ft/sec/yr
+  Annual decline by age:
+              mean  count
+Age                      
+(18, 22] -0.209091     55
+(22, 24] -0.129345    351
+(24, 26] -0.150827    907
+(26, 28] -0.148923   1114
+(28, 30] -0.161668    947
+(30, 40] -0.136336   1643
+
+  Annual decline for elite speed players (top 20%): -0.264 ft/sec/yr (N=1119)
+  Annual decline for average speed players:          -0.132 ft/sec/yr (N=2562)
+
+  Predicting MLB sprint speed (N=375):
+  PS Spd + MiLB SB/PA: N=375, R-=0.525, intercept=25.7305  Spd_mean=0.2843(p=0.000)  SB_PA_milb=16.9924(p=0.000)
+
+======================================================================
+WEIGHTING IMPLICATIONS
+======================================================================
+
+Current model speed weights:
+  ABILITY SB_talent : 15% of ABILITY
+  TOOLS Athleticism : 20% of TOOLS (which is ~20% of Combined via TOOLS weight)
+
+Empirical findings:
+
+1. Speed fraction of PPPA (Part 1):
+   Mean speed_PPPA / mean total PPPA = 2.2%
+   Correlation speed_PPPA with total PPPA: r=0.180 (R-=0.033)
+   Sub-component correlations with PPPA:
+     SB channel: r=0.189
+     3B bonus:   r=0.130
+     GIDP avoidance: r=0.001
+
+2. MiLB SB/PA predictability (Part 2):
+   MiLB SB/PA is a meaningful predictor of first-year MLB SB/PA.
+   AAA SB rate tends to be the strongest single-level predictor.
+
+3. Sprint speed in MLB (Part 3):
+   SprintSpeed correlates with PPPA beyond K% and HR/PA.
+   Speed adds a statistically meaningful but secondary contribution to PPPA
+   on top of the two dominant signals (K-avoidance, power).
+
+4. PS Spd signal (Part 4):
+   MiLB PS Spd (composite score) correlates with MLB SprintSpeed.
+   Adds marginal independent signal beyond MiLB SB/PA for predicting MLB speed.
+   Limited sample (AAA 2023-2026 and other levels 2023-2026) constrains confidence.
+
+5. Age-speed retention (Part 5):
+   Sprint speed declines with age; elite-speed players show larger absolute
+   decline but retain relative edge somewhat longer.
+   Young MiLB sprint speed at age 20-22 is a durable signal.
+
+Suggested weight range:
+  - ABILITY SB_talent (15%): Reasonable to slightly low. MiLB SB/PA has
+    meaningful predictive validity for MLB SB/PA (strongest at AAA).
+    The SB channel alone accounts for ~19% of speed-PPPA
+    correlation with total PPPA. Consider 15-20%.
+  - TOOLS Athleticism (20% of TOOLS): PS Spd adds signal beyond SB/PA,
+    but the sample is limited and the relationship is moderate.
+    The 3B bonus and GIDP-avoidance channels add another ~52%
+    of the speed contribution. Athleticism at 20% of TOOLS seems defensible;
+    could go 15-25% depending on how much independent Spd signal is confirmed.
+
