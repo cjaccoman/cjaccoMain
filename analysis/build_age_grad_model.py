@@ -84,22 +84,37 @@ def build_reference_table(feat: pd.DataFrame, grad_map: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def fit_tier2(feat: pd.DataFrame, comps: pd.DataFrame):
+def fit_tier2(feat: pd.DataFrame, comps: pd.DataFrame, career_pppa_disc: pd.Series):
+    """Survivors-only WLS with pppa_disc control to isolate the marginal age effect.
+
+    Including pppa_disc prevents the age coefficients from absorbing the production-
+    mediated path (young players at a level also tend to produce better, which predicts
+    better MLB outcomes). Without this control the linear term is inflated ~3x and the
+    kink is compressed.  Returns (model, mean_pppa_disc); predictions should set
+    pppa_disc=mean to derive a pure age-only multiplier.
+    """
     grads = comps[comps["graduated"].astype(bool)][["PlayerId", "Career_PPPA_Z"]].dropna(subset=["Career_PPPA_Z"])
     age_z = (
         feat[feat["PA"] >= MIN_PA].sort_values("Season")
         .groupby("PlayerId").last()[["Age_Z_SL"]].reset_index()
     )
     age_z["PlayerId"] = age_z["PlayerId"].astype(str)
-    df = grads.merge(age_z, on="PlayerId", how="inner").dropna()
+    df = grads.merge(age_z, on="PlayerId", how="inner")
+    df["pppa_disc"] = df["PlayerId"].map(career_pppa_disc)
+    df = df.dropna(subset=["Career_PPPA_Z", "Age_Z_SL", "pppa_disc"])
     df["age_z_pos"] = (-df["Age_Z_SL"]).clip(-3, 3)
     df["age_kink"]  = (df["age_z_pos"] - AGE_KINK_THRESH).clip(lower=0)
-    model = smf.wls("Career_PPPA_Z ~ age_z_pos + age_kink", data=df,
+    model = smf.wls("Career_PPPA_Z ~ age_z_pos + age_kink + pppa_disc", data=df,
                     weights=pd.Series(1.0, index=df.index)).fit()
+    # Use the within-graduate mean so the baseline reflects a typical graduate,
+    # not the all-players mean (which includes non-graduates with lower pppa_disc).
+    mean_disc_grads = float(df["pppa_disc"].mean())
     print(f"  Tier 2 (N={len(df):,}):  intercept={model.params['Intercept']:.4f}  "
           f"age_z_pos={model.params['age_z_pos']:.4f}  "
-          f"age_kink={model.params['age_kink']:.4f}  R²={model.rsquared:.4f}")
-    return model
+          f"age_kink={model.params['age_kink']:.4f}  "
+          f"pppa_disc={model.params['pppa_disc']:.4f}  R²={model.rsquared:.4f}")
+    print(f"  mean pppa_disc (graduates): {mean_disc_grads:.4f}")
+    return model, mean_disc_grads
 
 
 def knn_per_level(ref: pd.DataFrame, query: pd.DataFrame) -> pd.DataFrame:
@@ -178,11 +193,24 @@ def main() -> None:
     grad_by_level = ref.groupby("Level")["graduated"].agg(["sum", "count", "mean"])
     print(f"\n  Grad rates by level:\n{grad_by_level.reindex(LEVEL_ORDER).round(3).to_string()}\n")
 
+    # Career-average pppa_disc for all players (PA-weighted PPPA_Z_SL × level_discount)
+    f = feat[feat["PA"] >= MIN_PA].copy()
+    f["pppa_disc_row"] = f["PPPA_Z_SL"] * f["Level"].map(LEVEL_DISCOUNT).fillna(0)
+    career_pppa_disc = (
+        f.groupby("PlayerId")
+        .apply(lambda g: float(np.average(g["pppa_disc_row"], weights=g["PA"])))
+    )
+    career_pppa_disc.index = career_pppa_disc.index.astype(str)
+    print(f"pppa_disc computed for {len(career_pppa_disc):,} players "
+          f"(mean={career_pppa_disc.mean():.3f}, std={career_pppa_disc.std():.3f})\n")
+
     # Tier 2 regression
     print("Tier 2 regression:")
-    t2 = fit_tier2(feat, comps)
-    baseline_cond = float(t2.predict(pd.DataFrame({"age_z_pos": [0.0], "age_kink": [0.0]})).iloc[0])
-    print(f"  E[PPPA_Z | grad, age_z=0] = {baseline_cond:.4f}\n")
+    t2, mean_disc = fit_tier2(feat, comps, career_pppa_disc)
+    baseline_cond = float(t2.predict(
+        pd.DataFrame({"age_z_pos": [0.0], "age_kink": [0.0], "pppa_disc": [mean_disc]})
+    ).iloc[0])
+    print(f"  E[PPPA_Z | grad, age_z=0, pppa_disc=mean] = {baseline_cond:.4f}\n")
 
     # Query snapshots for current pool
     curr_level = pool.set_index("PlayerId")["Level"].to_dict()
@@ -209,16 +237,30 @@ def main() -> None:
     knn_out = knn_per_level(ref, query_df)
 
     # Tier 2 predictions
-    knn_out["age_z_pos"] = (-knn_out["current_age_z"]).clip(-3, 3)
-    knn_out["age_kink"]  = (knn_out["age_z_pos"] - AGE_KINK_THRESH).clip(lower=0)
-    knn_out["cond_pppa_z"]          = t2.predict(knn_out[["age_z_pos", "age_kink"]]).round(4).values
-    knn_out["expected_pppa_z"]      = (knn_out["p_grad_knn"] * knn_out["cond_pppa_z"]).round(4)
-    knn_out["level_base_expected"]  = (knn_out["level_base_p_grad"] * baseline_cond).round(4)
-    knn_out["p_grad_vs_baseline"]   = (knn_out["p_grad_knn"] / knn_out["level_base_p_grad"]).round(3)
-    # implied multiplier relative to level baseline
-    knn_out["implied_mult_2tier"]   = (knn_out["expected_pppa_z"] / knn_out["level_base_expected"]).round(3)
+    knn_out["age_z_pos"]   = (-knn_out["current_age_z"]).clip(-3, 3)
+    knn_out["age_kink"]    = (knn_out["age_z_pos"] - AGE_KINK_THRESH).clip(lower=0)
+    knn_out["pppa_disc"]   = knn_out["PlayerId"].map(career_pppa_disc).fillna(mean_disc)
+
+    # Age-only prediction: pppa_disc fixed at mean — isolates pure age signal for implied_mult
+    pred_ageonly = knn_out[["age_z_pos", "age_kink"]].copy()
+    pred_ageonly["pppa_disc"] = mean_disc
+    knn_out["cond_pppa_z_ageonly"] = t2.predict(pred_ageonly).round(4).values
+
+    # Controlled prediction: player's actual pppa_disc — best estimate of expected PPPA
+    knn_out["cond_pppa_z"] = t2.predict(
+        knn_out[["age_z_pos", "age_kink", "pppa_disc"]]
+    ).round(4).values
+
+    knn_out["expected_pppa_z"]     = (knn_out["p_grad_knn"] * knn_out["cond_pppa_z"]).round(4)
+    knn_out["level_base_expected"] = (knn_out["level_base_p_grad"] * baseline_cond).round(4)
+    knn_out["p_grad_vs_baseline"]  = (knn_out["p_grad_knn"] / knn_out["level_base_p_grad"]).round(3)
+
+    # implied_mult: pure age signal only (pppa_disc=mean), so it's comparable to current_mult
+    expected_ageonly          = knn_out["p_grad_knn"] * knn_out["cond_pppa_z_ageonly"]
+    knn_out["implied_mult_2tier"] = (expected_ageonly / knn_out["level_base_expected"]).round(3)
+
     # current piecewise multiplier for comparison
-    knn_out["current_mult"]         = (
+    knn_out["current_mult"] = (
         1.0 + 0.0054 * knn_out["age_z_pos"] + 0.192 * knn_out["age_kink"]
     ).round(4)
 
@@ -232,7 +274,8 @@ def main() -> None:
         "PlayerId", "Name", "Team", "Level", "Age",
         "current_age_z", "age_z_slope", "has_slope", "career_pa_eq",
         "p_grad_knn", "n_neighbors", "level_base_p_grad", "p_grad_vs_baseline",
-        "cond_pppa_z", "level_base_expected", "expected_pppa_z",
+        "pppa_disc", "cond_pppa_z_ageonly", "cond_pppa_z",
+        "level_base_expected", "expected_pppa_z",
         "implied_mult_2tier", "current_mult",
         "Combined_Rank", "Combined_Score", "ABILITY_Score", "TOOLS_Score",
     ]
