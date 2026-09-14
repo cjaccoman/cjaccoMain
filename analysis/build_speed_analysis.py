@@ -480,6 +480,128 @@ Suggested weight range:
 """)
 
 # -
+# PART 6: MiLB Speed Share Groups -> MLB Translation
+# -
+
+out("\n" + "=" * 70)
+out("PART 6: MiLB SPEED-SHARE GROUPS -> MLB SPEED TRANSLATION")
+out("=" * 70)
+
+# Load minorLeagueData for TP, 3B per player-season
+mld = pd.read_csv(DATA / "computed" / "minorLeagueData.csv")
+# Aggregate career MiLB totals per player via MLBAM_ID join
+# minorLeagueData has PlayerId (FG/MLBAM mix); milb_hitting has MLBAM_ID
+# Use milb_hitting as the primary source (has SB, CS, PA, 3B) and
+# join minorLeagueData for TP (total points)
+milb_pa50 = milb[milb["PA"] >= 50].copy()
+
+# TP from minorLeagueData -- join on PlayerId (both use same PlayerId system)
+mld_tp = mld[mld["PA"] >= 50][["PlayerId","Season","Level","TP","3B"]].copy()
+# milb_hitting PlayerId == minorLeagueData PlayerId (same pipeline source)
+milb_tp = milb_pa50.merge(
+    mld_tp[["PlayerId","Season","Level","TP"]],
+    on=["PlayerId","Season","Level"], how="left"
+)
+
+# Career totals per player (MLBAM_ID for MLB join)
+career_sp = milb_tp.groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "SB_total":  g["SB"].sum(),
+    "CS_total":  g["CS"].sum(),
+    "3B_total":  g["3B"].sum(),
+    "PA_total":  g["PA"].sum(),
+    "TP_total":  g["TP"].sum(),
+    "PPPA_milb": (g["TP"].sum() / g["PA"].sum()) if g["PA"].sum() > 0 else np.nan,
+})).reset_index()
+
+career_sp["speed_pts_milb"] = 3*career_sp["SB_total"] - 1.5*career_sp["CS_total"] + 3*career_sp["3B_total"]
+career_sp["speed_pts_pa_milb"] = career_sp["speed_pts_milb"] / career_sp["PA_total"].clip(lower=1)
+career_sp["speed_share"] = career_sp["speed_pts_milb"] / career_sp["TP_total"].replace(0, np.nan)
+
+# MLB side: first-year player-seasons PA>=100
+mlb_grp = mlb[mlb["PA"] >= 100].copy()
+mlb_grp["speed_pts_mlb"] = 3*mlb_grp["SB"] - 1.5*mlb_grp["CS"] + 3*mlb_grp["3B"]
+mlb_grp["speed_pts_pa_mlb"] = mlb_grp["speed_pts_mlb"] / mlb_grp["PA"]
+mlb_grp["SB_PA_mlb"] = mlb_grp["SB"] / mlb_grp["PA"]
+mlb_grp["3B_PA_mlb"] = mlb_grp["3B"] / mlb_grp["PA"]
+
+# First-year only
+fy_grp = mlb_grp.sort_values("Season").groupby("MLBAM_ID").first().reset_index()
+
+# Join
+j6 = career_sp.merge(fy_grp[["MLBAM_ID","PPPA","PPPA_Z","speed_pts_pa_mlb",
+                               "SB_PA_mlb","3B_PA_mlb","PA"]],
+                      on="MLBAM_ID", how="inner")
+j6 = j6[(j6["PA_total"] >= 100) & (j6["PA"] >= 100) &
+         j6["speed_share"].notna() & j6["speed_pts_pa_milb"].notna()].copy()
+
+out(f"\nJoined sample: {len(j6)} players (MiLB career PA>=100, MLB first-yr PA>=100)")
+out(f"MiLB speed_share distribution:")
+out(f"  p10={j6['speed_share'].quantile(.10):.3f}, p25={j6['speed_share'].quantile(.25):.3f}, "
+    f"p50={j6['speed_share'].quantile(.50):.3f}, p75={j6['speed_share'].quantile(.75):.3f}, "
+    f"p90={j6['speed_share'].quantile(.90):.3f}")
+
+# Fixed threshold grouping
+bins_fixed = [-np.inf, 0.05, 0.15, 0.25, np.inf]
+labels_fixed = ["<5% (low)", "5-15% (mod)", "15-25% (high)", ">25% (elite)"]
+j6["grp_fixed"] = pd.cut(j6["speed_share"], bins=bins_fixed, labels=labels_fixed)
+
+# Quartile grouping
+j6["grp_q"] = pd.qcut(j6["speed_share"], q=4, labels=["Q1","Q2","Q3","Q4"])
+
+def group_report(df, grp_col, label):
+    out(f"\n{label}:")
+    out(f"{'Group':<18} {'N':>5} {'MiLB_spd/PA':>12} {'MLB_spd/PA':>12} "
+        f"{'Trans_Rate':>11} {'MiLB_PPPA':>10} {'MLB_PPPA':>9} {'MLB_PPPA_Z':>11} "
+        f"{'SB/PA':>7} {'3B/PA':>7}")
+    for grp, sub in df.groupby(grp_col, observed=True):
+        n = len(sub)
+        if n < 3:
+            continue
+        m_spd  = sub["speed_pts_pa_milb"].mean()
+        ml_spd = sub["speed_pts_pa_mlb"].mean()
+        trans  = ml_spd / m_spd if m_spd > 0 else np.nan
+        out(f"  {str(grp):<16} {n:>5} {m_spd:>12.4f} {ml_spd:>12.4f} "
+            f"{trans:>11.3f} {sub['PPPA_milb'].mean():>10.4f} "
+            f"{sub['PPPA'].mean():>9.4f} {sub['PPPA_Z'].mean():>11.3f} "
+            f"{sub['SB_PA_mlb'].mean():>7.4f} {sub['3B_PA_mlb'].mean():>7.4f}")
+
+group_report(j6, "grp_fixed", "Fixed-threshold groups (by MiLB speed_share)")
+group_report(j6, "grp_q",     "Quartile groups (Q1=lowest speed share)")
+
+# Regression: MLB_speed_pts_PA ~ MiLB_speed_pts_PA * Group (interaction)
+out(f"\nRegression: MLB_speed_pts_PA ~ MiLB_speed_pts_PA x Group (quartiles)")
+out(f"(Tests whether speed translation slope differs by MiLB speed-share tier)")
+# Encode group dummies and interactions
+j6_reg = j6.dropna(subset=["speed_pts_pa_milb","speed_pts_pa_mlb","grp_q","PA"]).copy()
+j6_reg["grp_num"] = j6_reg["grp_q"].cat.codes   # 0=Q1 ... 3=Q4
+j6_reg["interaction"] = j6_reg["speed_pts_pa_milb"] * j6_reg["grp_num"]
+out(wls_summary(j6_reg["speed_pts_pa_mlb"],
+                j6_reg[["speed_pts_pa_milb","grp_num","interaction"]],
+                j6_reg["PA"].astype(float),
+                f"N={len(j6_reg)}"))
+
+# Per-quartile slope (separate regression per group)
+out(f"\nPer-quartile slope (MLB_spd_PA ~ MiLB_spd_PA within each group):")
+for grp, sub in j6_reg.groupby("grp_q", observed=True):
+    sub = sub.dropna(subset=["speed_pts_pa_milb","speed_pts_pa_mlb"])
+    if len(sub) < 10:
+        continue
+    res_line = wls_summary(sub["speed_pts_pa_mlb"],
+                           sub[["speed_pts_pa_milb"]],
+                           sub["PA"].astype(float),
+                           f"{grp} (N={len(sub)})")
+    out(res_line)
+
+out(f"""
+Part 6 Interpretation:
+  Translation rate = MLB speed_pts/PA divided by MiLB speed_pts/PA.
+  A rate >1.0 means speed skills AMPLIFY from MiLB to MLB.
+  A rate <1.0 means speed skills DECAY from MiLB to MLB.
+  The slope from per-group regressions shows how predictable the
+  translation is within each tier.
+""")
+
+# -
 # Write output
 # -
 
