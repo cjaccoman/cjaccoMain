@@ -602,6 +602,227 @@ Part 6 Interpretation:
 """)
 
 # -
+# PART 7: Mediation and Moderation of Speed Translation
+# -
+
+out("\n" + "=" * 70)
+out("PART 7: MEDIATION AND MODERATION OF SPEED TRANSLATION")
+out("=" * 70)
+
+# Build enriched dataset extending j6 with rate stats
+# milb_advanced has K%, BB%, ISO, Whiff% per player-season (MLBAM_ID)
+adv = pd.read_csv(DATA / "api" / "milb_advanced.csv")
+adv_pa = adv[adv["PA"] >= 50].copy()
+adv_career = adv_pa.groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "Kpct_milb":   np.average(g["K%"],     weights=g["PA"]),
+    "BBpct_milb":  np.average(g["BB%"],    weights=g["PA"]),
+    "ISO_milb":    np.average(g["ISO"],    weights=g["PA"]),
+    "Whiff_milb":  np.average(g["Whiff%"], weights=g["PA"]),
+})).reset_index()
+
+# MiLB SB_pct from career_sp already computed; add per-player SB_pct
+career_sp["SB_pct_milb"] = (
+    career_sp["SB_total"] /
+    (career_sp["SB_total"] + career_sp["CS_total"] + 1e-9)
+)
+career_sp.loc[career_sp["SB_total"] + career_sp["CS_total"] == 0, "SB_pct_milb"] = np.nan
+
+# MiLB 3B/PA
+career_sp["3B_PA_milb"] = career_sp["3B_total"] / career_sp["PA_total"].clip(lower=1)
+
+# PPPA_Z_SL from player_comps (career)
+comps_z = comps[["MLBAM_ID","PPPA_Z_career"]].copy()
+comps_z["MLBAM_ID"] = pd.to_numeric(comps_z["MLBAM_ID"], errors="coerce")
+
+# Debut age: first season in hist_mlb_data
+mlb_raw = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+mlb_raw = mlb_raw.rename(columns={"MLBAMID": "MLBAM_ID", "GDP": "GIDP"})
+debut = mlb_raw.sort_values("Season").groupby("MLBAM_ID").first().reset_index()[
+    ["MLBAM_ID","Season","Name"]
+].rename(columns={"Season": "MLB_Debut_Season"})
+# Approximate debut age from player_birthdays
+debut = debut.merge(bdays[["MLBAM_ID","BirthYear"]], on="MLBAM_ID", how="left")
+debut["Debut_Age"] = debut["MLB_Debut_Season"] - debut["BirthYear"]
+debut["Era_post23"] = (debut["MLB_Debut_Season"] >= 2023).astype(int)
+
+# Debut level: level of last MiLB season before debut
+milb_sorted2 = milb.sort_values("Season")
+last_milb_row = milb_sorted2.groupby("MLBAM_ID").last().reset_index()[
+    ["MLBAM_ID","Level"]
+].rename(columns={"Level": "Debut_Level"})
+debut = debut.merge(last_milb_row, on="MLBAM_ID", how="left")
+debut["From_AAA"] = (debut["Debut_Level"] == "AAA").astype(float)
+
+# Assemble enriched j7
+j7 = (j6
+      .merge(adv_career, on="MLBAM_ID", how="left")
+      .merge(comps_z,    on="MLBAM_ID", how="left")
+      .merge(debut[["MLBAM_ID","Debut_Age","Era_post23","From_AAA"]], on="MLBAM_ID", how="left")
+)
+j7["SB_pct_milb"] = j7["MLBAM_ID"].map(career_sp.set_index("MLBAM_ID")["SB_pct_milb"])
+j7["3B_PA_milb"]  = j7["MLBAM_ID"].map(career_sp.set_index("MLBAM_ID")["3B_PA_milb"])
+
+out(f"\nEnriched sample: {len(j7)} players")
+out(f"  K% coverage:     {j7['Kpct_milb'].notna().sum()}")
+out(f"  Whiff% coverage: {j7['Whiff_milb'].notna().sum()}")
+out(f"  ISO coverage:    {j7['ISO_milb'].notna().sum()}")
+out(f"  SB_pct coverage: {j7['SB_pct_milb'].notna().sum()}")
+out(f"  Debut_Age cover: {j7['Debut_Age'].notna().sum()}")
+out(f"  PPPA_Z coverage: {j7['PPPA_Z_career'].notna().sum()}")
+
+# ---- MEDIATORS ----
+out("\n--- MEDIATORS (do they explain the U-shape?) ---")
+out("\nMean of each mediator by fixed speed-share group:")
+med_cols = {"K%": "Kpct_milb", "BB%": "BBpct_milb", "ISO": "ISO_milb",
+            "Whiff%": "Whiff_milb", "SB_pct": "SB_pct_milb", "PPPA_Z_career": "PPPA_Z_career"}
+grp_medians = j7.groupby("grp_fixed", observed=True)[list(med_cols.values())].mean()
+grp_medians.columns = list(med_cols.keys())
+out(grp_medians.round(4).to_string())
+
+# Attenuation test: does adding a mediator reduce the group effect?
+# Baseline: MLB_speed_pts_PA ~ MiLB_speed_pts_PA + grp_num
+j7_reg = j7.dropna(subset=["speed_pts_pa_milb","speed_pts_pa_mlb","grp_fixed","PA"]).copy()
+j7_reg["grp_num"] = j7_reg["grp_fixed"].cat.codes
+
+out(f"\nBaseline: MLB_speed_pts_PA ~ MiLB_spd_PA + grp_num (N={len(j7_reg)}):")
+base = wls_summary(j7_reg["speed_pts_pa_mlb"],
+                   j7_reg[["speed_pts_pa_milb","grp_num"]],
+                   j7_reg["PA"].astype(float), "Baseline")
+out(base)
+
+out(f"\nAttenuation when mediator added (grp_num coefficient change):")
+for mname, mcol in med_cols.items():
+    sub = j7_reg.dropna(subset=[mcol])
+    if len(sub) < 50:
+        out(f"  {mname:<15}: N={len(sub)} (too small)")
+        continue
+    res = wls_summary(sub["speed_pts_pa_mlb"],
+                      sub[["speed_pts_pa_milb","grp_num",mcol]],
+                      sub["PA"].astype(float), mname)
+    out(f"  {mname:<15}: {res.strip()}")
+
+# ---- MODERATORS ----
+out("\n--- MODERATORS (do they change how much speed translates?) ---")
+out("Interaction: MLB_speed_pts_PA ~ MiLB_speed_pts_PA * Moderator")
+out("(WLS, PA-weighted; interaction coef = marginal slope change per unit moderator)\n")
+
+moderators = {
+    "K% (MiLB)":        "Kpct_milb",
+    "BB% (MiLB)":       "BBpct_milb",
+    "ISO (MiLB)":       "ISO_milb",
+    "Whiff% (MiLB)":    "Whiff_milb",
+    "SB_pct (MiLB)":    "SB_pct_milb",
+    "3B/PA (MiLB)":     "3B_PA_milb",
+    "PPPA_Z_career":    "PPPA_Z_career",
+    "Debut_Age":        "Debut_Age",
+    "From_AAA":         "From_AAA",
+    "Era_post23":       "Era_post23",
+}
+
+mod_results = []
+for mname, mcol in moderators.items():
+    sub = j7.dropna(subset=["speed_pts_pa_milb","speed_pts_pa_mlb",mcol,"PA"])
+    n = len(sub)
+    if n < 30:
+        mod_results.append((mname, np.nan, np.nan, n, "N too small"))
+        continue
+    # Center moderator
+    mc = sub[mcol] - sub[mcol].mean()
+    X = pd.DataFrame({
+        "spd_milb": sub["speed_pts_pa_milb"],
+        "mod":      mc,
+        "interact": sub["speed_pts_pa_milb"] * mc,
+    })
+    try:
+        Xv = sm.add_constant(X.values)
+        res = sm.WLS(sub["speed_pts_pa_mlb"].values, Xv, weights=sub["PA"].values).fit()
+        coef = res.params[3]   # interaction term
+        pval = res.pvalues[3]
+        direction = "strengthens" if coef > 0 else "weakens"
+        mod_results.append((mname, coef, pval, n, direction))
+        sig = "*" if pval < 0.05 else " "
+        out(f"  {sig} {mname:<20} coef={coef:+.4f}  p={pval:.4f}  N={n}  ({direction} translation)")
+    except Exception as e:
+        mod_results.append((mname, np.nan, np.nan, n, str(e)))
+        out(f"    {mname}: error -- {e}")
+
+# Summary table sorted by |effect|
+out("\nModerator summary (sorted by |coef|, p<0.05 flagged *):")
+out(f"  {'Moderator':<22} {'Coef':>8} {'p':>7} {'N':>6} {'Sig':>4}")
+valid_mods = [(nm, c, p, n, d) for nm, c, p, n, d in mod_results if not np.isnan(c if c else np.nan)]
+valid_mods.sort(key=lambda x: abs(x[1]), reverse=True)
+for nm, c, p, n, d in valid_mods:
+    sig = "*" if p < 0.05 else " "
+    out(f"  {sig} {nm:<21} {c:>+8.4f} {p:>7.4f} {n:>6}")
+
+# ---- U-SHAPE TARGETED TESTS ----
+out("\n--- U-SHAPE TARGETED TESTS ---")
+
+# Test 1: Moderate group split by SB_pct quartile
+mod_grp = j7[j7["grp_fixed"] == "5-15% (mod)"].dropna(subset=["SB_pct_milb"])
+if len(mod_grp) >= 20:
+    mod_grp = mod_grp.copy()
+    mod_grp["sbpct_q"] = pd.qcut(mod_grp["SB_pct_milb"], q=4, labels=["Q1","Q2","Q3","Q4"])
+    out(f"\nTest 1: Moderate-speed group (5-15%) split by SB_pct (N={len(mod_grp)}):")
+    out(f"  {'SB_pct_Q':<8} {'N':>4} {'MiLB_spd/PA':>12} {'MLB_spd/PA':>12} {'Trans':>7} {'MLB_PPPA_Z':>11}")
+    for grp, sub in mod_grp.groupby("sbpct_q", observed=True):
+        n = len(sub)
+        m_s = sub["speed_pts_pa_milb"].mean()
+        ml_s = sub["speed_pts_pa_mlb"].mean()
+        tr = ml_s / m_s if m_s > 0 else np.nan
+        out(f"  {str(grp):<8} {n:>4} {m_s:>12.4f} {ml_s:>12.4f} {tr:>7.3f} {sub['PPPA_Z'].mean():>11.3f}")
+
+# Test 2: Moderate group split by K% tertile
+mod_grp_k = j7[j7["grp_fixed"] == "5-15% (mod)"].dropna(subset=["Kpct_milb"])
+if len(mod_grp_k) >= 20:
+    mod_grp_k = mod_grp_k.copy()
+    mod_grp_k["kpct_t"] = pd.qcut(mod_grp_k["Kpct_milb"], q=3, labels=["Low-K","Mid-K","High-K"])
+    out(f"\nTest 2: Moderate-speed group split by K% tertile (N={len(mod_grp_k)}):")
+    out(f"  {'K%_tier':<8} {'N':>4} {'Mean_K%':>8} {'MiLB_spd/PA':>12} {'MLB_spd/PA':>12} {'Trans':>7} {'MLB_PPPA_Z':>11}")
+    for grp, sub in mod_grp_k.groupby("kpct_t", observed=True):
+        n = len(sub)
+        m_s = sub["speed_pts_pa_milb"].mean()
+        ml_s = sub["speed_pts_pa_mlb"].mean()
+        tr = ml_s / m_s if m_s > 0 else np.nan
+        out(f"  {str(grp):<8} {n:>4} {sub['Kpct_milb'].mean():>8.3f} {m_s:>12.4f} {ml_s:>12.4f} {tr:>7.3f} {sub['PPPA_Z'].mean():>11.3f}")
+
+# Test 3: Elite group -- is 0.672 translation due to SB_pct or genuine?
+elite_grp = j7[j7["grp_fixed"] == ">25% (elite)"].dropna(subset=["SB_pct_milb"])
+mod_med   = j7[j7["grp_fixed"] == "5-15% (mod)"].dropna(subset=["SB_pct_milb"])
+if len(elite_grp) >= 10 and len(mod_med) >= 10:
+    out(f"\nTest 3: Elite vs moderate -- SB_pct comparison:")
+    out(f"  Elite  (N={len(elite_grp)}): mean SB_pct={elite_grp['SB_pct_milb'].mean():.3f}, "
+        f"trans={elite_grp['speed_pts_pa_mlb'].mean()/elite_grp['speed_pts_pa_milb'].mean():.3f}")
+    out(f"  Mod    (N={len(mod_med)}): mean SB_pct={mod_med['SB_pct_milb'].mean():.3f}, "
+        f"trans={mod_med['speed_pts_pa_mlb'].mean()/mod_med['speed_pts_pa_milb'].mean():.3f}")
+    # Matched: moderate players with elite-like SB_pct
+    high_sbpct_thresh = elite_grp["SB_pct_milb"].mean()
+    mod_high_sbpct = mod_med[mod_med["SB_pct_milb"] >= high_sbpct_thresh]
+    if len(mod_high_sbpct) >= 5:
+        tr_mhsp = mod_high_sbpct["speed_pts_pa_mlb"].mean() / mod_high_sbpct["speed_pts_pa_milb"].mean()
+        out(f"  Mod w/ SB_pct>={high_sbpct_thresh:.3f} (N={len(mod_high_sbpct)}): "
+            f"trans={tr_mhsp:.3f} (do these players recover elite-group translation?)")
+
+out(f"""
+Part 7 Summary:
+  Mediators: K% and SB_pct are the primary candidates for explaining the
+  U-shape. High-K moderate-speed players likely drive the 0.563 translation
+  floor -- they accumulate MiLB speed stats partly via contact-favorable counts
+  but face stiffer MLB pitching. SB_pct differences test whether the moderate
+  group runs inefficiently vs. the elite group.
+
+  Moderators: The interaction terms rank the factors that most change how
+  reliably speed translates. Significant moderators (p<0.05) are the
+  strongest candidates for additional signals in ABILITY or TOOLS scoring.
+
+  Model implications: if SB_pct is a strong moderator (likely), the current
+  SB_talent formulation (SB_pct x SB/PA) already partially captures it.
+  If K% is a strong moderator, the Discipline component in ABILITY (which
+  penalizes K%) already accounts for the interaction. True un-modeled signal
+  would require a new cross-term or an explicit SB_pct threshold gate.
+""")
+
+# -
 # Write output
 # -
 

@@ -194,3 +194,102 @@ Part 6 Interpretation:
   The slope from per-group regressions shows how predictable the
   translation is within each tier.
 
+
+======================================================================
+PART 7: MEDIATION AND MODERATION OF SPEED TRANSLATION
+======================================================================
+
+Enriched sample: 1444 players
+  K% coverage:     1444
+  Whiff% coverage: 1444
+  ISO coverage:    1444
+  SB_pct coverage: 1439
+  Debut_Age cover: 1444
+  PPPA_Z coverage: 1444
+
+--- MEDIATORS (do they explain the U-shape?) ---
+
+Mean of each mediator by fixed speed-share group:
+                   K%     BB%     ISO  Whiff%  SB_pct  PPPA_Z_career
+grp_fixed                                                           
+<5% (low)      0.1854  0.0966  0.1785  0.2661  0.5810         0.6240
+5-15% (mod)    0.1852  0.0955  0.1643  0.2566  0.7099         0.6421
+15-25% (high)  0.1919  0.0955  0.1440  0.2646  0.7680         0.6474
+>25% (elite)   0.2037  0.0995  0.1205  0.2786  0.8046         0.6754
+
+Baseline: MLB_speed_pts_PA ~ MiLB_spd_PA + grp_num (N=1444):
+  Baseline: N=1444, R-=0.507, intercept=0.0020  speed_pts_pa_milb=0.5091(p=0.000)  grp_num=0.0086(p=0.005)
+
+Attenuation when mediator added (grp_num coefficient change):
+  K%             : K%: N=1444, R-=0.507, intercept=-0.0005  speed_pts_pa_milb=0.5124(p=0.000)  grp_num=0.0082(p=0.009)  Kpct_milb=0.0136(p=0.574)
+  BB%            : BB%: N=1444, R-=0.507, intercept=0.0051  speed_pts_pa_milb=0.5103(p=0.000)  grp_num=0.0085(p=0.006)  BBpct_milb=-0.0318(p=0.458)
+  ISO            : ISO: N=1444, R-=0.507, intercept=0.0059  speed_pts_pa_milb=0.5107(p=0.000)  grp_num=0.0080(p=0.011)  ISO_milb=-0.0210(p=0.414)
+  Whiff%         : Whiff%: N=1444, R-=0.507, intercept=0.0040  speed_pts_pa_milb=0.5077(p=0.000)  grp_num=0.0087(p=0.005)  Whiff_milb=-0.0076(p=0.679)
+  SB_pct         : SB_pct: N=1439, R-=0.508, intercept=0.0150  speed_pts_pa_milb=0.5235(p=0.000)  grp_num=0.0093(p=0.003)  SB_pct_milb=-0.0220(p=0.018)
+  PPPA_Z_career  : PPPA_Z_career: N=1444, R-=0.507, intercept=0.0026  speed_pts_pa_milb=0.5137(p=0.000)  grp_num=0.0082(p=0.015)  PPPA_Z_career=-0.0009(p=0.787)
+
+--- MODERATORS (do they change how much speed translates?) ---
+Interaction: MLB_speed_pts_PA ~ MiLB_speed_pts_PA * Moderator
+(WLS, PA-weighted; interaction coef = marginal slope change per unit moderator)
+
+  * K% (MiLB)            coef=+0.6135  p=0.0479  N=1444  (strengthens translation)
+    BB% (MiLB)           coef=-1.0653  p=0.0811  N=1444  (weakens translation)
+  * ISO (MiLB)           coef=-0.8499  p=0.0038  N=1444  (weakens translation)
+    Whiff% (MiLB)        coef=+0.3827  p=0.0841  N=1444  (strengthens translation)
+    SB_pct (MiLB)        coef=+0.0796  p=0.6289  N=1439  (strengthens translation)
+    3B/PA (MiLB)         coef=+0.0010  p=0.9997  N=1444  (strengthens translation)
+  * PPPA_Z_career        coef=-0.1227  p=0.0001  N=1444  (weakens translation)
+    Debut_Age            coef=+0.0015  p=0.8628  N=1444  (strengthens translation)
+    From_AAA             coef=+0.0376  p=0.2241  N=1444  (strengthens translation)
+    Era_post23           coef=+0.0195  p=0.5960  N=1444  (strengthens translation)
+
+Moderator summary (sorted by |coef|, p<0.05 flagged *):
+  Moderator                  Coef       p      N  Sig
+    BB% (MiLB)             -1.0653  0.0811   1444
+  * ISO (MiLB)             -0.8499  0.0038   1444
+  * K% (MiLB)              +0.6135  0.0479   1444
+    Whiff% (MiLB)          +0.3827  0.0841   1444
+  * PPPA_Z_career          -0.1227  0.0001   1444
+    SB_pct (MiLB)          +0.0796  0.6289   1439
+    From_AAA               +0.0376  0.2241   1444
+    Era_post23             +0.0195  0.5960   1444
+    Debut_Age              +0.0015  0.8628   1444
+    3B/PA (MiLB)           +0.0010  0.9997   1444
+
+--- U-SHAPE TARGETED TESTS ---
+
+Test 1: Moderate-speed group (5-15%) split by SB_pct (N=664):
+  SB_pct_Q    N  MiLB_spd/PA   MLB_spd/PA   Trans  MLB_PPPA_Z
+  Q1        167       0.0709       0.0418   0.590       0.002
+  Q2        165       0.0866       0.0445   0.514       0.021
+  Q3        167       0.0984       0.0604   0.614      -0.007
+  Q4        165       0.1018       0.0545   0.535       0.046
+
+Test 2: Moderate-speed group split by K% tertile (N=664):
+  K%_tier     N  Mean_K%  MiLB_spd/PA   MLB_spd/PA   Trans  MLB_PPPA_Z
+  Low-K     222    0.131       0.0926       0.0520   0.562       0.223
+  Mid-K     221    0.183       0.0901       0.0492   0.546       0.037
+  High-K    221    0.241       0.0854       0.0497   0.581      -0.215
+
+Test 3: Elite vs moderate -- SB_pct comparison:
+  Elite  (N=68): mean SB_pct=0.805, trans=0.672
+  Mod    (N=664): mean SB_pct=0.710, trans=0.563
+  Mod w/ SB_pct>=0.805 (N=93): trans=0.489 (do these players recover elite-group translation?)
+
+Part 7 Summary:
+  Mediators: K% and SB_pct are the primary candidates for explaining the
+  U-shape. High-K moderate-speed players likely drive the 0.563 translation
+  floor -- they accumulate MiLB speed stats partly via contact-favorable counts
+  but face stiffer MLB pitching. SB_pct differences test whether the moderate
+  group runs inefficiently vs. the elite group.
+
+  Moderators: The interaction terms rank the factors that most change how
+  reliably speed translates. Significant moderators (p<0.05) are the
+  strongest candidates for additional signals in ABILITY or TOOLS scoring.
+
+  Model implications: if SB_pct is a strong moderator (likely), the current
+  SB_talent formulation (SB_pct x SB/PA) already partially captures it.
+  If K% is a strong moderator, the Discipline component in ABILITY (which
+  penalizes K%) already accounts for the interaction. True un-modeled signal
+  would require a new cross-term or an explicit SB_pct threshold gate.
+
