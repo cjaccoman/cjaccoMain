@@ -50,7 +50,7 @@ LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 STUFF_IP_THRESH       = 167.0
 PERFORMANCE_IP_THRESH = 120.0
 
-AGE_LINEAR      = 0.077   # global linear slope (empirically derived, career PPPA_Z regression)
+AGE_LINEAR      = 0.0054   # full-population regression (non-graduates = 0); 14x smaller than survivors-only
 AGE_KINK        = 0.192   # extra slope per SD below -1.5 SD (youth kink, p=0.0000)
 AGE_KINK_THRESH = 1.5
 

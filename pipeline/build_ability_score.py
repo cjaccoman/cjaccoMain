@@ -55,7 +55,7 @@ W = dict(fantasy=0.45, discipline=0.25, sb=0.15, power=0.15)
 #   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
 # Global linear slope: 0.077/SD. Youth kink at −1.5 SD adds 0.192/SD beyond the threshold.
 # Old cliff not statistically significant (p=0.27) — no separate kink on the old side.
-AGE_LINEAR      = 0.077
+AGE_LINEAR      = 0.0054   # full-population regression (non-graduates = 0); 14x smaller than survivors-only
 AGE_KINK        = 0.192
 AGE_KINK_THRESH = 1.5
 
