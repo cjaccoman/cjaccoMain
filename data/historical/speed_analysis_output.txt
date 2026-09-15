@@ -293,3 +293,55 @@ Part 7 Summary:
   penalizes K%) already accounts for the interaction. True un-modeled signal
   would require a new cross-term or an explicit SB_pct threshold gate.
 
+
+=== Part 7b ===
+
+======================================================================
+PART 7b: REVISED MODERATION ANALYSIS
+======================================================================
+
+Enriched sample (from Part 6 base, N=1444):
+  K%/BB% coverage:  1444
+  HR/FB coverage:   1444
+  GB% coverage:     1444
+  PS Spd coverage:  353 (AAA 2023-2026 + all levels 2026)
+
+--- REVISED MODERATORS ---
+Interaction: MLB_speed_pts_PA ~ MiLB_speed_pts_PA + Mod + MiLB_speed_pts_PA x Mod
+(WLS PA-weighted; centered moderator; * = p<0.05)
+
+  * BB/2K (BB%-2*K%)       coef=-0.3988  p=0.0130  N=1444  (weakens translation)
+    BB% (MiLB)             coef=-1.0653  p=0.0811  N=1444  (weakens translation)
+    PS Spd (MiLB)          coef=+0.0082  p=0.6751  N=353  (strengthens translation)
+  * HR/FB (MiLB)           coef=-0.5944  p=0.0275  N=1444  (weakens translation)
+    GB% (MiLB)             coef=+0.3691  p=0.0729  N=1444  (strengthens translation)
+  * K% (MiLB)              coef=+0.6135  p=0.0479  N=1444  (strengthens translation)
+
+Moderator summary (sorted by |coef|, p<0.05 flagged *):
+  Moderator                    Coef       p      N
+    BB% (MiLB)               -1.0653  0.0811   1444
+  * K% (MiLB)                +0.6135  0.0479   1444
+  * HR/FB (MiLB)             -0.5944  0.0275   1444
+  * BB/2K (BB%-2*K%)         -0.3988  0.0130   1444
+    GB% (MiLB)               +0.3691  0.0729   1444
+    PS Spd (MiLB)            +0.0082  0.6751    353
+
+--- U-SHAPE TARGETED TESTS (revised) ---
+
+Test 1: Moderate-speed group split by SB_pct (N=664):
+  SB_pct_Q    N  MiLB_spd/PA   MLB_spd/PA   Trans  MLB_PPPA_Z
+  Q1        167       0.0709       0.0418   0.590       0.002
+  Q2        165       0.0866       0.0445   0.514       0.021
+  Q3        167       0.0984       0.0604   0.614      -0.007
+  Q4        165       0.1018       0.0545   0.535       0.046
+
+Test 2: Moderate-speed group split by BB/2K tertile (N=664):
+  BB2K_tier    N  Mean_BB2K  MiLB_spd/PA   MLB_spd/PA   Trans  MLB_PPPA_Z
+  Low        222    -0.3836       0.0863       0.0501   0.581      -0.187
+  Mid        221    -0.2711       0.0878       0.0487   0.555       0.045
+  High       221    -0.1693       0.0940       0.0521   0.554       0.188
+
+Test 3: Elite vs moderate -- SB_pct comparison:
+  Elite (N=68): SB_pct=0.805, trans=0.672
+  Mod   (N=664): SB_pct=0.710, trans=0.563
+  Mod w/ SB_pct>=0.805 (N=93): trans=0.489

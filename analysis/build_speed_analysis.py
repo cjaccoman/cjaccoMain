@@ -823,9 +823,155 @@ Part 7 Summary:
 """)
 
 # -
+# PART 7b: Revised Moderation -- BB/2K, BB%, Spd, HR/FB, GB%, K%
+# -
+
+p7b = "\n" + "=" * 70 + "\n"
+p7b += "PART 7b: REVISED MODERATION ANALYSIS\n"
+p7b += "=" * 70 + "\n"
+
+# Build career averages for the new moderator set from milb_advanced
+adv7b = adv[adv["PA"] >= 50].copy()
+adv7b["HRFB"] = adv7b["HR/FB"].where(adv7b["HR/FB"] <= 1.0)   # null physically impossible values
+adv_career2 = adv7b.groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "Kpct":   np.average(g["K%"],     weights=g["PA"]),
+    "BBpct":  np.average(g["BB%"],    weights=g["PA"]),
+    "HRFB":   np.average(g["HRFB"].fillna(g["HRFB"].median()), weights=g["PA"])
+              if g["HRFB"].notna().any() else np.nan,
+    "GBpct":  np.average(g["GB%"],    weights=g["PA"]),
+})).reset_index()
+adv_career2["BB2K"] = adv_career2["BBpct"] - 2 * adv_career2["Kpct"]
+
+# PS Spd: career average across all available seasons per player
+# ps_spd is already loaded above (combines all PS level/season files)
+ps_career_spd = (ps_spd[ps_spd["Spd"].notna() & (ps_spd["Spd"] > 0)]
+                 .groupby("MLBAM_ID")
+                 .apply(lambda g: np.average(g["Spd"], weights=g["PA"].fillna(1)))
+                 .reset_index(name="Spd_career"))
+ps_career_spd["MLBAM_ID"] = pd.to_numeric(ps_career_spd["MLBAM_ID"], errors="coerce")
+
+# Assemble j7b from j6 base
+j7b = (j6
+       .merge(adv_career2[["MLBAM_ID","Kpct","BBpct","BB2K","HRFB","GBpct"]], on="MLBAM_ID", how="left")
+       .merge(ps_career_spd, on="MLBAM_ID", how="left")
+)
+# Compute SB_pct and 3B_PA from career counting columns inherited from career_sp
+_sb_sum = j7b["SB_total"].fillna(0)
+_cs_sum = j7b["CS_total"].fillna(0)
+j7b["SB_pct_milb"] = (_sb_sum / (_sb_sum + _cs_sum + 1e-9)).where(_sb_sum + _cs_sum > 0)
+j7b["3B_PA_milb"]  = j7b["3B_total"] / j7b["PA_total"].clip(lower=1)
+
+p7b += f"\nEnriched sample (from Part 6 base, N={len(j7b)}):\n"
+p7b += f"  K%/BB% coverage:  {j7b['Kpct'].notna().sum()}\n"
+p7b += f"  HR/FB coverage:   {j7b['HRFB'].notna().sum()}\n"
+p7b += f"  GB% coverage:     {j7b['GBpct'].notna().sum()}\n"
+p7b += f"  PS Spd coverage:  {j7b['Spd_career'].notna().sum()} (AAA 2023-2026 + all levels 2026)\n"
+
+def p7b_mod_result(df, mname, mcol, wt_col="PA"):
+    sub = df.dropna(subset=["speed_pts_pa_milb","speed_pts_pa_mlb",mcol,wt_col])
+    n = len(sub)
+    if n < 20:
+        return f"    {mname:<22} N={n} (too small)", np.nan, np.nan, n
+    mc = sub[mcol] - sub[mcol].mean()
+    X = pd.DataFrame({
+        "spd_milb": sub["speed_pts_pa_milb"],
+        "mod":      mc,
+        "interact": sub["speed_pts_pa_milb"] * mc,
+    })
+    try:
+        Xv = sm.add_constant(X.values)
+        res = sm.WLS(sub["speed_pts_pa_mlb"].values, Xv, weights=sub[wt_col].values).fit()
+        coef = res.params[3]
+        pval = res.pvalues[3]
+        sig  = "*" if pval < 0.05 else " "
+        dirn = "strengthens" if coef > 0 else "weakens"
+        line = f"  {sig} {mname:<22} coef={coef:+.4f}  p={pval:.4f}  N={n}  ({dirn} translation)"
+        return line, coef, pval, n
+    except Exception as e:
+        return f"    {mname}: error -- {e}", np.nan, np.nan, n
+
+p7b += "\n--- REVISED MODERATORS ---\n"
+p7b += "Interaction: MLB_speed_pts_PA ~ MiLB_speed_pts_PA + Mod + MiLB_speed_pts_PA x Mod\n"
+p7b += "(WLS PA-weighted; centered moderator; * = p<0.05)\n\n"
+
+new_mods = [
+    ("BB/2K (BB%-2*K%)",  "BB2K"),
+    ("BB% (MiLB)",        "BBpct"),
+    ("PS Spd (MiLB)",     "Spd_career"),
+    ("HR/FB (MiLB)",      "HRFB"),
+    ("GB% (MiLB)",        "GBpct"),
+    ("K% (MiLB)",         "Kpct"),
+]
+
+mod7b_results = []
+for mname, mcol in new_mods:
+    line, coef, pval, n = p7b_mod_result(j7b, mname, mcol)
+    p7b += line + "\n"
+    mod7b_results.append((mname, coef, pval, n))
+
+p7b += "\nModerator summary (sorted by |coef|, p<0.05 flagged *):\n"
+p7b += f"  {'Moderator':<24} {'Coef':>8} {'p':>7} {'N':>6}\n"
+valid7b = [(nm, c, p, n) for nm, c, p, n in mod7b_results if not np.isnan(c)]
+valid7b.sort(key=lambda x: abs(x[1]), reverse=True)
+for nm, c, p, n in valid7b:
+    sig = "*" if p < 0.05 else " "
+    p7b += f"  {sig} {nm:<23} {c:>+8.4f} {p:>7.4f} {n:>6}\n"
+
+# ---- U-SHAPE TARGETED TESTS (revised) ----
+p7b += "\n--- U-SHAPE TARGETED TESTS (revised) ---\n"
+
+# Test 1: same as Part 7 -- moderate group by SB_pct quartile
+mod_grp7b = j7b[j7b["grp_fixed"] == "5-15% (mod)"].dropna(subset=["SB_pct_milb"])
+if len(mod_grp7b) >= 20:
+    mod_grp7b = mod_grp7b.copy()
+    mod_grp7b["sbpct_q"] = pd.qcut(mod_grp7b["SB_pct_milb"], q=4, labels=["Q1","Q2","Q3","Q4"])
+    p7b += f"\nTest 1: Moderate-speed group split by SB_pct (N={len(mod_grp7b)}):\n"
+    p7b += f"  {'SB_pct_Q':<8} {'N':>4} {'MiLB_spd/PA':>12} {'MLB_spd/PA':>12} {'Trans':>7} {'MLB_PPPA_Z':>11}\n"
+    for grp, sub in mod_grp7b.groupby("sbpct_q", observed=True):
+        n = len(sub)
+        m_s = sub["speed_pts_pa_milb"].mean()
+        ml_s = sub["speed_pts_pa_mlb"].mean()
+        tr = ml_s / m_s if m_s > 0 else np.nan
+        p7b += f"  {str(grp):<8} {n:>4} {m_s:>12.4f} {ml_s:>12.4f} {tr:>7.3f} {sub['PPPA_Z'].mean():>11.3f}\n"
+
+# Test 2: Moderate group split by BB/2K tertile (replacing K% from Part 7)
+mod_grp_bb2k = j7b[j7b["grp_fixed"] == "5-15% (mod)"].dropna(subset=["BB2K"])
+if len(mod_grp_bb2k) >= 20:
+    mod_grp_bb2k = mod_grp_bb2k.copy()
+    mod_grp_bb2k["bb2k_t"] = pd.qcut(mod_grp_bb2k["BB2K"], q=3, labels=["Low","Mid","High"])
+    p7b += f"\nTest 2: Moderate-speed group split by BB/2K tertile (N={len(mod_grp_bb2k)}):\n"
+    p7b += f"  {'BB2K_tier':<9} {'N':>4} {'Mean_BB2K':>10} {'MiLB_spd/PA':>12} {'MLB_spd/PA':>12} {'Trans':>7} {'MLB_PPPA_Z':>11}\n"
+    for grp, sub in mod_grp_bb2k.groupby("bb2k_t", observed=True):
+        n = len(sub)
+        m_s = sub["speed_pts_pa_milb"].mean()
+        ml_s = sub["speed_pts_pa_mlb"].mean()
+        tr = ml_s / m_s if m_s > 0 else np.nan
+        p7b += f"  {str(grp):<9} {n:>4} {sub['BB2K'].mean():>10.4f} {m_s:>12.4f} {ml_s:>12.4f} {tr:>7.3f} {sub['PPPA_Z'].mean():>11.3f}\n"
+
+# Test 3: Elite vs moderate SB_pct (same as Part 7)
+elite7b  = j7b[j7b["grp_fixed"] == ">25% (elite)"].dropna(subset=["SB_pct_milb"])
+mod7b_m  = j7b[j7b["grp_fixed"] == "5-15% (mod)"].dropna(subset=["SB_pct_milb"])
+if len(elite7b) >= 10 and len(mod7b_m) >= 10:
+    p7b += f"\nTest 3: Elite vs moderate -- SB_pct comparison:\n"
+    p7b += (f"  Elite (N={len(elite7b)}): SB_pct={elite7b['SB_pct_milb'].mean():.3f}, "
+            f"trans={elite7b['speed_pts_pa_mlb'].mean()/elite7b['speed_pts_pa_milb'].mean():.3f}\n")
+    p7b += (f"  Mod   (N={len(mod7b_m)}): SB_pct={mod7b_m['SB_pct_milb'].mean():.3f}, "
+            f"trans={mod7b_m['speed_pts_pa_mlb'].mean()/mod7b_m['speed_pts_pa_milb'].mean():.3f}\n")
+    thresh = elite7b["SB_pct_milb"].mean()
+    mod_hi = mod7b_m[mod7b_m["SB_pct_milb"] >= thresh]
+    if len(mod_hi) >= 5:
+        tr_hi = mod_hi["speed_pts_pa_mlb"].mean() / mod_hi["speed_pts_pa_milb"].mean()
+        p7b += (f"  Mod w/ SB_pct>={thresh:.3f} (N={len(mod_hi)}): "
+                f"trans={tr_hi:.3f}\n")
+
+out("\n=== Part 7b ===")
+out(p7b)
+
+# -
 # Write output
 # -
 
 OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-OUT_PATH.write_text(buf.getvalue(), encoding="utf-8")
+existing = OUT_PATH.read_text(encoding="utf-8") if OUT_PATH.exists() else ""
+OUT_PATH.write_text(existing + "\n=== Part 7b ===\n" + p7b, encoding="utf-8")
 print(f"\nOutput written to {OUT_PATH}")
