@@ -42,10 +42,9 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-DATA_DIR       = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN    = DATA_DIR / "rankings" / "prospect_features.csv"
-OUT_PATH       = DATA_DIR / "rankings" / "ability_scores.csv"
-AGE_MODEL_PATH = DATA_DIR / "computed" / "age_grad_model.csv"
+DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
+FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.csv"
+OUT_PATH    = DATA_DIR / "rankings" / "ability_scores.csv"
 MIN_PA      = 50    # minimum PA to count toward group z-score params
 MIN_ROWS    = 10    # minimum rows in Season+Level cell before falling back to Level-only
 
@@ -210,21 +209,11 @@ def main() -> None:
     # SB excluded: speed is a physical tool, not expected to improve with age —
     # a 23yo swiping 40 bags is as impressive as a 19yo doing the same.
     #
-    # Current prospects: KNN two-tier graduation model (age_grad_model.csv).
-    # Multiplier = p_grad_vs_baseline level-normalized — median prospect at each
-    # level gets 1.0; younger arcs boosted, older arcs penalized. R-ball = 1.0 flat.
-    # Historical rows not in the model fall back to the piecewise formula.
-    age_z     = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
-    piecewise = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
-
-    if AGE_MODEL_PATH.exists():
-        am       = pd.read_csv(AGE_MODEL_PATH, dtype={"PlayerId": str})
-        knn_map  = am.set_index("PlayerId")["age_mult_pgvb"].to_dict()
-        knn_mult = df["PlayerId"].astype(str).map(knn_map)
-        age_mult = knn_mult.where(knn_mult.notna(), piecewise)
-    else:
-        age_mult = piecewise
-
+    # Per-row piecewise formula using each row's own Age_Z_SL.
+    # Career-level graduation probability (KNN model) is applied separately
+    # in build_prospect_scores.py after career averaging.
+    age_z    = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
+    age_mult = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
     fantasy  = fantasy * age_mult
     disc     = disc    * age_mult
     gp       = gp      * age_mult

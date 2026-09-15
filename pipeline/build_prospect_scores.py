@@ -52,15 +52,16 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-TOOLS_PATH    = DATA_DIR / "rankings" / "tools_scores.csv"
-ABILITY_PATH  = DATA_DIR / "rankings" / "ability_scores.csv"
-FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
-MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.csv"
-OVR_PATH      = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
-OUT_PATH      = DATA_DIR / "rankings" / "prospect_scores.csv"
-HIT_PATH      = DATA_DIR / "api" / "milb_hitting.csv"
-POS_PATH      = DATA_DIR / "api" / "player_positions.csv"
-LUCK_PATH     = DATA_DIR / "computed" / "babip_luck.csv"
+TOOLS_PATH     = DATA_DIR / "rankings" / "tools_scores.csv"
+ABILITY_PATH   = DATA_DIR / "rankings" / "ability_scores.csv"
+FEATURES_PATH  = DATA_DIR / "rankings" / "prospect_features.csv"
+MLB_PATH       = DATA_DIR / "historical" / "hist_mlb_data.csv"
+OVR_PATH       = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
+OUT_PATH       = DATA_DIR / "rankings" / "prospect_scores.csv"
+HIT_PATH       = DATA_DIR / "api" / "milb_hitting.csv"
+POS_PATH       = DATA_DIR / "api" / "player_positions.csv"
+LUCK_PATH      = DATA_DIR / "computed" / "babip_luck.csv"
+AGE_MODEL_PATH = DATA_DIR / "computed" / "age_grad_model.csv"
 
 # Discipline gate — applied post-blend to Combined_Score.
 # Thresholds are percentile cutoffs applied to disc_composite_z (z-scored within pool).
@@ -308,6 +309,17 @@ def main() -> None:
     )
     pool["Career_Whiff_Z"] = pool["PlayerId"].map(career_whiff)
     pool["Career_Disc_Flag"] = ""   # populated below after gate computation
+
+    # Apply KNN graduation-probability multiplier to career ABILITY_Score before
+    # pool standardization. age_mult_pgvb is level-normalized (median=1.0 per level,
+    # R-ball=1.0 flat); applied to the deviation from 50 so a neutral-scoring
+    # player stays neutral regardless of multiplier.
+    if AGE_MODEL_PATH.exists():
+        am       = pd.read_csv(AGE_MODEL_PATH, dtype={"PlayerId": str})
+        knn_map  = am.set_index("PlayerId")["age_mult_pgvb"].to_dict()
+        knn_mult = pool["PlayerId"].astype(str).map(knn_map).fillna(1.0)
+        raw_ab   = pool["ABILITY_Score"].fillna(50)
+        pool["ABILITY_Score"] = (50 + (raw_ab - 50) * knn_mult).round(2)
 
     # Standardize TOOLS and ABILITY within current pool to 50±10
     pool["TOOLS_Score"]   = to_50_10(pool["TOOLS_Score"].fillna(50))
