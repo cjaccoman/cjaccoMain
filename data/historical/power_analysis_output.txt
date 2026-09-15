@@ -1,0 +1,186 @@
+
+========================================================================
+LOADING DATA
+========================================================================
+prospect_features: 71,035 rows
+Rows with PA >= 50: 57,779
+player_comps: 20,367 rows
+hist_mlb_data: 29,777 rows
+mlb_statcast: 9,832 rows
+ProspectSavant rows (PA>=50): 13,768
+  xSLG non-null: 13,768
+  Barrel%BBE non-null: 8,956
+PS career rows (xSLG): 5,144
+PS career rows (Barrel%BBE): 4,530
+
+Graduated players: 1,409
+  with Debut_PA >= 100: 750
+  with Career_MLB_PA >= 200: 1,277
+
+========================================================================
+PART 1 -- COVERAGE AUDIT
+========================================================================
+
+Metric          Non-null  Coverage%     Mean      Std      Min      Max
+---------------------------------------------------------------------------
+HR/FB             57,778     100.0%    0.066    0.067    0.000    0.778
+HR_AB             57,779     100.0%    0.017    0.017    0.000    0.146
+PullAir%          57,623      99.7%    0.157    0.065    0.000    1.000
+MaxEV              2,165       3.7%  107.553    4.628   54.600  119.800
+EV90               2,165       3.7%  102.054    3.949   54.600  113.500
+
+ProspectSavant metrics (from ps_*.csv files, PA >= 50):
+Metric              Non-null Levels/Seasons
+------------------------------------------------------------
+xSLG                  13,768  A2023, A2024, A2025, A2026, A+2023, A+2024, A+2025, A+2026, AA2023, AA2024, AA2025, AA2026, AAA2023, AAA2024, AAA2025, AAA2026, R2023, R2024, R2025, R2026
+Barrel%BBE             8,956  A2023, A2024, A2025, A2026, AAA2023, AAA2024, AAA2025, AAA2026, R2023, R2024, R2025, R2026
+
+EV metrics by level (MaxEV non-null, PA>=50):
+Level  Season   N
+    A    2023 205
+    A    2024 228
+    A    2025 226
+    A    2026 229
+  AAA    2023 167
+  AAA    2024 169
+  AAA    2025 183
+  AAA    2026 349
+    R    2026 409
+
+========================================================================
+PART 2 -- YEAR-OVER-YEAR STICKINESS
+========================================================================
+
+Same level, consecutive seasons (N1 and N2 both PA>=50):
+
+Metric          Same-Level r  N pairs  Across-Level r  N pairs
+-----------------------------------------------------------------
+HR/FB                  0.476   20,126           0.454   14,958
+HR_AB                  0.490   20,127           0.462   14,958
+PullAir%               0.339   20,091           0.363   14,926
+PS xSLG                0.947    5,205  (PS data, AAA 2023-2026)
+PS Barrel%BBE          0.399    3,674  (PS data, AAA 2023-2026)
+
+========================================================================
+PART 3 -- MiLB CAREER AVG -> MLB TRANSLATION
+========================================================================
+
+Outcome 1: First-year MLB HR_AB (Debut_PA >= 100)
+MiLB Metric             r raw      N  r partial  (controlling K%+BB2K)
+------------------------------------------------------------
+HR/FB                   0.465    750      0.344
+PullAir%                0.215    750      0.158
+MaxEV (sparse)          0.412    669      0.336
+EV90 (sparse)           0.361    137      0.215
+
+Outcome 2: Career MLB PPPA_Z (Career_MLB_PA >= 200)
+MiLB Metric             r raw      N  r partial  (controlling K%+BB2K)
+------------------------------------------------------------
+HR/FB                   0.020  1,277      0.277
+PullAir%               -0.004  1,277      0.054
+MaxEV (sparse)          0.260  1,149      0.418
+EV90 (sparse)           0.057    185      0.269
+HR_AB (career)          0.060  1,265      0.278  (HR_AB from pf agg)
+
+========================================================================
+PART 4 -- MULTIVARIATE: BEST POWER COMBINATION -> CAREER PPPA_Z
+========================================================================
+
+Best single power metric:
+  HR_AB        adj_R?=0.003  r=0.060  N=1,265
+  HRFB         adj_R?=-0.000  r=0.020  N=1,277
+  PullAir      adj_R?=-0.001  r=-0.004  N=1,277
+
+Best 2-metric power combo:
+  HRFB+HR_AB           adj_R?=0.007  N=1,265
+  HR_AB+PullAir        adj_R?=0.003  N=1,265
+  HRFB+PullAir         adj_R?=-0.001  N=1,277
+
+Best 3-metric combo:
+  HRFB+HR_AB+PullAir  adj_R?=0.009  N=1,265
+
+With discipline added (best power + K% + BB2K):
+  HRFB+disc  adj_R?=0.178  (discipline alone=0.110)  N=1,277  +?R?=0.068
+  HR_AB+disc  adj_R?=0.179  (discipline alone=0.110)  N=1,265  +?R?=0.068
+  PullAir+disc  adj_R?=0.112  (discipline alone=0.110)  N=1,277  +?R?=0.002
+
+========================================================================
+PART 5 -- EXIT VELOCITY: GENUINE PS DATA ONLY
+========================================================================
+
+Graduated players with genuine MaxEV_career: 1,149 / 1,277 (90.0%)
+
+In MaxEV subset (N=1,149):
+  r(MaxEV_career, Career_PPPA_Z):    0.260
+  r(HRFB_career, Career_PPPA_Z):     0.021  (same subset)
+  adj_R? HRFB alone:       -0.000
+  adj_R? HRFB + MaxEV:     0.082  (?R?=+0.083)
+  r(EV90_career, Career_PPPA_Z):     0.057
+  adj_R? HRFB + EV90:      0.009  (?R?=+0.010)
+
+  MiLB MaxEV -> MLB MaxEV: r=0.885  N=1,149
+  MiLB MaxEV -> MLB Brl%:  r=0.632  N=1,149
+
+========================================================================
+PART 6 -- xSLG AND BARREL%BBE (ProspectSavant)
+========================================================================
+
+xSLG_career_ps: 257 / 1,277 grad players
+Barrel%BBE_career_ps: 250 / 1,277 grad players
+
+In xSLG subset (N=257):
+  r(xSLG, Career_PPPA_Z):  -0.095
+  r(xSLG, Career_HR_AB):   0.230
+  r(HRFB, Career_PPPA_Z):  -0.049  (same subset, for comparison)
+  r(xSLG partial, PPPA_Z):  -0.085  (controlling HR/FB)
+  adj_R? xSLG alone:   0.005
+  adj_R? HRFB alone:   -0.001
+  adj_R? xSLG+HRFB:   0.002
+
+In Barrel%BBE subset (N=250):
+  r(Barrel%BBE, Career_PPPA_Z):  0.083
+  r(Barrel%BBE, Career_HR_AB):   0.655
+  r(HRFB, Career_PPPA_Z):        -0.027  (same subset)
+  r(Barrel%BBE partial, PPPA_Z): 0.130  (controlling HR/FB)
+
+========================================================================
+PART 7 -- SUMMARY RANKING
+========================================================================
+
+Metric          Stickiness  Translation   Coverage  Usefulness
+                   (YoY r) (r, CareerZ)   (PA>=50)      s?t??c
+-----------------------------------------------------------------
+MaxEV              n/a        0.260       3.7%         n/a
+EV90               n/a        0.057       3.7%         n/a
+HR_AB                0.490        0.060     100.0%       0.029
+Barrel%BBE           0.399        0.083      15.5%       0.013
+HR/FB                0.476        0.020     100.0%       0.010
+PullAir%             0.339       -0.004      99.7%      -0.001
+xSLG (PS)            0.947       -0.095      23.8%      -0.044
+
+========================================================================
+PART 8 -- IMPLICATIONS FOR CURRENT MODEL
+========================================================================
+
+Current ABILITY Game_Power: 0.5 ? PullAir% + 0.5 ? HR_AB
+Current TOOLS Power fallback: HRFB_adj (100%)
+Current TOOLS Power full tier: MaxEV (35%) + EV90 (35%) + HRFB (30%)
+
+Best single predictor of Career_PPPA_Z (among adequately-covered metrics): MaxEV (r=0.260)
+
+Comparison (N=1,265):
+  Current formula (0.5?HR_AB + 0.5?PullAir%):  r=0.014  adj_R?=-0.001
+  HR_AB alone:                                   r=0.060  adj_R?=0.003
+  PullAir% alone:                                r=-0.003
+  HR/FB alone:                                   r=0.022  adj_R?=-0.000
+  HR/FB + HR_AB:                                 adj_R?=0.007
+  HR/FB + HR_AB + PullAir%:                      adj_R?=0.009
+
+--- RECOMMENDATION ---
+Current formula (0.5?HR_AB + 0.5?PullAir%) is competitive with alternatives.
+No strong statistical case for replacement -- PullAir% may add non-power dimension worth keeping.
+
+xSLG (PS, limited coverage): r=-0.095 vs HRFB r=-0.049 in same subset.
+xSLG does not meaningfully outperform HRFB; coverage < 10% makes adoption premature.
+
+Output written to C:\Users\cjacc\PycharmProjects\prospectsMain\data\historical\power_analysis_output.txt
