@@ -1,0 +1,332 @@
+========================================================================
+SECTION 1 — GRADUATED PLAYER DATASET
+========================================================================
+Graduated players with Career_MLB_PA >= 200: 1,277
+  Imputed 128 NaN in MaxEV_career with mean=109.3351
+  Imputed 1092 NaN in EV90_career with mean=104.1459
+  Imputed 1092 NaN in Chase_career with mean=28.2595
+  Imputed 1092 NaN in ZContact_career with mean=84.4730
+
+Success tier distribution (Career_PPPA_Z):
+  Tier
+Above Avg    647
+Elite        484
+Average      141
+Below Avg      5
+  Overall success rate: 88.6%
+  PPPA_Z_career — mean=0.662 std=0.379 p25=0.430 p75=0.870
+
+Note: Graduated sample is survivor-biased (above-average MLB PA required).
+Tier thresholds are fixed (-0.25/+0.25/+0.75 PPPA_Z); ~0% fall 'Below Avg', ~38% are 'Elite'.
+
+========================================================================
+SECTION 2 — FEATURE IMPORTANCE (Random Forest + Decision Tree)
+========================================================================
+
+Random Forest (500 trees) — 5-fold CV R²: 0.501 ± 0.027
+
+Feature importances (MiLB -> MLB PPPA, points-scoring):
+  HRFB_career             0.2167  █████████████████
+  BB2K_career             0.1616  ████████████
+  Kpct_career             0.1454  ███████████
+  SBTalent_career         0.1245  █████████
+  MaxEV_career            0.0885  ███████
+  Whiff_career            0.0782  ██████
+  PullAir_career          0.0782  ██████
+  BBpct_career            0.0555  ████
+  ZContact_career         0.0194  █
+  EV90_career             0.0171  █
+  Chase_career            0.0150  █
+
+Decision Tree (max_depth=4) — 5-fold CV R²: 0.254 ± 0.035
+
+Decision Tree rules (truncated):
+|--- BB2K_career <= -0.33
+|   |--- HRFB_career <= 0.14
+|   |   |--- BB2K_career <= -0.43
+|   |   |   |--- value: [0.17]
+|   |   |--- BB2K_career >  -0.43
+|   |   |   |--- SBTalent_career <= 0.03
+|   |   |   |   |--- value: [0.35]
+|   |   |   |--- SBTalent_career >  0.03
+|   |   |   |   |--- value: [0.57]
+|   |--- HRFB_career >  0.14
+|   |   |--- Kpct_career <= 0.28
+|   |   |   |--- ZContact_career <= 83.25
+|   |   |   |   |--- value: [0.49]
+|   |   |   |--- ZContact_career >  83.25
+|   |   |   |   |--- value: [0.72]
+|   |   |--- Kpct_career >  0.28
+|   |   |   |--- value: [0.39]
+|--- BB2K_career >  -0.33
+|   |--- HRFB_career <= 0.08
+|   |   |--- BB2K_career <= -0.18
+|   |   |   |--- SBTalent_career <= 0.03
+|   |   |   |   |--- value: [0.38]
+|   |   |   |--- SBTalent_career >  0.03
+|   |   |   |   |--- value: [0.65]
+|   |   |--- BB2K_career >  -0.18
+|   |   |   |--- SBTalent_career <= 0.03
+|   |   |   |   |--- value: [0.66]
+|   |   |   |--- SBTalent_career >  0.03
+|   |   |   |   |--- value: [0.97]
+|   |--- HRFB_career >  0.08
+|   |   |--- BB2K_career <= -0.15
+|   |   |   |--- HRFB_career <= 0.15
+|   |   |   |   |--- value: [0.76]
+|   |   |   |--- HRFB_career >  0.15
+|   |   |   |   |--- value: [1.01]
+|   |   |--- BB2K_career >  -0.15
+|   |   |   |--- value: [1.24]
+
+
+========================================================================
+SECTION 3 — K-MEANS SWEEP (k=4..10, core features)
+========================================================================
+
+  k   Silhouette   Davies-Bouldin   SuccessSpread
+   4       0.2203           1.3408           0.148
+   5       0.2079           1.3425           0.175
+   6       0.1877           1.3828           0.179
+   7       0.1862           1.2057           0.212
+   8       0.1879           1.2160           0.230
+   9       0.1891           1.2884           0.359
+  10       0.1898           1.2600           0.336
+
+Best k by silhouette: 4
+Using k=4 for detailed analysis (also reporting k=6 for comparison).
+
+========================================================================
+SECTION 4 — CLUSTER PROFILES (k=4)
+========================================================================
+
+Archetype                  N    MeanZ     MedZ   Success%     BB2K      K%    SBTal    HRFB   PullAir
+------------------------------------------------------------------------------------------
+  Pure Contact             338    0.717    0.690      89.6%  -0.1709    0.1%  0.01517    0.1%      0.2%
+  Power/K-Risk             271    0.561    0.540      81.2%  -0.4088    0.3%  0.01927    0.2%      0.2%
+  Speed                    197    0.739    0.670      95.9%  -0.2568    0.2%  0.05254    0.1%      0.1%
+  Average                  471    0.648    0.630      89.0%  -0.2892    0.2%  0.01211    0.1%      0.2%
+
+Top 5 players per cluster (Career_PPPA_Z):
+
+  [Pure Contact]
+    Robinson Canó              PPPA_Z=2.20  Career_PA=10101
+    Kevin McGonigle            PPPA_Z=2.14  Career_PA=272
+    Kevin Kouzmanoff           PPPA_Z=1.99  Career_PA=2730
+    Jacob Wilson               PPPA_Z=1.95  Career_PA=794
+    Andrew Benintendi          PPPA_Z=1.90  Career_PA=4980
+
+  [Power/K-Risk]
+    Jac Caglianone             PPPA_Z=1.59  Career_PA=450
+    Mark Reynolds              PPPA_Z=1.44  Career_PA=6243
+    Nick Kurtz                 PPPA_Z=1.34  Career_PA=774
+    Kris Bryant                PPPA_Z=1.32  Career_PA=4509
+    Paul Goldschmidt           PPPA_Z=1.30  Career_PA=8969
+
+  [Speed]
+    Eugenio Velez              PPPA_Z=2.63  Career_PA=665
+    Konnor Griffin             PPPA_Z=2.02  Career_PA=208
+    Chandler Simpson           PPPA_Z=1.92  Career_PA=691
+    Yasiel Puig                PPPA_Z=1.91  Career_PA=3376
+    Mookie Betts               PPPA_Z=1.77  Career_PA=7069
+
+  [Average]
+    Juan Soto                  PPPA_Z=2.77  Career_PA=5004
+    Ben Rice                   PPPA_Z=1.73  Career_PA=954
+    Julio Rodríguez            PPPA_Z=1.70  Career_PA=2883
+    Ryan Braun                 PPPA_Z=1.69  Career_PA=7340
+    Howie Kendrick             PPPA_Z=1.69  Career_PA=6421
+
+========================================================================
+SECTION 4 — CLUSTER PROFILES (k=6)
+========================================================================
+
+Archetype                  N    MeanZ     MedZ   Success%     BB2K      K%    SBTal    HRFB   PullAir
+------------------------------------------------------------------------------------------
+  Average                  283    0.591    0.580      85.9%  -0.2998    0.2%  0.01349    0.1%      0.1%
+  Pure Contact_1           230    0.779    0.770      93.0%  -0.2030    0.1%  0.01303    0.1%      0.2%
+  Power/K-Risk_1           201    0.524    0.520      78.1%  -0.4252    0.3%  0.01959    0.2%      0.2%
+  Power/K-Risk_2           187    0.671    0.660      91.4%  -0.3194    0.2%  0.01302    0.1%      0.2%
+  Speed                    150    0.749    0.680      96.0%  -0.2731    0.2%  0.05750    0.1%      0.1%
+  Pure Contact_2           226    0.688    0.640      89.4%  -0.1667    0.1%  0.02031    0.1%      0.1%
+
+Top 5 players per cluster (Career_PPPA_Z):
+
+  [Average]
+    Julio Rodríguez            PPPA_Z=1.70  Career_PA=2883
+    Howie Kendrick             PPPA_Z=1.69  Career_PA=6421
+    Cam Smith                  PPPA_Z=1.67  Career_PA=736
+    Corey Dickerson            PPPA_Z=1.41  Career_PA=3938
+    Brooks Baldwin             PPPA_Z=1.39  Career_PA=449
+
+  [Pure Contact_1]
+    Juan Soto                  PPPA_Z=2.77  Career_PA=5004
+    Kevin McGonigle            PPPA_Z=2.14  Career_PA=272
+    Andrew Benintendi          PPPA_Z=1.90  Career_PA=4980
+    Vladimir Guerrero Jr.      PPPA_Z=1.84  Career_PA=4486
+    Ryan Braun                 PPPA_Z=1.69  Career_PA=7340
+
+  [Power/K-Risk_1]
+    Nick Kurtz                 PPPA_Z=1.34  Career_PA=774
+    Kris Bryant                PPPA_Z=1.32  Career_PA=4509
+    Paul Goldschmidt           PPPA_Z=1.30  Career_PA=8969
+    Yordan Alvarez             PPPA_Z=1.30  Career_PA=3142
+    Elly De La Cruz            PPPA_Z=1.30  Career_PA=2079
+
+  [Power/K-Risk_2]
+    Ben Rice                   PPPA_Z=1.73  Career_PA=954
+    Jac Caglianone             PPPA_Z=1.59  Career_PA=450
+    Ryan Zimmerman             PPPA_Z=1.46  Career_PA=7402
+    Mark Reynolds              PPPA_Z=1.44  Career_PA=6243
+    Alex Gordon                PPPA_Z=1.38  Career_PA=7250
+
+  [Speed]
+    Eugenio Velez              PPPA_Z=2.63  Career_PA=665
+    Konnor Griffin             PPPA_Z=2.02  Career_PA=208
+    Chandler Simpson           PPPA_Z=1.92  Career_PA=691
+    Yasiel Puig                PPPA_Z=1.91  Career_PA=3376
+    Corey Hart                 PPPA_Z=1.54  Career_PA=4113
+
+  [Pure Contact_2]
+    Robinson Canó              PPPA_Z=2.20  Career_PA=10101
+    Kevin Kouzmanoff           PPPA_Z=1.99  Career_PA=2730
+    Jacob Wilson               PPPA_Z=1.95  Career_PA=794
+    Jeff Francoeur             PPPA_Z=1.84  Career_PA=5633
+    Mookie Betts               PPPA_Z=1.77  Career_PA=7069
+
+========================================================================
+SECTION 5 — TOOLS × ABILITY QUADRANT ANALYSIS
+========================================================================
+
+Players with both TOOLS and ABILITY scores: 1,161 / 1,277
+
+2×2 TOOLS × ABILITY grid (median split):
+  ABILITY median=58.9, TOOLS median=55.1
+
+                       N  Mean_PPPA_Z  Success_Rate
+TS_tier  AB_tier                                   
+Hi-TOOLS Hi-ABILITY  377        0.893         0.987
+         Lo-ABILITY  204        0.531         0.873
+Lo-TOOLS Hi-ABILITY  204        0.739         0.980
+         Lo-ABILITY  376        0.424         0.737
+
+3×3 TOOLS (rows) × ABILITY (cols) grid — mean Career_PPPA_Z:
+AB_t3     Lo    Mid     Hi
+TS_t3                     
+Lo     0.358  0.601  0.778
+Mid    0.403  0.646  0.829
+Hi     0.474  0.722  0.987
+
+3×3 TOOLS × ABILITY — Success Rate (% ≥+0.25):
+AB_t3     Lo    Mid     Hi
+TS_t3                     
+Lo     0.649  0.928  1.000
+Mid    0.720  0.959  0.967
+Hi     0.859  1.000  0.995
+
+3×3 TOOLS × ABILITY — N players:
+AB_t3   Lo  Mid   Hi
+TS_t3               
+Lo     205  125   57
+Mid    118  147  122
+Hi      64  115  208
+
+========================================================================
+SECTION 6 — DISCIPLINE FLOOR: K% × SBTalent / HRFB INTERACTION
+========================================================================
+
+K% tercile boundaries:
+                 min    max
+K_terc                   
+Lo-K (good)  0.029  0.162
+Mid-K        0.163  0.206
+Hi-K (bad)   0.207  0.400
+
+K% tercile × SBTalent tercile — Success Rate (% Career_PPPA_Z ≥ +0.25):
+SB_terc      Lo-SB  Mid-SB  Hi-SB
+K_terc                           
+Lo-K (good)  0.867   0.921  0.993
+Mid-K        0.921   0.926  0.943
+Hi-K (bad)   0.729   0.799  0.868
+
+K% tercile × SBTalent tercile — mean Career_PPPA_Z:
+SB_terc      Lo-SB  Mid-SB  Hi-SB
+K_terc                           
+Lo-K (good)  0.737   0.755  0.866
+Mid-K        0.631   0.681  0.704
+Hi-K (bad)   0.461   0.511  0.606
+
+K% tercile × HR/FB tercile — Success Rate:
+HR_terc      Lo-HR/FB  Mid-HR/FB  Hi-HR/FB
+K_terc                                    
+Lo-K (good)     0.882      1.000     1.000
+Mid-K           0.778      0.989     1.000
+Hi-K (bad)      0.600      0.687     0.882
+
+K% tercile × HR/FB tercile — mean Career_PPPA_Z:
+HR_terc      Lo-HR/FB  Mid-HR/FB  Hi-HR/FB
+K_terc                                    
+Lo-K (good)     0.632      0.948     1.269
+Mid-K           0.421      0.682     0.921
+Hi-K (bad)      0.315      0.381     0.627
+
+========================================================================
+SECTION 7 — GRADUATION-ADJUSTED ARCHETYPE VALUE
+========================================================================
+(penalizes archetypes that look good in MiLB but rarely reach MLB)
+  [Pure Contact          ]  N_all= 3934  P(grad)=0.086  E[PPPA_Z|grad]=+0.717  Adj_Value=+0.0616
+  [Power/K-Risk          ]  N_all= 6734  P(grad)=0.040  E[PPPA_Z|grad]=+0.561  Adj_Value=+0.0226
+  [Speed                 ]  N_all= 3498  P(grad)=0.056  E[PPPA_Z|grad]=+0.739  Adj_Value=+0.0416
+  [Average               ]  N_all= 6201  P(grad)=0.076  E[PPPA_Z|grad]=+0.648  Adj_Value=+0.0492
+
+========================================================================
+SECTION 8 — RANKED SUMMARY & RECOMMENDATIONS
+========================================================================
+
+Rank   Archetype                   N   Mean PPPA_Z   Success%
+--------------------------------------------------------------
+  1    Speed                     197         0.739      95.9%
+  2    Pure Contact              338         0.717      89.6%
+  3    Average                   471         0.648      89.0%
+  4    Power/K-Risk              271         0.561      81.2%
+
+KEY FINDINGS:
+-------------
+1. Feature importance (RF): The top MiLB predictors of MLB PPPA are listed in
+   Section 2. K% and BB2K_career consistently rank at top — consistent with
+   the model's -2 SO penalty. SBTalent and HRFB are next.
+
+2. TOOLS × ABILITY: The 3×3 grid (Section 5) shows whether high TOOLS alone
+   or high ABILITY alone is sufficient, or whether the combination is required.
+   Inspect the Hi-TOOLS/Hi-ABILITY cell for the "sweet spot" vs Hi-ABILITY-only.
+
+3. Discipline floor (Section 6): The K% × SBTalent and K% × HRFB grids show
+   whether power/speed archetypes with high K% translate — the Hi-K/Hi-SB and
+   Hi-K/Hi-HRFB cells are the critical test. If success rates collapse, the
+   discipline gate is validated.
+
+4. Graduation adjustment (Section 7): Compares raw cluster quality to MLB
+   delivery. An archetype that looks strong but graduates few players has lower
+   adjusted value — reveals which archetypes are drafting-floor risks.
+
+
+========================================================================
+RECOMMENDATION FOR build_archetypes.py UPGRADE
+========================================================================
+
+Current system: K-means k=6 on [Discipline, SB_Talent, Game_Power] (ABILITY only).
+
+Suggested upgrade:
+  1. Add TOOLS sub-components to clustering: include TOOLS Discipline, Power,
+     Athleticism alongside ABILITY components — 6 dimensions total.
+  2. Optimal k from sweep: 4. If interpretability is prioritized, k=6 is
+     defensible (similar silhouette within ~0.01). Best k=4 is recommended.
+  3. Top RF features for MLB PPPA (should be prioritized in archetype design):
+     HRFB_career, BB2K_career, Kpct_career
+  4. Consider weighting cluster dimensions by RF feature importance rather than
+     equal-weight StandardScaler — this would make clusters more PPPA-predictive
+     rather than geometrically balanced.
+  5. Graduation-adjusted archetype value (Section 7) should be shown in the HTML
+     artifact alongside raw cluster means — it surfaces which archetypes are
+     misleading in MiLB context.
+
