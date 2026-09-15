@@ -226,6 +226,20 @@ Applied in `pipeline/build_prospect_scores.py` after the discipline gate. Option
 
 `build_archetypes.py` assigns a descriptive label to each prospect based on their TOOLS and ABILITY component profile. Output: `data/rankings/archetype_labels.csv`. Labels appear in `prospect_scores.csv` and the HTML artifact.
 
+**Architecture:** K-means (k=6) on 7 dimensions — TOOLS_Disc, TOOLS_Power, TOOLS_Ath + AB_BB (BB% z-score), AB_K (K% z-score), AB_SB, AB_Power. BB% and K% are kept **separate** (not combined as BB_2K) so Three-True-Outcomes profiles (high BB + high K) form their own cluster instead of collapsing to "Average". Dimensions weighted by RF feature importances trained on Career_PPPA_Z (AB_K is highest at 1.52×, reflecting the -2/K PPPA penalty).
+
+**Post-clustering overrides (individual-level):**
+- TTO: AB_BB > 0.40 AND AB_K > 0.40 AND AB_Power > 0.00 → "Three True Outcomes"
+- Contact/Power rescue: Power/K-Risk players with AB_BB > 0.50 AND AB_K < 0.40 → "Contact/Power" (extreme power pulled them into wrong cluster despite good plate discipline)
+
+**Archetype calibration (career PPPA_Z residuals, N=42–156 per archetype):**
+- Three True Outcomes: −0.149 residual → **−3.0 score adjustment** (high K% destroys PPPA value despite patience; worse than Power/K-Risk)
+- Pure Contact: +0.109 residual → **+2.0 score adjustment** (low-K/high-contact systematically under-valued in MiLB)
+- Power/K-Risk: −0.011 residual (neutral after TTO separation; no adjustment)
+- All others: < |0.03| residual, not significant
+
+Adjustments applied in `build_prospect_scores.py` via `ARCHETYPE_ADJ` dict.
+
 ---
 
 ## Era Analysis (v1.0 Research Foundation)

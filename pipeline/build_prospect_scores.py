@@ -340,13 +340,24 @@ def main() -> None:
     else:
         pool["Archetype"] = ""
 
-    # Archetype level-shift adjustment.
-    # Power/K-Risk receives +3: calibrated to career PPPA_Z residual (+0.109),
-    # estimated slope beta ~0.046 PPPA_Z per score point -> 2.4 pts, rounded to 3.
-    pool["Archetype_Adj"] = 0.0
-    pool.loc[pool["Archetype"] == "Power/K-Risk", "Archetype_Adj"] = 3.0
-    n_adj = (pool["Archetype_Adj"] != 0).sum()
-    print(f"Archetype_Adj applied: {n_adj:,} players (+3.0 Power/K-Risk)")
+    # Archetype level-shift adjustments (k=6 system, beta ~0.046 PPPA_Z per point).
+    # Three True Outcomes: -0.149 career residual -> -3.2 -> -3.0
+    #   High BB% does NOT offset the -2/K PPPA drag. Despite patience, TTO players
+    #   are penalised harder in PPPA than in wRC+/WAR because the K count is very high.
+    # Pure Contact:  +0.109 career residual -> +2.4 -> +2.0
+    #   Low-K/high-contact profiles are systematically under-valued by MiLB production.
+    # Power/K-Risk: after TTO separation + Contact/Power rescue, career residual -0.011
+    #   -> effectively neutral, no adjustment warranted.
+    # Others: career residuals < |0.03| — not significant.
+    ARCHETYPE_ADJ = {
+        "Three True Outcomes": -3.0,
+        "Pure Contact":         2.0,
+    }
+    pool["Archetype_Adj"] = pool["Archetype"].map(ARCHETYPE_ADJ).fillna(0.0)
+    for arch, val in ARCHETYPE_ADJ.items():
+        n = (pool["Archetype"] == arch).sum()
+        if n:
+            print(f"Archetype_Adj: {n:,} {arch} -> {val:+.1f}")
 
     # Final blend
     pool["Combined_Score"] = (

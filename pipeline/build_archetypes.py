@@ -1,7 +1,10 @@
 """Build player archetypes from PA-weighted TOOLS + ABILITY sub-components.
 
-K-means (k=4) on 6 dimensions — 3 TOOLS (Discipline/Power/Athleticism) and
-3 ABILITY (Discipline/SB_Talent/Game_Power) — identifies natural player profiles.
+K-means (k=6) on 7 dimensions — 3 TOOLS (Discipline/Power/Athleticism) and
+4 ABILITY (BB-rate / K-rate separate, SB_Talent, Game_Power) — identifies
+natural player profiles.  BB% and K% are kept as independent dimensions
+(rather than combined into BB_2K) so Three-True-Outcomes profiles (high BB +
+high K + power) form their own cluster instead of collapsing into "Average".
 Fantasy_Out is excluded from clustering (it's a composite of everything) and
 used as within-archetype validation only.
 
@@ -23,7 +26,7 @@ Outputs:
   data/rankings/archetype_labels.csv  -- one row per player:
       PlayerId, Archetype, Cluster_ID, Cluster_PA,
       TOOLS_Disc, TOOLS_Power, TOOLS_Ath,
-      AB_Disc, AB_SB, AB_Power, Fantasy_Out
+      AB_BB, AB_K, AB_SB, AB_Power, Fantasy_Out
 """
 
 import numpy as np
@@ -33,26 +36,28 @@ from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 
-DATA_DIR     = Path(__file__).resolve().parent.parent / "data"
-TOOLS_PATH   = DATA_DIR / "rankings" / "tools_scores.csv"
-ABILITY_PATH = DATA_DIR / "rankings" / "ability_scores.csv"
-MLB_PATH     = DATA_DIR / "historical" / "hist_mlb_data.csv"
-OVR_PATH     = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
-OUT_PATH     = DATA_DIR / "rankings" / "archetype_labels.csv"
+DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
+TOOLS_PATH    = DATA_DIR / "rankings" / "tools_scores.csv"
+ABILITY_PATH  = DATA_DIR / "rankings" / "ability_scores.csv"
+FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
+MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.csv"
+OVR_PATH      = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
+OUT_PATH      = DATA_DIR / "rankings" / "archetype_labels.csv"
 
 FULL_SEASON_LEVELS = {"A", "A+", "AA", "AAA"}
 MIN_PA_ROW          = 50    # min PA per season-level row
 MIN_CLUSTER_PA      = 100   # min total qualifying PA to assign an archetype
-N_CLUSTERS          = 4     # optimal k from silhouette sweep in build_archetype_analysis.py
+N_CLUSTERS          = 6     # k=6: enough resolution to capture TTO + richer profiles
 RANDOM_STATE        = 42
 MLB_PA_MIN          = 100   # min first-year MLB PA for calibration
 CAREER_MLB_PA_MIN   = 400
 CAREER_MLB_SEAS_MIN = 2
 
-# 6 cluster dimensions: 3 TOOLS + 3 ABILITY (Fantasy_Out excluded — composite)
+# 7 cluster dimensions: 3 TOOLS + 4 ABILITY
+# BB% and K% are separate dims (not combined as BB_2K) so TTO profiles are visible.
 CLUSTER_DIMS = [
     "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
-    "AB_Disc",    "AB_SB",       "AB_Power",
+    "AB_BB",  "AB_K",  "AB_SB",  "AB_Power",
 ]
 
 
@@ -61,34 +66,85 @@ CLUSTER_DIMS = [
 # ---------------------------------------------------------------------------
 
 def _name_cluster(
-    t_disc:  float, t_power: float, t_ath:  float,
-    ab_disc: float, ab_sb:   float, ab_pow: float,
-    thr: float = 0.25,
+    t_disc:  float, t_power: float, t_ath: float,
+    ab_bb:   float, ab_k:    float,
+    ab_sb:   float, ab_pow:  float,
+    thr: float = 0.28,
 ) -> str:
-    hi_t_disc  = t_disc  >  thr
-    lo_t_disc  = t_disc  < -thr
-    hi_t_pow   = t_power >  thr
-    hi_t_ath   = t_ath   >  thr
-    hi_ab_disc = ab_disc >  thr
-    lo_ab_disc = ab_disc < -thr
-    hi_ab_sb   = ab_sb   >  thr
-    hi_ab_pow  = ab_pow  >  thr
+    """Name a cluster from its centroid coordinates in standardised space.
 
-    good_disc = hi_t_disc or hi_ab_disc
-    bad_disc  = lo_t_disc and lo_ab_disc
+    ab_bb = BB% z-score (positive = more walks)
+    ab_k  = K%  z-score (positive = more strikeouts — not inverted)
+    """
+    hi_t_disc = t_disc  >  thr
+    lo_t_disc = t_disc  < -thr
+    hi_t_pow  = t_power >  thr
+    hi_t_ath  = t_ath   >  thr
+    hi_bb     = ab_bb   >  thr    # high walk rate
+    lo_bb     = ab_bb   < -thr    # low walk rate
+    hi_k      = ab_k    >  thr    # high strikeout rate
+    lo_k      = ab_k    < -thr    # low strikeout rate
+    hi_ab_sb  = ab_sb   >  thr
+    hi_ab_pow = ab_pow  >  thr
+
+    # TTO: high BB + high K + power (BB and K both elevated but cancel in BB_2K)
+    is_tto    = hi_bb and hi_k and (hi_t_pow or hi_ab_pow)
+    # Disciplined: good tools discipline, OR high walks + low Ks
+    good_disc = (hi_t_disc and lo_k) or hi_bb
+    # True K-risk: low walks AND high Ks AND poor tools discipline
+    bad_disc  = lo_bb and hi_k and lo_t_disc
+    # Moderate K-risk: high Ks without walk compensation, even if tools OK
+    k_risk    = hi_k and not hi_bb
     has_power = hi_t_pow  or hi_ab_pow
     has_speed = hi_t_ath  or hi_ab_sb
 
+    if is_tto:                                       return "Three True Outcomes"
     if good_disc and has_speed and has_power:         return "All-Around"
-    if good_disc and has_speed and not has_power:     return "Contact/Speed"
-    if good_disc and has_power and not has_speed:     return "Contact/Power"
-    if good_disc:                                     return "Pure Contact"
+    if good_disc and has_speed:                      return "Contact/Speed"
+    if good_disc and has_power:                      return "Contact/Power"
+    if good_disc:                                    return "Pure Contact"
     if bad_disc  and has_power and has_speed:         return "Power-Speed/K-Risk"
-    if bad_disc  and has_power:                       return "Power/K-Risk"
-    if bad_disc  and has_speed:                       return "Speed/K-Risk"
-    if has_speed:                                     return "Speed"
-    if has_power:                                     return "Raw Power"
+    if bad_disc  and has_power:                      return "Power/K-Risk"
+    if bad_disc  and has_speed:                      return "Speed/K-Risk"
+    if k_risk   and has_power:                       return "Power/K-Risk"
+    if k_risk   and has_speed:                       return "Speed/K-Risk"
+    if has_speed:                                    return "Speed"
+    if has_power:                                    return "Raw Power"
     return "Average"
+
+
+def _z_within_sl(df: pd.DataFrame, col: str,
+                  min_pa: int = 50, min_rows: int = 10) -> pd.Series:
+    """Z-score col within Season+Level; Level-only fallback for sparse cells.
+    Only rows with PA >= min_pa and non-null col contribute to group params.
+    """
+    out   = pd.Series(np.nan, index=df.index, dtype=float)
+    valid = df[df["PA"] >= min_pa].dropna(subset=[col])
+
+    grp_sl = valid.groupby(["Season", "Level"], observed=True)[col].agg(
+        ["mean", "std", "count"]
+    )
+    grp_l = valid.groupby("Level", observed=True)[col].agg(["mean", "std"])
+
+    for (season, level), idx in df.groupby(["Season", "Level"], observed=True).groups.items():
+        mu, sig = None, None
+        try:
+            row = grp_sl.loc[(season, level)]
+            if row["count"] >= min_rows and row["std"] > 1e-9:
+                mu, sig = row["mean"], row["std"]
+        except KeyError:
+            pass
+        if mu is None:
+            try:
+                fb = grp_l.loc[level]
+                if fb["std"] > 1e-9:
+                    mu, sig = fb["mean"], fb["std"]
+            except KeyError:
+                continue
+        if mu is not None and sig is not None:
+            out.loc[idx] = (df.loc[idx, col] - mu) / sig
+
+    return out.round(4)
 
 
 def _dedup_names(names: dict) -> dict:
@@ -123,10 +179,18 @@ def main() -> None:
     ability = pd.read_csv(
         ABILITY_PATH,
         usecols=["PlayerId", "Season", "Level", "PA",
-                 "Discipline", "SB_Talent", "Game_Power", "Fantasy_Out"],
-    ).rename(columns={"Discipline": "AB_Disc",
-                      "SB_Talent":  "AB_SB",
+                 "SB_Talent", "Game_Power", "Fantasy_Out"],
+    ).rename(columns={"SB_Talent":  "AB_SB",
                       "Game_Power": "AB_Power"})
+
+    # BB% and K% as separate dimensions (not combined as BB_2K).
+    # Z-scored within Season+Level so era drift doesn't contaminate clustering.
+    pf = pd.read_csv(
+        FEATURES_PATH,
+        usecols=["PlayerId", "Season", "Level", "PA", "BB%", "K%"],
+    )
+    pf["BB%_z"] = _z_within_sl(pf, "BB%")
+    pf["K%_z"]  = _z_within_sl(pf, "K%")
 
     # Join: PA comes from ability (authoritative for ABILITY rows); tools PA should match
     rows = ability.merge(
@@ -134,9 +198,16 @@ def main() -> None:
                "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath"]],
         on=["PlayerId", "Season", "Level"],
         how="left",
+    ).merge(
+        pf[["PlayerId", "Season", "Level", "BB%_z", "K%_z"]],
+        on=["PlayerId", "Season", "Level"],
+        how="left",
     )
+    rows = rows.rename(columns={"BB%_z": "AB_BB", "K%_z": "AB_K"})
     print(f"Loaded {len(rows):,} joined rows")
-    print(f"  TOOLS coverage: {rows['TOOLS_Disc'].notna().sum():,} / {len(rows):,} rows")
+    print(f"  TOOLS coverage:  {rows['TOOLS_Disc'].notna().sum():,} / {len(rows):,} rows")
+    print(f"  AB_BB coverage:  {rows['AB_BB'].notna().sum():,} / {len(rows):,} rows")
+    print(f"  AB_K  coverage:  {rows['AB_K'].notna().sum():,} / {len(rows):,} rows")
 
     mlb = pd.read_csv(MLB_PATH, usecols=["PlayerId", "Season", "PA", "PPPA_Z"])
     debut_year = mlb.groupby("PlayerId")["Season"].min().rename("debut_year")
@@ -218,7 +289,8 @@ def main() -> None:
     raw_names = {
         i: _name_cluster(
             row.TOOLS_Disc, row.TOOLS_Power, row.TOOLS_Ath,
-            row.AB_Disc,    row.AB_SB,       row.AB_Power,
+            row.AB_BB,      row.AB_K,
+            row.AB_SB,      row.AB_Power,
         )
         for i, row in centers_scaled.iterrows()
     }
@@ -226,14 +298,15 @@ def main() -> None:
 
     print(f"\nCluster centroids (standardised, importance-weighted space):")
     label_counts = pd.Series(hist_labels).value_counts()
-    hdr = f"  {'Archetype':<22} {'TDisc':>6} {'TPow':>6} {'TAth':>6}  {'ADisc':>6} {'ASB':>6} {'APow':>6}  {'N':>5}"
+    hdr = (f"  {'Archetype':<24} {'TDisc':>6} {'TPow':>6} {'TAth':>6}"
+           f"  {'ABB':>6} {'AK':>6} {'ASB':>6} {'APow':>6}  {'N':>5}")
     print(hdr)
     for i, row in centers_scaled.iterrows():
         n = label_counts.get(i, 0)
         print(
-            f"  {cluster_names[i]:<22}"
+            f"  {cluster_names[i]:<24}"
             f" {row.TOOLS_Disc:+6.2f} {row.TOOLS_Power:+6.2f} {row.TOOLS_Ath:+6.2f}"
-            f"  {row.AB_Disc:+6.2f} {row.AB_SB:+6.2f} {row.AB_Power:+6.2f}"
+            f"  {row.AB_BB:+6.2f} {row.AB_K:+6.2f} {row.AB_SB:+6.2f} {row.AB_Power:+6.2f}"
             f"  {n:5d}"
         )
 
@@ -255,9 +328,42 @@ def main() -> None:
         .rename_axis("PlayerId")
         .reset_index()
     )
+
+    # Post-clustering individual-level overrides.
+    # K-means centroids sometimes misclassify extreme players because distance to
+    # the nearest centroid is dominated by one dimension, ignoring offsetting signals.
+
+    # TTO override: high BB + high K + positive power.
+    # Catches players whose elevated BB% and K% cancel in BB_2K, making them look
+    # "average" in discipline when they're actually a specific high-variance profile.
+    tto_mask = (
+        (all_out["AB_BB"]    > 0.40) &   # above-average walk rate
+        (all_out["AB_K"]     > 0.40) &   # above-average strikeout rate
+        (all_out["AB_Power"] > 0.00)      # any positive demonstrated power
+    )
+    n_tto = tto_mask.sum()
+    all_out.loc[tto_mask, "Archetype"] = "Three True Outcomes"
+    print(f"  TTO: {n_tto:,} players relabeled as 'Three True Outcomes'")
+
+    # Contact/Power rescue: players pulled into Power/K-Risk by extreme power
+    # but who actually have good plate discipline (high BB%, normal-or-low K%).
+    # AB_K < 0.40 means their K% is not elevated relative to peers — they don't
+    # belong in a K-risk cluster regardless of how high their power is.
+    cp_rescue_mask = (
+        (all_out["Archetype"] == "Power/K-Risk") &
+        (all_out["AB_BB"] > 0.50) &    # genuinely good walk rate
+        (all_out["AB_K"]  < 0.40)      # K% near or below average — not K-risk
+    )
+    n_cp = cp_rescue_mask.sum()
+    all_out.loc[cp_rescue_mask, "Archetype"] = "Contact/Power"
+    print(f"  Contact/Power rescue: {n_cp:,} Power/K-Risk players moved "
+          f"(high BB, non-elevated K)")
+
+    print()
+
     out_cols = ["PlayerId", "Archetype", "Cluster_ID", "Cluster_PA",
                 "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
-                "AB_Disc", "AB_SB", "AB_Power", "Fantasy_Out"]
+                "AB_BB", "AB_K", "AB_SB", "AB_Power", "Fantasy_Out"]
     all_out[out_cols].to_csv(OUT_PATH, index=False)
     print(f"\nWrote {len(all_out):,} rows -> {OUT_PATH}")
     print(f"\nArchetype distribution:")
