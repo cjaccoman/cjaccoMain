@@ -102,8 +102,8 @@ TOOLS_PA_THRESH   = PA_THRESH_BY_LEVEL   # kept for backward-compat reference
 ABILITY_PA_THRESH = PA_THRESH_BY_LEVEL
 ARCHETYPE_PATH     = DATA_DIR / "rankings" / "archetype_labels.csv"
 
-W_TOOLS   = 0.40
-W_ABILITY = 0.60
+W_TOOLS   = 0.50
+W_ABILITY = 0.50
 
 
 # ---------------------------------------------------------------------------
