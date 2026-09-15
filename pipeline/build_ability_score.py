@@ -50,7 +50,7 @@ MIN_PA      = 50    # minimum PA to count toward group z-score params
 MIN_ROWS    = 10    # minimum rows in Season+Level cell before falling back to Level-only
 
 # Component weights
-W = dict(fantasy=0.45, discipline=0.25, sb=0.15, power=0.15)
+W = dict(fantasy=0.47, discipline=0.30, sb=0.08, power=0.15)
 
 # Piecewise age multiplier (empirically derived from career PPPA_Z regression, N=4,655):
 #   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
