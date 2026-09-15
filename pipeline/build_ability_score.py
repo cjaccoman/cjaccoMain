@@ -7,7 +7,7 @@ Component weights:
   Fantasy Output  45%  -- PPPA_Z_SL with level discount
   Discipline      25%  -- BB% − 2×K% (BB_2K), z-scored within Season+Level
   SB Talent       15%  -- SB_pct × (SB/PA), z-scored within Season+Level
-  Game Power      15%  -- 0.5 × PullAir% + 0.5 × HR_AB, z-scored within Season+Level
+  Game Power      15%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level
 
 Age adjustment (AGE_ALPHA = 0.11):
   Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
@@ -23,7 +23,7 @@ Z-scoring approach (peer-relative, era-robust by construction):
   PPPA_Z_SL  -- already z-scored within Season+League; apply level discount only.
   BB_2K      -- z-scored within Season+Level; Season+Level peers control for era drift.
   SB_talent  -- SB_pct × (SB/PA), z-scored within Season+Level.
-  Game Power -- 0.5×PullAir% + 0.5×HR_AB, z-scored within Season+Level.
+  Game Power -- 0.5×HR/FB + 0.5×HR_AB, z-scored within Season+Level.
 
 Sparse Season+Level cells (< MIN_ROWS qualifying rows) fall back to Level-only
 z-scoring. Rows contributing to group params must have PA >= MIN_PA.
@@ -153,20 +153,24 @@ def build_sb_talent(df: pd.DataFrame) -> pd.Series:
 
 
 def build_game_power(df: pd.DataFrame) -> pd.Series:
-    """0.5 × PullAir% + 0.5 × HR_AB, z-scored within Season+Level.
+    """0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level.
 
-    Uses whichever components are available (blend, PullAir%-only, or HR_AB-only).
+    PullAir% was replaced: partial r with Career_PPPA_Z = 0.054 vs 0.277 for
+    HR/FB or HR_AB (controlling K%+BB2K). Both HR metrics have equal predictive
+    power and 100% coverage; blending them averages out single-season noise.
+
+    Uses whichever components are available (blend, hrfb-only, or HR_AB-only).
     """
-    pull  = df["PullAir%"]
+    hrfb  = df["HR/FB"]
     hr_ab = df["HR_AB"]
 
-    both      = pull.notna() & hr_ab.notna()
-    pull_only = pull.notna() & hr_ab.isna()
-    hrab_only = pull.isna() & hr_ab.notna()
+    both      = hrfb.notna() & hr_ab.notna()
+    hrfb_only = hrfb.notna() & hr_ab.isna()
+    hrab_only = hrfb.isna() & hr_ab.notna()
 
     raw = pd.Series(np.nan, index=df.index, dtype=float)
-    raw[both]      = 0.5 * pull[both] + 0.5 * hr_ab[both]
-    raw[pull_only] = pull[pull_only]
+    raw[both]      = 0.5 * hrfb[both] + 0.5 * hr_ab[both]
+    raw[hrfb_only] = hrfb[hrfb_only]
     raw[hrab_only] = hr_ab[hrab_only]
 
     tmp = df.copy()
@@ -267,7 +271,7 @@ def main() -> None:
     out["BB_2K"]  = df["BB_2K"]
     out["SB"]     = df["SB"]
     out["SB_pct"] = df["SB_pct"]
-    out["PullAir%"] = df["PullAir%"]
+    out["HR/FB"]  = df["HR/FB"]
     out["HR_AB"]  = df["HR_AB"]
 
     # Discipline floor flags — which threshold(s) fired for this row.

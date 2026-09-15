@@ -153,7 +153,7 @@ Measures what a player *has done* — demonstrated production, adjusted for era 
 | Fantasy Output | PPPA_Z_SL × level_discount | Level discounts: AAA=1.00, AA=0.59, A+=0.34, A=0.23, R=0.10 |
 | Discipline | BB% − 2×K% (BB_2K) | z-scored within Season+Level |
 | SB Talent | SB_pct × (SB/PA) | z-scored within Season+Level |
-| Game Power | 0.5×PullAir% + 0.5×HR_AB | z-scored within Season+Level; HR_AB = HR / AB |
+| Game Power | 0.5×HR/FB + 0.5×HR_AB | z-scored within Season+Level; HR_AB = HR / AB |
 
 **Level discount methodology:** Derived from `analysis/skill_pppa_translation.py` using a full-population approach: all non-prospect MiLB players (PA ≥ 50 per level), with non-graduates assigned MLB_Skill = 0. Metric: Skill_PPPA = −2×K% + 4×HR/PA + 3×SB/PA − 1.5×CS/PA (the three components with highest PPPA formula weights and strongest MiLB→MLB signal). Ratios normalized to AAA=1.0. Values reflect both translation quality AND probability of reaching MLB (graduation rates: AAA≈51%, AA≈33%, A+≈20%, A≈14%, R≈6%). Prior SB-only chain (AA=0.84, A+=0.71, A=0.57, R=0.39) superseded — it answered the wrong question and used a selection-biased sample.
 
@@ -299,7 +299,7 @@ These era breaks are encoded in `pipeline/add_era_columns.py` and used for era-r
 
 **A-ball (2021–2026) shows 30–76% zone coverage — park-specific Trackman only, not level-wide. Not used.**
 
-**Usage in model:** PullAir% feeds into ABILITY Game Power (all rows); Chase% and Z-Contact% feed into TOOLS Discipline full tier (AAA 2023–2026 via game feeds; all levels 2026 via ProspectSavant). Rows without Chase%/Z-Contact% use the fallback tier (Whiff%+BB%).
+**Usage in model:** PullAir% was removed from ABILITY Game Power (partial r = 0.054 vs 0.277 for HR/FB; see `data/historical/power_analysis_output.txt`). It is retained as a feature in `prospect_features.csv` for potential future use. Chase% and Z-Contact% feed into TOOLS Discipline full tier (AAA 2023–2026 via game feeds; all levels 2026 via ProspectSavant). Rows without Chase%/Z-Contact% use the fallback tier (Whiff%+BB%).
 
 **Incremental update:**
 ```
@@ -583,8 +583,8 @@ Currently has `LAST_SEASON = 2025`. Update to 2026 when Baseball Savant MiLB end
 
 **TOOLS_Score** captures what a player *can do*: plate discipline (Chase%+Z-Contact%+Whiff% full tier where available — AAA 2023–2026 and all levels 2026; Whiff%+BB% fallback elsewhere), raw power (MaxEV/EV90 where available; HR/FB fallback), and athleticism (Sprint Speed + 3B/PA). All metrics are era-adjusted within Level×era cells and age-boosted by 0.20×−Age_Z_SL per component. Weight: Discipline 45% / Power 35% / Athleticism 20%.
 
-**ABILITY_Score** captures what a player *has done*: fantasy output (PPPA_Z_SL with level discounts), contact/discipline (BB%−2×K%), stolen base talent (SB_success × SB_rate), and game power (PullAir% + HR/AB). Same age-boost applied to all components. Weight: Output 45% / Discipline 25% / Speed 15% / Power 15%.
+**ABILITY_Score** captures what a player *has done*: fantasy output (PPPA_Z_SL with level discounts), contact/discipline (BB%−2×K%), stolen base talent (SB_success × SB_rate), and game power (HR/FB + HR/AB). Same age-boost applied to all components. Weight: Output 45% / Discipline 25% / Speed 15% / Power 15%.
 
 **Final ranking:** `Combined_Score = 0.50×Current_Score + 0.50×OVR_Score`, then a post-blend discipline gate (−1.5 to −4.0 pts) fires for prospects in the bottom 16–25% of career BB_2K, with a PA-weighted OLS slope modifier that softens the penalty for improving trajectories and hardens it for worsening ones. Current_Score weights today's pool (season ≥ 2025) with ABILITY outweighing TOOLS (50/30/20 ABILITY/TOOLS/Age) — reflecting that demonstrated PPPA-relevant production is more predictive than physical proxies, consistent with the MiLB→MLB ablation (R²≈0.13). OVR_Score weights historical all-time performance equally between TOOLS, ABILITY, and PPPA trajectory slope (40/40/20). The 50/50 blend ensures that a player's career arc (OVR) is as important as their current standing — rewarding players who have been consistently excellent and penalizing players who looked good recently but have a weaker historical profile.
 
-**What the model prioritizes, in order:** (1) Strikeout avoidance — K% is the single largest negative lever and appears in both TOOLS (Discipline) and ABILITY (BB_2K). (2) Stolen base talent — SB=+3 per stolen base with no wRC+ analog; both SB_talent (ABILITY) and Sprint Speed (TOOLS) capture it. (3) Real power production — HR/AB and PullAir% (ABILITY Game Power) + MaxEV/HR/FB (TOOLS Raw Power). (4) Age relative to peers — baked into every component via the per-component age multiplier, plus a standalone Age_Score at 20% in Current_Score.
+**What the model prioritizes, in order:** (1) Strikeout avoidance — K% is the single largest negative lever and appears in both TOOLS (Discipline) and ABILITY (BB_2K). (2) Stolen base talent — SB=+3 per stolen base with no wRC+ analog; both SB_talent (ABILITY) and Sprint Speed (TOOLS) capture it. (3) Real power production — HR/FB and HR/AB (ABILITY Game Power) + MaxEV/HR/FB (TOOLS Raw Power). (4) Age relative to peers — baked into every component via the per-component age multiplier, plus a standalone Age_Score at 20% in Current_Score.
