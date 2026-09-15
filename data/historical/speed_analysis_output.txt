@@ -345,3 +345,149 @@ Test 3: Elite vs moderate -- SB_pct comparison:
   Elite (N=68): SB_pct=0.805, trans=0.672
   Mod   (N=664): SB_pct=0.710, trans=0.563
   Mod w/ SB_pct>=0.805 (N=93): trans=0.489
+
+=== Part 7c ===
+======================================================================
+PART 7c: PPPA_Z_career vs HR/FB -- INDEPENDENT OR CONFOUNDED?
+======================================================================
+
+Working sample: 1444 players
+
+--- TEST 1: Partial effects controlling for both moderators ---
+
+  A) MiLB_spd x PPPA_Z_career alone (N=1444, R2=0.510):
+    const                               coef=+0.0005  p=0.8178
+    spd                                 coef=+0.6212  p=0.0000
+    pppa_z_c                            coef=+0.0083  p=0.0659
+    spd_x_pppa                          coef=-0.1227  p=0.0001
+
+  B) MiLB_spd x HR/FB alone (N=1444, R2=0.506):
+    const                               coef=+0.0032  p=0.1023
+    spd                                 coef=+0.5774  p=0.0000
+    hrfb_c                              coef=+0.0337  p=0.3361
+    spd_x_hrfb                          coef=-0.5944  p=0.0275
+
+  C) Both interactions together (N=1444, R2=0.511):
+    const                               coef=+0.0011  p=0.5998
+    spd                                 coef=+0.6095  p=0.0000
+    pppa_z_c                            coef=+0.0087  p=0.0593
+    hrfb_c                              coef=+0.0388  p=0.2755
+    spd_x_pppa                          coef=-0.1195  p=0.0002
+    spd_x_hrfb                          coef=-0.5485  p=0.0411
+
+  Interpretation: compare PPPA_Z_career interaction coef in A vs C.
+  If coef attenuates (shrinks / loses sig) in C, HR/FB explains the PPPA_Z signal.
+  If coef persists in C, PPPA_Z_career captures independent signal.
+
+--- TEST 2: PPPA_Z_career moderation within HR/FB terciles ---
+
+  Tercile            N  Mean_HRFB  PPPA_Z_coef  p-value
+  * Low-HR/FB       482      0.045     -0.1925   0.0009
+  * Mid-HR/FB       481      0.093     -0.1412   0.0042
+    High-HR/FB      481      0.158     +0.0580   0.3526
+
+  Goal: does PPPA_Z moderation persist in Low-HR/FB tercile?
+  If yes -> independent signal (pure speed/contact players still over-represent MiLB speed).
+  If only in High-HR/FB -> fully explained by power-speed profile.
+
+--- TEST 3: 2x2 descriptive table (PPPA_Z_career median x HR/FB median) ---
+
+  PPPA_Z median=0.620, HR/FB median=0.092
+
+  Quadrant                           N  MiLB_spd/PA   MLB_spd/PA   Trans  MLB_PPPA_Z
+  High-PPPA/High-HR/FB             442       0.0875       0.0494   0.564       0.162
+  High-PPPA/Low-HR/FB              295       0.1360       0.0858   0.631       0.264
+  Low-PPPA/High-HR/FB              280       0.0717       0.0444   0.620      -0.299
+  Low-PPPA/Low-HR/FB               427       0.0903       0.0535   0.592      -0.150
+
+  The 'poor translation' signature: is it High-PPPA/High-HR/FB specifically,
+  or does High-PPPA/Low-HR/FB also show decay?
+
+--- TEST 4: Correlation PPPA_Z_career x HR/FB ---
+
+  Pearson r(PPPA_Z_career, HR/FB) = 0.228  p=0.0000  N=1444
+  R2 = 0.052
+
+  High r -> collinear player types; confound hypothesis plausible.
+  Low r  -> PPPA_Z and HR/FB measure different things; both signals independent.
+=== Part 8 ===
+======================================================================
+PART 8: EMPIRICAL COMPONENT RE-WEIGHTING (career MLB PPPA target)
+======================================================================
+
+--- STEP 1: Career MLB PPPA outcome ---
+
+  N graduated (career PA >= 200): 2879
+  Mean career PPPA: 0.6684  Std: 0.2938
+
+--- STEP 2: MiLB component scores (level-discounted PA weights) ---
+
+  j8 assembled: 2879 rows (career MLB PA >= 200)
+    Fantasy_Out           : N=1360 non-null
+    Discipline            : N=1452 non-null
+    SB_talent             : N=1360 non-null
+    Game_Power            : N=1360 non-null
+    Discipline_tools      : N=1452 non-null
+    Power_tools           : N=1360 non-null
+    Athleticism_tools     : N=1360 non-null
+
+--- STEP 3: ABILITY components -> career PPPA_Z ---
+
+  Current model weights: Fantasy_Out=45%, Discipline=25%, SB_talent=15%, Game_Power=15%
+
+  ABILITY -> career PPPA_Z (WLS) (N=1360, R2=0.315):
+    Component                  Coef    p-val    |Coef|    Emp_Wt   Model_Wt  Direction
+    Fantasy_Out              0.2381   0.0000    0.2381    51.1%     45.0%  ~RIGHT
+    Discipline               0.1524   0.0000    0.1524    32.7%     25.0%  UNDER
+    SB_talent                0.0348   0.0463    0.0348     7.5%     15.0%  OVER
+    Game_Power               0.0408   0.0813    0.0408     8.8%     15.0%  OVER
+
+  Note: z-scored outcome gives normalized coefficients directly comparable to implied weights.
+
+--- STEP 4: Speed channel analysis ---
+
+  Bivariate N: 1360
+
+  Bivariate SB_talent_z -> career_pppa_z:
+    r=0.106  R2=0.011  p=0.0001
+    WLS coef=0.0685  p=0.0000
+
+  SB_talent + HR/FB interaction:
+    N=1360  R2=0.023
+    SB_talent_z coef=0.0860  p=0.0000
+    hrfb_z      coef=0.0641  p=0.0001
+    spd_x_hrfb  coef=0.0068  p=0.6654
+    Delta R2 from adding interaction: 0.0108
+
+--- STEP 5: TOOLS component proxies -> career PPPA_Z ---
+
+  Current model weights: Discipline=45%, Power=35%, Athleticism=20%
+
+  TOOLS proxies -> career PPPA_Z (WLS) (N=1360, R2=0.268):
+    Component                  Coef    p-val    |Coef|    Emp_Wt   Model_Wt  Direction
+    Discipline(-K%)          0.3878   0.0000    0.3878    48.0%     45.0%  ~RIGHT
+    Power(HR/FB)             0.2923   0.0000    0.2923    36.2%     35.0%  ~RIGHT
+    Athleticism(SB_tal)      0.1277   0.0000    0.1277    15.8%     20.0%  OVER
+
+======================================================================
+WEIGHTING VERDICT
+======================================================================
+
+ABILITY components (vs current 45/25/15/15):
+  Empirical results assess each component's contribution to career PPPA_Z.
+  Fantasy_Out (45%): Should anchor — it is PPPA itself level-discounted,
+    so its coefficient partly reflects circularity (MiLB PPPA predicts MLB PPPA).
+    Monitor sign and significance; should be the dominant term.
+  Discipline (25%): BB%-2*K% is the strongest non-circular signal in ablation
+    studies (R2~0.13 for first-year MLB). Empirical weight vs. 25% guides adjustment.
+  SB_talent (15%): Part 7-7c showed speed translation r~0.67 but moderated
+    downward by HR/FB and PPPA_Z. Career weight may differ from first-year weight.
+  Game_Power (15%): HR/AB is a reliable per-AB metric; ABILITY weight vs. empirical
+    guides whether power is over/under-weighted relative to speed and discipline.
+
+TOOLS proxies note:
+  -K% is only a proxy for Chase%+ZContact%+Whiff% full tier.
+  HR/FB is a noisier power signal than MaxEV+EV90 (full tier).
+  Athleticism_tools = SB_talent (same variable) — not independent.
+  These regressions diagnose the direction of bias (tools proxy < true tools signal)
+  rather than exact weights, since proxies attenuate coefficients vs. true measures.

@@ -968,10 +968,327 @@ out("\n=== Part 7b ===")
 out(p7b)
 
 # -
+# PART 7c: Is PPPA_Z_career moderation independent of HR/FB moderation?
+# -
+
+p7c_lines = []
+def c(msg=""):
+    p7c_lines.append(msg)
+
+c("=" * 70)
+c("PART 7c: PPPA_Z_career vs HR/FB -- INDEPENDENT OR CONFOUNDED?")
+c("=" * 70)
+
+# Working dataset: j7b + PPPA_Z_career from comps_z
+j7c = j7b.merge(comps_z, on="MLBAM_ID", how="left")
+j7c = j7c.dropna(subset=["speed_pts_pa_milb","speed_pts_pa_mlb","PPPA_Z_career","HRFB","PA"]).copy()
+c(f"\nWorking sample: {len(j7c)} players")
+
+# Center both moderators
+j7c["pppa_z_c"] = j7c["PPPA_Z_career"] - j7c["PPPA_Z_career"].mean()
+j7c["hrfb_c"]   = j7c["HRFB"]          - j7c["HRFB"].mean()
+j7c["spd"]      = j7c["speed_pts_pa_milb"]
+j7c["mlb_spd"]  = j7c["speed_pts_pa_mlb"]
+j7c["wt"]       = j7c["PA"].astype(float)
+
+def run_wls(y, X_cols, df, label):
+    X = sm.add_constant(df[X_cols].values)
+    res = sm.WLS(df[y].values, X, weights=df["wt"].values).fit()
+    c(f"\n  {label} (N={len(df)}, R2={res.rsquared:.3f}):")
+    for i, col in enumerate(["const"] + X_cols):
+        c(f"    {col:<35} coef={res.params[i]:+.4f}  p={res.pvalues[i]:.4f}")
+    return res
+
+# --- Test 1 ---
+c("\n--- TEST 1: Partial effects controlling for both moderators ---")
+
+j7c["spd_x_pppa"] = j7c["spd"] * j7c["pppa_z_c"]
+j7c["spd_x_hrfb"] = j7c["spd"] * j7c["hrfb_c"]
+
+run_wls("mlb_spd", ["spd","pppa_z_c","spd_x_pppa"], j7c,
+        "A) MiLB_spd x PPPA_Z_career alone")
+run_wls("mlb_spd", ["spd","hrfb_c","spd_x_hrfb"],   j7c,
+        "B) MiLB_spd x HR/FB alone")
+run_wls("mlb_spd", ["spd","pppa_z_c","hrfb_c","spd_x_pppa","spd_x_hrfb"], j7c,
+        "C) Both interactions together")
+
+c("\n  Interpretation: compare PPPA_Z_career interaction coef in A vs C.")
+c("  If coef attenuates (shrinks / loses sig) in C, HR/FB explains the PPPA_Z signal.")
+c("  If coef persists in C, PPPA_Z_career captures independent signal.")
+
+# --- Test 2 ---
+c("\n--- TEST 2: PPPA_Z_career moderation within HR/FB terciles ---")
+j7c["hrfb_t"] = pd.qcut(j7c["HRFB"], q=3, labels=["Low-HR/FB","Mid-HR/FB","High-HR/FB"])
+c(f"\n  {'Tercile':<14} {'N':>5} {'Mean_HRFB':>10}  PPPA_Z_coef  p-value")
+for grp, sub in j7c.groupby("hrfb_t", observed=True):
+    sub = sub.copy()
+    sub["pppa_z_c2"] = sub["PPPA_Z_career"] - sub["PPPA_Z_career"].mean()
+    sub["spd_x_p2"]  = sub["spd"] * sub["pppa_z_c2"]
+    n = len(sub)
+    if n < 20:
+        c(f"  {str(grp):<14} {n:>5}  (too small)")
+        continue
+    X = sm.add_constant(sub[["spd","pppa_z_c2","spd_x_p2"]].values)
+    res = sm.WLS(sub["mlb_spd"].values, X, weights=sub["wt"].values).fit()
+    coef = res.params[3]
+    pval = res.pvalues[3]
+    sig  = "*" if pval < 0.05 else " "
+    c(f"  {sig} {str(grp):<13} {n:>5} {sub['HRFB'].mean():>10.3f}  {coef:>+10.4f}   {pval:.4f}")
+
+c("\n  Goal: does PPPA_Z moderation persist in Low-HR/FB tercile?")
+c("  If yes -> independent signal (pure speed/contact players still over-represent MiLB speed).")
+c("  If only in High-HR/FB -> fully explained by power-speed profile.")
+
+# --- Test 3 ---
+c("\n--- TEST 3: 2x2 descriptive table (PPPA_Z_career median x HR/FB median) ---")
+pppa_med = j7c["PPPA_Z_career"].median()
+hrfb_med = j7c["HRFB"].median()
+j7c["pppa_hi"] = (j7c["PPPA_Z_career"] >= pppa_med).map({True:"High-PPPA",False:"Low-PPPA"})
+j7c["hrfb_hi"] = (j7c["HRFB"]          >= hrfb_med).map({True:"High-HR/FB",False:"Low-HR/FB"})
+
+c(f"\n  PPPA_Z median={pppa_med:.3f}, HR/FB median={hrfb_med:.3f}")
+c(f"\n  {'Quadrant':<30} {'N':>5} {'MiLB_spd/PA':>12} {'MLB_spd/PA':>12} {'Trans':>7} {'MLB_PPPA_Z':>11}")
+for (pppa_g, hrfb_g), sub in j7c.groupby(["pppa_hi","hrfb_hi"], observed=True):
+    n    = len(sub)
+    ms   = sub["spd"].mean()
+    mls  = sub["mlb_spd"].mean()
+    tr   = mls / ms if ms > 0 else np.nan
+    label = f"{pppa_g}/{hrfb_g}"
+    c(f"  {label:<30} {n:>5} {ms:>12.4f} {mls:>12.4f} {tr:>7.3f} {sub['PPPA_Z'].mean():>11.3f}")
+
+c("\n  The 'poor translation' signature: is it High-PPPA/High-HR/FB specifically,")
+c("  or does High-PPPA/Low-HR/FB also show decay?")
+
+# --- Test 4 ---
+c("\n--- TEST 4: Correlation PPPA_Z_career x HR/FB ---")
+r4, p4 = stats.pearsonr(j7c["PPPA_Z_career"], j7c["HRFB"])
+c(f"\n  Pearson r(PPPA_Z_career, HR/FB) = {r4:.3f}  p={p4:.4f}  N={len(j7c)}")
+c(f"  R2 = {r4**2:.3f}")
+c("\n  High r -> collinear player types; confound hypothesis plausible.")
+c("  Low r  -> PPPA_Z and HR/FB measure different things; both signals independent.")
+
+p7c = "\n".join(p7c_lines)
+out("\n=== Part 7c ===")
+out(p7c)
+
+# -
+# PART 8: Empirical component re-weighting — career MLB PPPA as target
+# -
+
+p8_lines = []
+def c8(msg=""):
+    p8_lines.append(msg)
+
+c8("=" * 70)
+c8("PART 8: EMPIRICAL COMPONENT RE-WEIGHTING (career MLB PPPA target)")
+c8("=" * 70)
+
+LEVEL_DISC = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
+
+# --- Step 1: Career MLB PPPA outcome ---
+c8("\n--- STEP 1: Career MLB PPPA outcome ---")
+career_mlb8 = mlb.groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "career_pppa": np.average(g["PPPA"], weights=g["PA"]),
+    "career_pa":   g["PA"].sum(),
+})).reset_index()
+career_mlb8 = career_mlb8[career_mlb8["career_pa"] >= 200].copy()
+mean_c, std_c = career_mlb8["career_pppa"].mean(), career_mlb8["career_pppa"].std()
+career_mlb8["career_pppa_z"] = (career_mlb8["career_pppa"] - mean_c) / std_c
+c8(f"\n  N graduated (career PA >= 200): {len(career_mlb8)}")
+c8(f"  Mean career PPPA: {mean_c:.4f}  Std: {std_c:.4f}")
+
+# --- Step 2: MiLB component scores (level-discount-weighted) ---
+c8("\n--- STEP 2: MiLB component scores (level-discounted PA weights) ---")
+
+# Load minorLeagueData for PPPA_Z_SL; join MLBAM_ID via milb_hitting PlayerId crosswalk
+mld = pd.read_csv(DATA / "computed" / "minorLeagueData.csv")
+milb_id_map = (milb[["PlayerId","MLBAM_ID"]]
+               .dropna(subset=["PlayerId","MLBAM_ID"])
+               .drop_duplicates("PlayerId"))
+mld = mld.merge(milb_id_map, on="PlayerId", how="left")
+mld["disc"] = mld["Level"].map(LEVEL_DISC).fillna(0.0)
+mld["eff_PA"] = mld["PA"] * mld["disc"]
+
+# Fantasy_Out: sum(PPPA_Z_SL * disc * PA) / sum(eff_PA)
+fo_grp = mld[mld["PA"] >= 50].dropna(subset=["MLBAM_ID"]).groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "Fantasy_Out": (
+        (g["PPPA_Z_SL"] * g["disc"] * g["PA"]).sum() / g["eff_PA"].sum()
+        if g["eff_PA"].sum() > 0 else np.nan
+    ),
+    "milb_pa_total": g["PA"].sum(),
+})).reset_index()
+
+# From milb_hitting: SB_talent, Game_Power
+milb8 = milb[milb["PA"] >= 50].copy()
+milb8["disc"] = milb8["Level"].map(LEVEL_DISC).fillna(0.0)
+milb8["eff_PA"] = milb8["PA"] * milb8["disc"]
+milb8["SB_att"] = milb8["SB"].fillna(0) + milb8["CS"].fillna(0)
+milb8["SB_pct_row"] = milb8["SB"].fillna(0) / (milb8["SB_att"] + 1e-9)
+milb8.loc[milb8["SB_att"] == 0, "SB_pct_row"] = np.nan
+milb8["SB_PA_row"] = milb8["SB"].fillna(0) / milb8["PA"].clip(lower=1)
+milb8["SB_talent_row"] = milb8["SB_pct_row"].fillna(0) * milb8["SB_PA_row"]
+# HR_AB = HR / (PA - BB - IBB)
+milb8["denom_ab"] = (milb8["PA"] - milb8["BB"].fillna(0) - milb8["IBB"].fillna(0)).clip(lower=1)
+milb8["HR_AB_row"] = milb8["HR"] / milb8["denom_ab"]
+
+def eff_wavg(g, val_col):
+    mask = g[val_col].notna() & (g["eff_PA"] > 0)
+    if mask.sum() == 0:
+        return np.nan
+    return np.average(g.loc[mask, val_col], weights=g.loc[mask, "eff_PA"])
+
+cnt_grp = milb8.groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "SB_talent":  eff_wavg(g, "SB_talent_row"),
+    "Game_Power": eff_wavg(g, "HR_AB_row"),
+})).reset_index()
+
+# From milb_advanced: Discipline (BB%-2*K%), Discipline_tools (-K%), Power_tools (HR/FB)
+adv8 = adv[adv["PA"] >= 50].copy()
+adv8["disc"] = adv8["Level"].map(LEVEL_DISC).fillna(0.0)
+adv8["eff_PA"] = adv8["PA"] * adv8["disc"]
+adv8["BB_2K_row"] = adv8["BB%"] - 2 * adv8["K%"]
+adv8["negK_row"] = -adv8["K%"]
+adv8["HRFB_row"] = adv8["HR/FB"].where(adv8["HR/FB"] <= 1.0)
+
+rate_grp = adv8.groupby("MLBAM_ID").apply(lambda g: pd.Series({
+    "Discipline":       eff_wavg(g, "BB_2K_row"),
+    "Discipline_tools": eff_wavg(g, "negK_row"),
+    "Power_tools":      eff_wavg(g, "HRFB_row"),
+})).reset_index()
+
+# Assemble j8
+j8 = (career_mlb8
+      .merge(fo_grp[["MLBAM_ID","Fantasy_Out"]], on="MLBAM_ID", how="left")
+      .merge(cnt_grp,  on="MLBAM_ID", how="left")
+      .merge(rate_grp, on="MLBAM_ID", how="left")
+)
+# Athleticism_tools = same as SB_talent proxy
+j8["Athleticism_tools"] = j8["SB_talent"]
+
+# Standardize all components to mean=0, std=1
+comp_cols = ["Fantasy_Out","Discipline","SB_talent","Game_Power",
+             "Discipline_tools","Power_tools","Athleticism_tools"]
+for col in comp_cols:
+    mu, sd = j8[col].mean(), j8[col].std()
+    j8[f"{col}_z"] = (j8[col] - mu) / sd if sd > 0 else 0.0
+
+c8(f"\n  j8 assembled: {len(j8)} rows (career MLB PA >= 200)")
+for col in comp_cols:
+    n_valid = j8[col].notna().sum()
+    c8(f"    {col:<22}: N={n_valid} non-null")
+
+# --- Step 3: ABILITY WLS ---
+c8("\n--- STEP 3: ABILITY components -> career PPPA_Z ---")
+c8("\n  Current model weights: Fantasy_Out=45%, Discipline=25%, SB_talent=15%, Game_Power=15%")
+
+ABILITY_COLS = ["Fantasy_Out_z","Discipline_z","SB_talent_z","Game_Power_z"]
+ABILITY_LABELS = ["Fantasy_Out","Discipline","SB_talent","Game_Power"]
+ABILITY_MODEL_WT = [0.45, 0.25, 0.15, 0.15]
+
+def run_wls8(y_col, X_cols, labels, model_wts, df, wt_col, section_label):
+    mask = df[y_col].notna() & df[wt_col].notna() & (df[wt_col] > 0)
+    for col in X_cols:
+        mask = mask & df[col].notna()
+    sub = df[mask].copy()
+    n = len(sub)
+    if n < 20:
+        c8(f"  {section_label}: N={n} (too small)")
+        return None
+    X = sm.add_constant(sub[X_cols].values)
+    y = sub[y_col].values
+    w = sub[wt_col].values
+    res = sm.WLS(y, X, weights=w).fit()
+    c8(f"\n  {section_label} (N={n}, R2={res.rsquared:.3f}):")
+    c8(f"    {'Component':<22} {'Coef':>8}  {'p-val':>7}  {'|Coef|':>8}  {'Emp_Wt':>8}  {'Model_Wt':>9}  Direction")
+    abs_coefs = np.abs(res.params[1:])
+    total_abs = abs_coefs.sum()
+    for i, (lbl, mwt) in enumerate(zip(labels, model_wts)):
+        coef = res.params[i+1]
+        pv   = res.pvalues[i+1]
+        emp  = abs_coefs[i] / total_abs if total_abs > 0 else 0
+        direction = ("OVER" if emp < mwt * 0.8 else
+                     "UNDER" if emp > mwt * 1.2 else "~RIGHT")
+        c8(f"    {lbl:<22} {coef:>8.4f}  {pv:>7.4f}  {abs_coefs[i]:>8.4f}  "
+           f"{emp:>7.1%}  {mwt:>8.1%}  {direction}")
+    return res
+
+res_ability = run_wls8("career_pppa_z", ABILITY_COLS, ABILITY_LABELS,
+                       ABILITY_MODEL_WT, j8, "career_pa", "ABILITY -> career PPPA_Z (WLS)")
+
+# Also run with raw career_pppa (standardized betas are the same as z-scored outcome, so just report)
+c8("\n  Note: z-scored outcome gives normalized coefficients directly comparable to implied weights.")
+
+# --- Step 4: Speed component ---
+c8("\n--- STEP 4: Speed channel analysis ---")
+j8s = j8.dropna(subset=["career_pppa_z","SB_talent_z","Power_tools_z","career_pa"]).copy()
+c8(f"\n  Bivariate N: {len(j8s)}")
+
+r_spd, p_spd = stats.pearsonr(j8s["SB_talent_z"], j8s["career_pppa_z"])
+c8(f"\n  Bivariate SB_talent_z -> career_pppa_z:")
+c8(f"    r={r_spd:.3f}  R2={r_spd**2:.3f}  p={p_spd:.4f}")
+
+X_spd = sm.add_constant(j8s[["SB_talent_z"]].values)
+res_spd = sm.WLS(j8s["career_pppa_z"].values, X_spd, weights=j8s["career_pa"].values).fit()
+c8(f"    WLS coef={res_spd.params[1]:.4f}  p={res_spd.pvalues[1]:.4f}")
+
+# SB_talent + HR/FB interaction
+j8s["hrfb_z"] = (j8s["Power_tools"] - j8s["Power_tools"].mean()) / j8s["Power_tools"].std()
+j8s["spd_x_hrfb"] = j8s["SB_talent_z"] * j8s["hrfb_z"]
+X_int = sm.add_constant(j8s[["SB_talent_z","hrfb_z","spd_x_hrfb"]].values)
+res_int = sm.WLS(j8s["career_pppa_z"].values, X_int, weights=j8s["career_pa"].values).fit()
+c8(f"\n  SB_talent + HR/FB interaction:")
+c8(f"    N={len(j8s)}  R2={res_int.rsquared:.3f}")
+c8(f"    SB_talent_z coef={res_int.params[1]:.4f}  p={res_int.pvalues[1]:.4f}")
+c8(f"    hrfb_z      coef={res_int.params[2]:.4f}  p={res_int.pvalues[2]:.4f}")
+c8(f"    spd_x_hrfb  coef={res_int.params[3]:.4f}  p={res_int.pvalues[3]:.4f}")
+delta_r2 = res_int.rsquared - res_spd.rsquared
+c8(f"    Delta R2 from adding interaction: {delta_r2:.4f}")
+
+# --- Step 5: TOOLS WLS ---
+c8("\n--- STEP 5: TOOLS component proxies -> career PPPA_Z ---")
+c8("\n  Current model weights: Discipline=45%, Power=35%, Athleticism=20%")
+
+TOOLS_COLS   = ["Discipline_tools_z","Power_tools_z","Athleticism_tools_z"]
+TOOLS_LABELS = ["Discipline(-K%)","Power(HR/FB)","Athleticism(SB_tal)"]
+TOOLS_MODEL_WT = [0.45, 0.35, 0.20]
+
+run_wls8("career_pppa_z", TOOLS_COLS, TOOLS_LABELS,
+         TOOLS_MODEL_WT, j8, "career_pa", "TOOLS proxies -> career PPPA_Z (WLS)")
+
+# --- Weighting verdict ---
+c8("\n" + "=" * 70)
+c8("WEIGHTING VERDICT")
+c8("=" * 70)
+c8("""
+ABILITY components (vs current 45/25/15/15):
+  Empirical results assess each component's contribution to career PPPA_Z.
+  Fantasy_Out (45%): Should anchor — it is PPPA itself level-discounted,
+    so its coefficient partly reflects circularity (MiLB PPPA predicts MLB PPPA).
+    Monitor sign and significance; should be the dominant term.
+  Discipline (25%): BB%-2*K% is the strongest non-circular signal in ablation
+    studies (R2~0.13 for first-year MLB). Empirical weight vs. 25% guides adjustment.
+  SB_talent (15%): Part 7-7c showed speed translation r~0.67 but moderated
+    downward by HR/FB and PPPA_Z. Career weight may differ from first-year weight.
+  Game_Power (15%): HR/AB is a reliable per-AB metric; ABILITY weight vs. empirical
+    guides whether power is over/under-weighted relative to speed and discipline.
+
+TOOLS proxies note:
+  -K% is only a proxy for Chase%+ZContact%+Whiff% full tier.
+  HR/FB is a noisier power signal than MaxEV+EV90 (full tier).
+  Athleticism_tools = SB_talent (same variable) — not independent.
+  These regressions diagnose the direction of bias (tools proxy < true tools signal)
+  rather than exact weights, since proxies attenuate coefficients vs. true measures.
+""")
+
+p8 = "\n".join(p8_lines)
+out("\n=== Part 8 ===")
+out(p8)
+
+# -
 # Write output
 # -
 
 OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 existing = OUT_PATH.read_text(encoding="utf-8") if OUT_PATH.exists() else ""
-OUT_PATH.write_text(existing + "\n=== Part 7b ===\n" + p7b, encoding="utf-8")
+OUT_PATH.write_text(existing + "\n=== Part 8 ===\n" + p8, encoding="utf-8")
 print(f"\nOutput written to {OUT_PATH}")
