@@ -27,12 +27,12 @@ Methodology:
   A-ball level weight (0.23×) in the career average blend.
 
 Combined_Score = 0.50 × Current_Score + 0.50 × OVR_Score
-  Current_Score  = 0.40 × TOOLS_Score + 0.60 × ABILITY_Score
+  Current_Score  = 0.50 × TOOLS_Score + 0.50 × ABILITY_Score
     (both standardized to 50±10 within current pool)
-  Age enters via the piecewise multiplier inside ABILITY_Score only
-    (global linear 0.077/SD + youth kink 0.192/SD below −1.5 SD applied
-    per component per row before career averaging). No standalone Age_Score —
-    that would double-count the age signal already baked into ABILITY.
+  Age enters via per-row KNN graduation-probability multipliers inside ABILITY_Score
+    (age_mult_rows.csv, built by analysis/build_age_grad_model.py). Each row's
+    multiplier uses point-in-time features — A-ball rows use A-ball age context,
+    not the player's current level. No standalone Age_Score to avoid double-counting.
   OVR_Score = Combined_Score from prospect_scores_ovr.csv
     (0.40 × TOOLS + 0.40 × ABILITY + 0.20 × Slope_Score, standardized
     within the full historical pool; Slope_Score is the PA-weighted
@@ -61,7 +61,6 @@ OUT_PATH       = DATA_DIR / "rankings" / "prospect_scores.csv"
 HIT_PATH       = DATA_DIR / "api" / "milb_hitting.csv"
 POS_PATH       = DATA_DIR / "api" / "player_positions.csv"
 LUCK_PATH      = DATA_DIR / "computed" / "babip_luck.csv"
-AGE_MODEL_PATH = DATA_DIR / "computed" / "age_grad_model.csv"
 
 # Discipline gate — applied post-blend to Combined_Score.
 # Thresholds are percentile cutoffs applied to disc_composite_z (z-scored within pool).
@@ -309,17 +308,6 @@ def main() -> None:
     )
     pool["Career_Whiff_Z"] = pool["PlayerId"].map(career_whiff)
     pool["Career_Disc_Flag"] = ""   # populated below after gate computation
-
-    # Apply KNN graduation-probability multiplier to career ABILITY_Score before
-    # pool standardization. age_mult_pgvb is level-normalized (median=1.0 per level,
-    # R-ball=1.0 flat); applied to the deviation from 50 so a neutral-scoring
-    # player stays neutral regardless of multiplier.
-    if AGE_MODEL_PATH.exists():
-        am       = pd.read_csv(AGE_MODEL_PATH, dtype={"PlayerId": str})
-        knn_map  = am.set_index("PlayerId")["age_mult_pgvb"].to_dict()
-        knn_mult = pool["PlayerId"].astype(str).map(knn_map).fillna(1.0)
-        raw_ab   = pool["ABILITY_Score"].fillna(50)
-        pool["ABILITY_Score"] = (50 + (raw_ab - 50) * knn_mult).round(2)
 
     # Standardize TOOLS and ABILITY within current pool to 50±10
     pool["TOOLS_Score"]   = to_50_10(pool["TOOLS_Score"].fillna(50))

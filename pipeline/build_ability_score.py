@@ -42,11 +42,12 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.csv"
-OUT_PATH    = DATA_DIR / "rankings" / "ability_scores.csv"
-MIN_PA      = 50    # minimum PA to count toward group z-score params
-MIN_ROWS    = 10    # minimum rows in Season+Level cell before falling back to Level-only
+DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
+FEATURES_IN   = DATA_DIR / "rankings" / "prospect_features.csv"
+OUT_PATH      = DATA_DIR / "rankings" / "ability_scores.csv"
+AGE_MULT_PATH = DATA_DIR / "computed"  / "age_mult_rows.csv"
+MIN_PA        = 50    # minimum PA to count toward group z-score params
+MIN_ROWS      = 10    # minimum rows in Season+Level cell before falling back to Level-only
 
 # Component weights
 W = dict(fantasy=0.47, discipline=0.30, sb=0.08, power=0.15)
@@ -206,14 +207,36 @@ def main() -> None:
 
     # 2b. Age multiplier — applied after standardization so age adjusts signal
     # strength within the peer distribution, not the raw stat values.
-    # SB excluded: speed is a physical tool, not expected to improve with age —
-    # a 23yo swiping 40 bags is as impressive as a 19yo doing the same.
+    # SB excluded: speed is a physical tool, not expected to improve with age.
     #
-    # Per-row piecewise formula using each row's own Age_Z_SL.
-    # Career-level graduation probability (KNN model) is applied separately
-    # in build_prospect_scores.py after career averaging.
-    age_z    = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
-    age_mult = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
+    # Primary: per-row KNN graduation probability from age_mult_rows.csv,
+    # joined on (PlayerId, Season, Level). Each row uses point-in-time features
+    # (no look-ahead), so A-ball rows use A-ball age context, not current-level.
+    # Fallback (if CSV missing): piecewise formula using this row's Age_Z_SL.
+    if AGE_MULT_PATH.exists():
+        amt = pd.read_csv(AGE_MULT_PATH, dtype={"PlayerId": str},
+                          usecols=["PlayerId", "Season", "Level", "age_mult_pgvb"])
+        amt = amt.drop_duplicates(subset=["PlayerId", "Season", "Level"])
+        knn_map = {(r.PlayerId, r.Season, r.Level): r.age_mult_pgvb
+                   for r in amt.itertuples(index=False)}
+        pid_str = df["PlayerId"].astype(str)
+        age_mult = pd.Series(
+            [knn_map.get((p, s, l), np.nan)
+             for p, s, l in zip(pid_str, df["Season"], df["Level"])],
+            index=df.index, dtype=float,
+        )
+        matched = age_mult.notna().sum()
+        # age_mult_pgvb was calibrated for 50-scale career adjustment;
+        # clip to [0.7, 1.5] so it acts as a per-component signal-strength
+        # modifier without creating extreme outliers in the z-score space.
+        age_mult = age_mult.clip(0.70, 1.50).fillna(1.0)
+        print(f"  KNN age_mult: {matched:,} / {len(age_mult):,} rows matched  "
+              f"(mean={age_mult.mean():.3f}  p10={age_mult.quantile(.1):.2f}  "
+              f"p90={age_mult.quantile(.9):.2f})")
+    else:
+        age_z    = (-df["Age_Z_SL"]).clip(-3.0, 3.0).fillna(0.0)
+        age_mult = 1.0 + AGE_LINEAR * age_z + AGE_KINK * (age_z - AGE_KINK_THRESH).clip(lower=0)
+        print("  age_mult_rows.csv not found — using piecewise fallback")
     fantasy  = fantasy * age_mult
     disc     = disc    * age_mult
     gp       = gp      * age_mult
