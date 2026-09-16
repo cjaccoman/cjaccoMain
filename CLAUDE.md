@@ -575,6 +575,60 @@ Age adjustment: same as STUFF.
 
 ---
 
+## Empirical Research — MiLB Signal Validation
+
+### Tiered MiLB Outcome Study (September 2026)
+
+Full-population analysis of 1,277 graduated MLB hitters (≥200 MLB PA) assigned to Career PPPA_Z outcome tiers. Data sources: `player_comps.csv`, `minorLeagueData.csv`, `missing_milb_data.csv`. Artifact: `https://claude.ai/code/artifact/d2bc6317-5153-4145-b061-34656f492aef`
+
+**Tier definitions (Career PPPA_Z):**
+
+| Tier | Range | N | % |
+|------|-------|---|---|
+| Elite | ≥1.00 | 61 | 4.8% |
+| High-end | 0.65–0.999 | 153 | 12.0% |
+| Solid | 0.35–0.649 | 265 | 20.8% |
+| Starter | 0.10–0.349 | 267 | 20.9% |
+| Replaceable | <0.10 | 531 | 41.6% |
+
+**Signal rankings by separation power (high → low):**
+
+1. **Age at AA debut** — sharpest single signal in the dataset. Elite rate: 37.9% at ≤19, 11.9% at 20, 2.4% at 22, 0.9% at ≥24. The 19→20 cliff is larger than any other single step. `Age_Z_SL` captures peer-relative age but NOT absolute timing. A 19-year-old in AA is a categorically different population.
+
+2. **AA PPPA_Z** — clean continuous gradient. Elite% rises from 0.0% (<0.0) to 20.5% (≥1.5). Key inflection: ≥1.0 is where Elite rate becomes meaningful (7.6%); ≥1.5 is the real jump (20.5%). AA PPPA_Z ≥0.5 is a practical floor — 95% of Career PPPA_Z ≥1.0 players cleared it.
+
+3. **BB_2K (BB% − 2×K%)** — monotonic gradient, adds independent signal beyond K% alone. Elite rate jumps at −0.10 threshold: 5.8% → 14.3%. Genuine plate discipline (BB% ≈ 2×K%) is under-priced in the current model — the gate correctly penalizes the floor (−0.40 zone, 75.9% Replaceable) but doesn't positively reward the upper end.
+
+4. **K%** — floor signal only, not a ceiling signal. Low K% does NOT reliably predict Elite outcomes: 29.7% of sub-13% K players still end up Replaceable. K% mainly disqualifies: ≥25% makes Replaceable nearly inevitable (74%). Do not over-reward low-K prospects absent other signals.
+
+5. **SBTalent** — only ≥6% matters. Sub-6% SBTalent (all four buckets: <0.5%, 0.5–1.5%, 1.5–3.0%, 3–6%) is statistically indistinguishable noise (53–58% Replaceable in all four). Only ≥6% cuts Replaceable to 35% and lifts median career Z to 0.425. Moderate speed in MiLB is a red herring.
+
+6. **HRFB at AA** — weakest standalone signal. All buckets cluster at 51–59% Replaceable. Only ≥20% shows real lift (9.9% Elite). Power at AA requires multi-season career averaging or EV validation to be meaningful.
+
+**Best predictive combinations:**
+
+| Combination | N | Elite% | Replaceable% |
+|-------------|---|--------|-------------|
+| Age ≤20 + AA PPPA_Z ≥1.0 | 47 | **30.2%** | 19.1% |
+| Age ≤20 + K% <17% | 39 | 23.1% | 20.5% |
+| AA PPPA_Z ≥1.5 alone | 83 | 20.5% | 22.9% |
+| BB_2K ≥−0.10 alone | 51 | 15.7% | 25.5% |
+| K%≥25% + HRFB<15% + SBTalent<3% | 59 | 1.7% | **72.9%** |
+
+**Key findings from top-25 leaderboard survivors (N=79, separate study):**
+- K%≥28% + HRFB<15% + SBTalent<3% = zero successes above 0.65 Career PPPA_Z
+- 95% of Career PPPA_Z ≥1.0 players had AA PPPA_Z ≥0.5 (only Freeman, Olson, Rosario exceptions)
+- First-year MLB performance is noise: 12% of eventual elite performers had negative PPPA_Z debuts (Rizzo −1.05 first year, 0.94 career)
+- Bad AAA stints are often small-sample artifacts (Harper −0.05 AAA, Rendon −0.90 AAA — both became elite)
+
+**Model implications:**
+- Discipline gate thresholds (−0.67 SD soft, −1.0 SD hard) are empirically validated — the −0.40 BB_2K cliff matches exactly
+- BB_2K ≥−0.10 (genuine plate discipline) is under-rewarded; consider a positive signal pathway
+- Absolute AA debut age ≤19 is independent signal not currently captured by `Age_Z_SL`
+- AA PPPA_Z <0.5 with no compensating tool profile warrants scrutiny above ~#40 in rankings
+
+---
+
 ## Roadmap
 
 ### Situational Splits Integration (planned)
