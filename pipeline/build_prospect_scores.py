@@ -99,6 +99,19 @@ HARDFLOOR_RANK_PENALTY = 1_000_000  # guarantees flagged players sort last
 OVR_FLOOR_NAME_REF     = "Harold Castro"
 OVR_FLOOR_FALLBACK     = 41.21  # used only if the reference player isn't found
 
+# Age-at-AA-debut + AA production combo bonus (Tiered MiLB Outcome Study, Sept
+# 2026, see CLAUDE.md): Age<=20 at AA debut + AA PPPA_Z>=1.0 -> N=47, 30.2% Elite
+# (vs ~4.8% pool baseline) — the single best predictive combination found.
+# AA PPPA_Z uses the debut season's PPPA_Z_SL when debut PA>=80; otherwise it's
+# a PA-weighted blend of the debut season and the player's next AA season (not
+# necessarily consecutive calendar years), to avoid a small-sample cameo driving
+# the threshold check. If no next AA season exists, falls back to the debut
+# season as-is. Age at debut always comes from the debut season itself.
+AGE_AA_DEBUT_MAX   = 20
+AA_PPPAZ_COMBO_MIN = 1.0
+AA_DEBUT_PA_MIN    = 80
+AGE_AA_COMBO_BONUS = 3.0   # pts added to Combined_Score (matches TTO/hard-gate scale)
+
 MAX_PROSPECT_AGE  = 24
 MIN_SEASON        = 2025
 MLB_PA_EXCL       = 50
@@ -281,7 +294,7 @@ def main() -> None:
     feats = pd.read_csv(
         FEATURES_PATH,
         usecols=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj",
-                 "K%", "HR/FB", "SB", "SB_pct"],
+                 "K%", "HR/FB", "SB", "SB_pct", "Age", "PPPA_Z_SL"],
     )
     # Career BB_2K: PA-weighted avg of raw rate, excluding AAA to avoid survivorship bias
     sub_career = feats[feats["Level"] != "AAA"].dropna(subset=["BB_2K"])
@@ -332,6 +345,40 @@ def main() -> None:
     n_hard_floor = pool["Hard_Floor"].sum()
     print(f"Hard Floor gate fired: {n_hard_floor:,} / {len(pool):,} players "
           f"(K%>={HARDFLOOR_K_MIN:.0%}, HR/FB<{HARDFLOOR_HRFB_MAX:.0%}, SBTalent<{HARDFLOOR_SBTALENT_MAX:.0%})")
+
+    # Age-at-AA-debut + AA production combo (see constants above).
+    aa_rows = (
+        feats[feats["Level"] == "AA"]
+        .dropna(subset=["Age", "PPPA_Z_SL"])
+        .sort_values(["PlayerId", "Season"])
+    )
+    aa_debut = aa_rows.groupby("PlayerId").first()   # first AA season per player
+
+    def _aa_ppppaz_combo(grp: pd.DataFrame) -> float:
+        first = grp.iloc[0]
+        if first["PA"] >= AA_DEBUT_PA_MIN or len(grp) < 2:
+            return float(first["PPPA_Z_SL"])
+        second = grp.iloc[1]
+        pa1, pa2 = first["PA"], second["PA"]
+        return float((first["PPPA_Z_SL"] * pa1 + second["PPPA_Z_SL"] * pa2) / (pa1 + pa2))
+
+    aa_ppppaz_combo = (
+        aa_rows.groupby("PlayerId", group_keys=False)
+        .apply(_aa_ppppaz_combo, include_groups=False)
+    )
+
+    pool["Age_AA_Debut"]   = pool["PlayerId"].map(aa_debut["Age"])
+    pool["AA_PPPAZ_Combo"] = pool["PlayerId"].map(aa_ppppaz_combo)
+
+    pool["AgeAA_Combo_Flag"] = (
+        pool["Age_AA_Debut"].notna() & pool["AA_PPPAZ_Combo"].notna()
+        & (pool["Age_AA_Debut"] <= AGE_AA_DEBUT_MAX)
+        & (pool["AA_PPPAZ_Combo"] >= AA_PPPAZ_COMBO_MIN)
+    )
+    pool["AgeAA_Combo_Flag_Label"] = pool["AgeAA_Combo_Flag"].map({True: "Young AA Elite", False: ""})
+    n_combo = pool["AgeAA_Combo_Flag"].sum()
+    print(f"Age<={AGE_AA_DEBUT_MAX}-at-AA-debut + AA_PPPAZ>={AA_PPPAZ_COMBO_MIN} combo: "
+          f"{n_combo:,} / {len(pool):,} players (+{AGE_AA_COMBO_BONUS} pts)")
 
     # Discipline slope: PA-weighted OLS of BB_2K on Season across all career rows.
     # Positive = improving discipline over time. Requires >= 2 qualifying seasons
@@ -439,10 +486,12 @@ def main() -> None:
             print(f"Archetype_Adj: {n:,} {arch} -> {val:+.1f}")
 
     # Final blend
+    pool["AgeAA_Combo_Bonus"] = pool["AgeAA_Combo_Flag"].astype(float) * AGE_AA_COMBO_BONUS
     pool["Combined_Score"] = (
         0.50 * pool["Current_Score"]
         + 0.50 * pool["OVR_Score"]
         + pool["Archetype_Adj"]
+        + pool["AgeAA_Combo_Bonus"]
     ).round(2)
 
     # Post-blend discipline gate — applied to Combined_Score.
@@ -551,6 +600,7 @@ def main() -> None:
         "Disc_Composite_Z", "Disc_Slope",
         "Career_K%", "Career_HRFB", "Career_SBTalent", "Hard_Floor_Flag",
         "Below_OVR_Floor",
+        "Age_AA_Debut", "AA_PPPAZ_Combo", "AgeAA_Combo_Bonus", "AgeAA_Combo_Flag_Label",
     ]
     out = pool[out_cols].sort_values("Combined_Rank").reset_index(drop=True)
     out.to_csv(OUT_PATH, index=False)

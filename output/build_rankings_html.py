@@ -23,6 +23,7 @@ ps["Discipline_Flag"] = ps["Discipline_Flag"].fillna("")
 ps["Career_Disc_Flag"] = ps["Career_Disc_Flag"].fillna("")
 ps["Hard_Floor_Flag"] = ps["Hard_Floor_Flag"].fillna("")
 ps["Below_OVR_Floor"] = ps["Below_OVR_Floor"].fillna(False)
+ps["AgeAA_Combo_Flag_Label"] = ps["AgeAA_Combo_Flag_Label"].fillna("")
 ps["Pos"] = ps["Pos"].fillna("")
 ps["Age"] = ps["Age"].fillna("").astype(str).str.replace(".0", "", regex=False)
 for c in ["Total_Weighted_PA", "TOOLS_Score", "ABILITY_Score",
@@ -33,7 +34,8 @@ ps["Pos_Adj_Score"] = ps["Pos_Adj_Score"].round(1)
 cols = ["Combined_Rank", "Pos_Adj_Rank", "Name", "Pos", "Team", "Level", "Age", "Last_Season",
         "Career_PA", "TOOLS_Score", "ABILITY_Score", "Current_Score",
         "OVR_Score", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
-        "Discipline_Flag", "Career_Disc_Flag", "Hard_Floor_Flag", "Below_OVR_Floor"]
+        "Discipline_Flag", "Career_Disc_Flag", "Hard_Floor_Flag", "Below_OVR_Floor",
+        "AgeAA_Combo_Flag_Label"]
 raw = json.dumps(ps[cols].to_dict(orient="records"), separators=(",", ":"))
 covered = (ps["Pos"] != "").sum()
 print(f"Position coverage: {covered:,} / {len(ps):,} ({covered/len(ps)*100:.1f}%)")
@@ -162,6 +164,7 @@ HTML = """\
   --flag-soft-bg:#fff3cd;--flag-soft-text:#7d4e00;
   --flag-hard-bg:#ffeaea;--flag-hard-text:#a10000;
   --flag-whiff-bg:#fff0e0;--flag-whiff-text:#7a3900;
+  --flag-good-bg:#e6f4ea;--flag-good-text:#1a7a3d;
   --tab-active-bg:#ffffff;--tab-active-border:var(--accent);
 }
 @media(prefers-color-scheme:dark){:root{
@@ -171,6 +174,7 @@ HTML = """\
   --flag-soft-bg:#2d2000;--flag-soft-text:#e3a008;
   --flag-hard-bg:#2d0000;--flag-hard-text:#ff6b6b;
   --flag-whiff-bg:#2d1500;--flag-whiff-text:#f97316;
+  --flag-good-bg:#0d2e1a;--flag-good-text:#4ade80;
   --tab-active-bg:#0d1117;
 }}
 :root[data-theme="light"]{
@@ -180,6 +184,7 @@ HTML = """\
   --flag-soft-bg:#fff3cd;--flag-soft-text:#7d4e00;
   --flag-hard-bg:#ffeaea;--flag-hard-text:#a10000;
   --flag-whiff-bg:#fff0e0;--flag-whiff-text:#7a3900;
+  --flag-good-bg:#e6f4ea;--flag-good-text:#1a7a3d;
   --tab-active-bg:#ffffff;
 }
 :root[data-theme="dark"]{
@@ -189,6 +194,7 @@ HTML = """\
   --flag-soft-bg:#2d2000;--flag-soft-text:#e3a008;
   --flag-hard-bg:#2d0000;--flag-hard-text:#ff6b6b;
   --flag-whiff-bg:#2d1500;--flag-whiff-text:#f97316;
+  --flag-good-bg:#0d2e1a;--flag-good-text:#4ade80;
   --tab-active-bg:#0d1117;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -255,6 +261,7 @@ tbody tr:hover{background:var(--row-hover)}
 .flag-hard,.flag-hardwhiff{background:var(--flag-hard-bg);color:var(--flag-hard-text)}
 .pos-bonus{font-size:0.7em;opacity:0.7;margin-left:4px;font-variant-numeric:tabular-nums}
 .flag-whiff{background:var(--flag-whiff-bg);color:var(--flag-whiff-text)}
+.flag-good{background:var(--flag-good-bg);color:var(--flag-good-text)}
 .score-bar-wrap{display:flex;align-items:center;gap:5px;justify-content:flex-end}
 .score-val{min-width:34px;text-align:right;font-weight:600}
 .bar{width:42px;height:4px;border-radius:2px;background:var(--surface2);overflow:hidden;display:inline-block;vertical-align:middle}
@@ -324,7 +331,8 @@ tbody tr:hover{background:var(--row-hover)}
   #table th:nth-child(12),#table td:nth-child(12),
   #table th:nth-child(13),#table td:nth-child(13),
   #table th:nth-child(15),#table td:nth-child(15),
-  #table th:nth-child(16),#table td:nth-child(16){display:none}
+  #table th:nth-child(16),#table td:nth-child(16),
+  #table th:nth-child(17),#table td:nth-child(17){display:none}
   /* AAA: show Rank Name Team Pos Age PA PPPA Overall (cols 1-8), hide 9+ */
   #aaa-table th:nth-child(n+9),#aaa-table td:nth-child(n+9){display:none}
   /* Luck: show Rank Name Pos Level PA Luck PPPA_Z (cols 1-4,6,12,13), hide others */
@@ -368,6 +376,7 @@ tbody tr:hover{background:var(--row-hover)}
       <option value="whiff">Whiff (either)</option>
       <option value="hidden">Hidden: clean recent, flagged career</option>
       <option value="hardfloor">Hard Floor (K%/HRFB/SBTalent)</option>
+      <option value="youngaaelite">Young AA Elite (Age&le;20 + AA PPPA_Z&ge;1.0)</option>
       <option value="clean">Fully clean (no flags)</option>
     </select>
     <div class="spacer"></div>
@@ -394,6 +403,7 @@ tbody tr:hover{background:var(--row-hover)}
         <th data-col="Discipline_Flag" data-type="str">Recent Flag</th>
         <th data-col="Career_Disc_Flag" data-type="str">Career Flag</th>
         <th data-col="Hard_Floor_Flag" data-type="str">Hard Floor</th>
+        <th data-col="AgeAA_Combo_Flag_Label" data-type="str">Young AA Elite</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -603,6 +613,7 @@ function fclass(f){
   if(f==='soft'||f==='soft+whiff')return'flag-soft';
   if(f==='hard'||f==='hard+whiff'||f==='Hard Floor')return'flag-hard';
   if(f==='whiff')return'flag-whiff';
+  if(f==='Young AA Elite')return'flag-good';
   return'';
 }
 function fcell(f){
@@ -620,7 +631,7 @@ function render(){
   const tbody=document.getElementById('tbody');
   document.getElementById('count').textContent=filtered.length.toLocaleString()+' players';
   if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="16" class="no-results">No players match.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="17" class="no-results">No players match.</td></tr>';
     return;
   }
   tbody.innerHTML=filtered.map(r=>{
@@ -645,6 +656,7 @@ function render(){
     ${fcell(r.Discipline_Flag)}
     ${fcell(r.Career_Disc_Flag)}
     ${fcell(r.Hard_Floor_Flag)}
+    ${fcell(r.AgeAA_Combo_Flag_Label)}
   </tr>`;
   }).join('');
 }
@@ -666,7 +678,7 @@ function applyFilters(){
       if(pos==='OF'){if(!POS_OF_SET.has(rp))return false;}
       else if(rp!==pos)return false;
     }
-    const rf=r.Discipline_Flag||'', cf=r.Career_Disc_Flag||'', hf=r.Hard_Floor_Flag||'';
+    const rf=r.Discipline_Flag||'', cf=r.Career_Disc_Flag||'', hf=r.Hard_Floor_Flag||'', yf=r.AgeAA_Combo_Flag_Label||'';
     if(flag==='any_recent'&&!rf)return false;
     if(flag==='any_career'&&!cf)return false;
     if(flag==='hard'&&!rf.includes('hard')&&!cf.includes('hard'))return false;
@@ -674,7 +686,8 @@ function applyFilters(){
     if(flag==='whiff'&&!rf.includes('whiff')&&!cf.includes('whiff'))return false;
     if(flag==='hidden'&&!(rf===''&&cf!==''))return false;
     if(flag==='hardfloor'&&!hf)return false;
-    if(flag==='clean'&&(rf!==''||cf!==''||hf!==''))return false;
+    if(flag==='youngaaelite'&&!yf)return false;
+    if(flag==='clean'&&(rf!==''||cf!==''||hf!==''||yf!==''))return false;
     return true;
   });
   sort();
