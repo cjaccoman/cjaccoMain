@@ -21,6 +21,8 @@ else:
 ps = pd.read_csv(DATA_DIR / "rankings" / "prospect_scores.csv")
 ps["Discipline_Flag"] = ps["Discipline_Flag"].fillna("")
 ps["Career_Disc_Flag"] = ps["Career_Disc_Flag"].fillna("")
+ps["Hard_Floor_Flag"] = ps["Hard_Floor_Flag"].fillna("")
+ps["Below_OVR_Floor"] = ps["Below_OVR_Floor"].fillna(False)
 ps["Pos"] = ps["Pos"].fillna("")
 ps["Age"] = ps["Age"].fillna("").astype(str).str.replace(".0", "", regex=False)
 for c in ["Total_Weighted_PA", "TOOLS_Score", "ABILITY_Score",
@@ -31,7 +33,7 @@ ps["Pos_Adj_Score"] = ps["Pos_Adj_Score"].round(1)
 cols = ["Combined_Rank", "Pos_Adj_Rank", "Name", "Pos", "Team", "Level", "Age", "Last_Season",
         "Career_PA", "TOOLS_Score", "ABILITY_Score", "Current_Score",
         "OVR_Score", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
-        "Discipline_Flag", "Career_Disc_Flag"]
+        "Discipline_Flag", "Career_Disc_Flag", "Hard_Floor_Flag", "Below_OVR_Floor"]
 raw = json.dumps(ps[cols].to_dict(orient="records"), separators=(",", ":"))
 covered = (ps["Pos"] != "").sum()
 print(f"Position coverage: {covered:,} / {len(ps):,} ({covered/len(ps)*100:.1f}%)")
@@ -365,9 +367,11 @@ tbody tr:hover{background:var(--row-hover)}
       <option value="soft">Soft floor (either)</option>
       <option value="whiff">Whiff (either)</option>
       <option value="hidden">Hidden: clean recent, flagged career</option>
+      <option value="hardfloor">Hard Floor (K%/HRFB/SBTalent)</option>
       <option value="clean">Fully clean (no flags)</option>
     </select>
     <div class="spacer"></div>
+    <button class="clear-btn" id="ovr-floor-btn" title="Prospects graded below Harold Castro's all-time OVR score are hidden by default (still findable via search or flags)">Below Floor: HIDDEN</button>
     <button class="clear-btn" id="pos-adj-btn" title="Toggle positional scarcity adjustment">Pos Adj: OFF</button>
     <button class="clear-btn" id="clear-btn">Clear</button>
   </div>
@@ -389,6 +393,7 @@ tbody tr:hover{background:var(--row-hover)}
         <th class="num" data-col="Combined_Score" data-type="num">Combined</th>
         <th data-col="Discipline_Flag" data-type="str">Recent Flag</th>
         <th data-col="Career_Disc_Flag" data-type="str">Career Flag</th>
+        <th data-col="Hard_Floor_Flag" data-type="str">Hard Floor</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -575,6 +580,7 @@ const RAW = PROSPECTS_DATA_PLACEHOLDER;
 const LVL = {R:1,A:2,'A+':3,AA:4,AAA:5};
 let sortCol='Combined_Rank', sortDir=1, filtered=RAW.slice();
 let posAdj=false;
+let hideFloor=true;
 
 const tf=document.getElementById('team-filter');
 [...new Set(RAW.map(r=>r.Team))].sort().forEach(t=>{
@@ -595,7 +601,7 @@ POS_BUCKETS.forEach(({val,label})=>{
 function fclass(f){
   if(!f)return'';
   if(f==='soft'||f==='soft+whiff')return'flag-soft';
-  if(f==='hard'||f==='hard+whiff')return'flag-hard';
+  if(f==='hard'||f==='hard+whiff'||f==='Hard Floor')return'flag-hard';
   if(f==='whiff')return'flag-whiff';
   return'';
 }
@@ -638,6 +644,7 @@ function render(){
     <td class="num">${scoreCell}</td>
     ${fcell(r.Discipline_Flag)}
     ${fcell(r.Career_Disc_Flag)}
+    ${fcell(r.Hard_Floor_Flag)}
   </tr>`;
   }).join('');
 }
@@ -648,7 +655,9 @@ function applyFilters(){
   const lvl=document.getElementById('level-filter').value;
   const pos=document.getElementById('pos-filter').value;
   const flag=document.getElementById('flag-filter').value;
+  const anyFilterActive=!!(q||team||lvl||pos||flag);
   filtered=RAW.filter(r=>{
+    if(hideFloor&&!anyFilterActive&&r.Below_OVR_Floor)return false;
     if(q&&!r.Name.toLowerCase().includes(q))return false;
     if(team&&r.Team!==team)return false;
     if(lvl&&r.Level!==lvl)return false;
@@ -657,14 +666,15 @@ function applyFilters(){
       if(pos==='OF'){if(!POS_OF_SET.has(rp))return false;}
       else if(rp!==pos)return false;
     }
-    const rf=r.Discipline_Flag||'', cf=r.Career_Disc_Flag||'';
+    const rf=r.Discipline_Flag||'', cf=r.Career_Disc_Flag||'', hf=r.Hard_Floor_Flag||'';
     if(flag==='any_recent'&&!rf)return false;
     if(flag==='any_career'&&!cf)return false;
     if(flag==='hard'&&!rf.includes('hard')&&!cf.includes('hard'))return false;
     if(flag==='soft'&&!rf.startsWith('soft')&&!cf.startsWith('soft'))return false;
     if(flag==='whiff'&&!rf.includes('whiff')&&!cf.includes('whiff'))return false;
     if(flag==='hidden'&&!(rf===''&&cf!==''))return false;
-    if(flag==='clean'&&(rf!==''||cf!==''))return false;
+    if(flag==='hardfloor'&&!hf)return false;
+    if(flag==='clean'&&(rf!==''||cf!==''||hf!==''))return false;
     return true;
   });
   sort();
@@ -694,6 +704,12 @@ document.querySelectorAll('th[data-col]').forEach(th=>{
 
 ['search','team-filter','level-filter','pos-filter','flag-filter'].forEach(id=>{
   document.getElementById(id).addEventListener(id==='search'?'input':'change',applyFilters);
+});
+document.getElementById('ovr-floor-btn').addEventListener('click',()=>{
+  hideFloor=!hideFloor;
+  document.getElementById('ovr-floor-btn').textContent='Below Floor: '+(hideFloor?'HIDDEN':'SHOWN');
+  document.getElementById('ovr-floor-btn').style.opacity=hideFloor?'0.7':'1';
+  applyFilters();
 });
 document.getElementById('pos-adj-btn').addEventListener('click',()=>{
   posAdj=!posAdj;

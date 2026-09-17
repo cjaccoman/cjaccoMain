@@ -76,6 +76,29 @@ TREND_THRESHOLD   =  0.02   # raw BB_2K rate shift to trigger slope modifier
 TREND_IMPROVE_MUL =  0.60   # soften penalty when visibly improving
 TREND_WORSEN_MUL  =  1.25   # harden penalty when visibly worsening
 
+# Hard Floor gate — empirical zero-success combination from the Tiered MiLB
+# Outcome Study (Sept 2026, see CLAUDE.md): K%>=28% + HRFB<15% + SBTalent<3%
+# produced zero Career_PPPA_Z > 0.65 outcomes among top-25 leaderboard survivors
+# (N=59, 72.9% Replaceable). All three career stats computed the same way as
+# Career_BB2K: PA-weighted average across non-AAA rows (avoids AAA survivorship
+# bias). Flagged players are demoted to the bottom of both rank columns via a
+# large rank-key penalty; their Combined_Score / Pos_Adj_Score are left intact.
+HARDFLOOR_K_MIN        = 0.28
+HARDFLOOR_HRFB_MAX     = 0.15
+HARDFLOOR_SBTALENT_MAX = 0.03
+HARDFLOOR_RANK_PENALTY = 1_000_000  # guarantees flagged players sort last
+
+# OVR floor — display-only cutoff, not a scoring change. Threshold is Harold
+# Castro's all-time OVR_Score: worst all-time OVR grade (as of this build) among
+# graduated players with >=1,000 career MLB PA whose MLB survival isn't explained
+# by elite/framing defense (see CLAUDE.md research notes, Sept 2026). Prospects
+# grading below this line are hidden from the default rankings view in the HTML
+# artifact (still present in prospect_scores.csv and still searchable/filterable
+# there) since there's no precedent for a prospect this poorly rated turning into
+# a rosterable MLB contributor on merit alone.
+OVR_FLOOR_NAME_REF     = "Harold Castro"
+OVR_FLOOR_FALLBACK     = 41.21  # used only if the reference player isn't found
+
 MAX_PROSPECT_AGE  = 24
 MIN_SEASON        = 2025
 MLB_PA_EXCL       = 50
@@ -257,7 +280,8 @@ def main() -> None:
     # filtered group; their AAA discipline looks artificially clean vs. true development.
     feats = pd.read_csv(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj"],
+        usecols=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj",
+                 "K%", "HR/FB", "SB", "SB_pct"],
     )
     # Career BB_2K: PA-weighted avg of raw rate, excluding AAA to avoid survivorship bias
     sub_career = feats[feats["Level"] != "AAA"].dropna(subset=["BB_2K"])
@@ -267,6 +291,47 @@ def main() -> None:
     ).rename("Career_BB2K")
 
     pool["Career_BB2K"] = pool["PlayerId"].map(career_bb2k)
+
+    # Hard Floor inputs: career K%, HR/FB, and SB_talent — same PA-weighted,
+    # non-AAA-excluded convention as Career_BB2K.
+    non_aaa = feats[feats["Level"] != "AAA"]
+
+    kpct_rows = non_aaa.dropna(subset=["K%"])
+    career_kpct = (
+        (kpct_rows["K%"] * kpct_rows["PA"]).groupby(kpct_rows["PlayerId"]).sum()
+        / kpct_rows.groupby("PlayerId")["PA"].sum()
+    )
+    pool["Career_K%"] = pool["PlayerId"].map(career_kpct)
+
+    hrfb_rows = non_aaa.dropna(subset=["HR/FB"])
+    career_hrfb = (
+        (hrfb_rows["HR/FB"] * hrfb_rows["PA"]).groupby(hrfb_rows["PlayerId"]).sum()
+        / hrfb_rows.groupby("PlayerId")["PA"].sum()
+    )
+    pool["Career_HRFB"] = pool["PlayerId"].map(career_hrfb)
+
+    # SB_talent = SB_pct x (SB/PA); SB_pct NaN (0 SB + 0 CS) -> 0, same convention
+    # as build_ability_score.py's build_sb_talent().
+    sbt_rows = non_aaa.copy()
+    sbt_rows["_sb_talent"] = sbt_rows["SB_pct"].fillna(0) * (sbt_rows["SB"] / sbt_rows["PA"]).fillna(0)
+    career_sbtalent = (
+        (sbt_rows["_sb_talent"] * sbt_rows["PA"]).groupby(sbt_rows["PlayerId"]).sum()
+        / sbt_rows.groupby("PlayerId")["PA"].sum()
+    )
+    pool["Career_SBTalent"] = pool["PlayerId"].map(career_sbtalent)
+
+    # Hard Floor: all three career stats must be present and cross their
+    # threshold. Missing data -> flag does not fire (insufficient evidence).
+    pool["Hard_Floor"] = (
+        pool["Career_K%"].notna() & pool["Career_HRFB"].notna() & pool["Career_SBTalent"].notna()
+        & (pool["Career_K%"] >= HARDFLOOR_K_MIN)
+        & (pool["Career_HRFB"] < HARDFLOOR_HRFB_MAX)
+        & (pool["Career_SBTalent"] < HARDFLOOR_SBTALENT_MAX)
+    )
+    pool["Hard_Floor_Flag"] = pool["Hard_Floor"].map({True: "Hard Floor", False: ""})
+    n_hard_floor = pool["Hard_Floor"].sum()
+    print(f"Hard Floor gate fired: {n_hard_floor:,} / {len(pool):,} players "
+          f"(K%>={HARDFLOOR_K_MIN:.0%}, HR/FB<{HARDFLOOR_HRFB_MAX:.0%}, SBTalent<{HARDFLOOR_SBTALENT_MAX:.0%})")
 
     # Discipline slope: PA-weighted OLS of BB_2K on Season across all career rows.
     # Positive = improving discipline over time. Requires >= 2 qualifying seasons
@@ -322,13 +387,27 @@ def main() -> None:
 
     # OVR score — career arc relative to all historical prospects
     # Prerequisite: build_prospect_scores_ovr.py must have run first
-    ovr = pd.read_csv(OVR_PATH, usecols=["PlayerId", "Combined_Score"])
-    ovr = ovr.rename(columns={"Combined_Score": "OVR_Score"})
+    ovr_full = pd.read_csv(OVR_PATH, usecols=["PlayerId", "Name", "Combined_Score"])
+    ovr = ovr_full.rename(columns={"Combined_Score": "OVR_Score"})[["PlayerId", "OVR_Score"]]
     pool = pool.merge(ovr, on="PlayerId", how="left")
     pool["OVR_Score"] = pool["OVR_Score"].fillna(50.0)   # not in OVR pool → neutral
     n_missing_ovr = (pool["OVR_Score"] == 50.0).sum()
     if n_missing_ovr:
         print(f"  {n_missing_ovr} players not in OVR pool -> OVR_Score set to 50")
+
+    # OVR floor threshold: Harold Castro's OVR_Score, looked up live so the cutoff
+    # tracks the reference player rather than a frozen number.
+    ref_row = ovr_full[ovr_full["Name"].apply(_norm) == _norm(OVR_FLOOR_NAME_REF)]
+    if len(ref_row):
+        ovr_floor = float(ref_row["Combined_Score"].iloc[0])
+    else:
+        ovr_floor = OVR_FLOOR_FALLBACK
+        print(f"  WARNING: '{OVR_FLOOR_NAME_REF}' not found in OVR pool -> "
+              f"using fallback OVR floor {ovr_floor}")
+    pool["Below_OVR_Floor"] = pool["OVR_Score"] < ovr_floor
+    n_below_floor = pool["Below_OVR_Floor"].sum()
+    print(f"OVR floor ({OVR_FLOOR_NAME_REF} = {ovr_floor:.2f}): "
+          f"{n_below_floor:,} / {len(pool):,} players below floor")
 
     # Archetype labels (requires build_archetypes.py to have run first)
     if ARCHETYPE_PATH.exists():
@@ -401,7 +480,10 @@ def main() -> None:
     print(f"  {pool['Career_Disc_Flag'].value_counts().to_dict()}")
     print(f"  Slope data available for {pool['Disc_Slope'].notna().sum():,} / {len(pool):,} players")
 
-    pool["Combined_Rank"] = pool["Combined_Score"].rank(ascending=False, method="min").astype(int)
+    # Hard Floor players are demoted to the bottom of the rank column via a large
+    # rank-key penalty; Combined_Score itself is left untouched.
+    combined_rank_key = pool["Combined_Score"] - HARDFLOOR_RANK_PENALTY * pool["Hard_Floor"]
+    pool["Combined_Rank"] = combined_rank_key.rank(ascending=False, method="min").astype(int)
 
     # Position from MLB Stats API via MLBAM_ID crosswalk
     pid_to_mlbam = (
@@ -456,7 +538,8 @@ def main() -> None:
 
     pool["Pos_Bonus"]     = pool["FantasyPos"].map(POS_BONUS).fillna(0.0).round(2)
     pool["Pos_Adj_Score"] = (pool["Combined_Score"] + pool["Pos_Bonus"]).round(2)
-    pool["Pos_Adj_Rank"]  = pool["Pos_Adj_Score"].rank(ascending=False, method="min").astype(int)
+    pos_adj_rank_key = pool["Pos_Adj_Score"] - HARDFLOOR_RANK_PENALTY * pool["Hard_Floor"]
+    pool["Pos_Adj_Rank"]  = pos_adj_rank_key.rank(ascending=False, method="min").astype(int)
 
     out_cols = [
         "Combined_Rank", "Pos_Adj_Rank", "PlayerId", "Name", "Pos", "FantasyPos",
@@ -466,6 +549,8 @@ def main() -> None:
         "Archetype", "Archetype_Adj", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag",
         "Disc_Composite_Z", "Disc_Slope",
+        "Career_K%", "Career_HRFB", "Career_SBTalent", "Hard_Floor_Flag",
+        "Below_OVR_Floor",
     ]
     out = pool[out_cols].sort_values("Combined_Rank").reset_index(drop=True)
     out.to_csv(OUT_PATH, index=False)
