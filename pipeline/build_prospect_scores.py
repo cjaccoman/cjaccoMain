@@ -77,13 +77,15 @@ TREND_IMPROVE_MUL =  0.60   # soften penalty when visibly improving
 TREND_WORSEN_MUL  =  1.25   # harden penalty when visibly worsening
 
 # Hard Floor gate — empirical zero-success combination from the Tiered MiLB
-# Outcome Study (Sept 2026, see CLAUDE.md): K%>=28% + HRFB<15% + SBTalent<3%
-# produced zero Career_PPPA_Z > 0.65 outcomes among top-25 leaderboard survivors
-# (N=59, 72.9% Replaceable). All three career stats computed the same way as
-# Career_BB2K: PA-weighted average across non-AAA rows (avoids AAA survivorship
+# Outcome Study (Sept 2026, see CLAUDE.md): K%>=25% + HRFB<15% + SBTalent<3%
+# produced zero Career_PPPA_Z >= 0.65 outcomes in our own reconstruction of the
+# study (N=41, 0% Elite/High-end, 73.2% Replaceable) — widened from the original
+# K%>=28% cutoff (N=59, 72.9% Replaceable in the source study) since both versions
+# tell the same zero-upside story. All three career stats computed the same way
+# as Career_BB2K: PA-weighted average across non-AAA rows (avoids AAA survivorship
 # bias). Flagged players are demoted to the bottom of both rank columns via a
 # large rank-key penalty; their Combined_Score / Pos_Adj_Score are left intact.
-HARDFLOOR_K_MIN        = 0.28
+HARDFLOOR_K_MIN        = 0.25
 HARDFLOOR_HRFB_MAX     = 0.15
 HARDFLOOR_SBTALENT_MAX = 0.03
 HARDFLOOR_RANK_PENALTY = 1_000_000  # guarantees flagged players sort last
