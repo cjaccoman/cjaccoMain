@@ -1,7 +1,7 @@
 """Build ABILITY_Score for every player-season row in prospect_features.csv.
 
 ABILITY_Score measures demonstrated production, normalized for era and level.
-Output: data/rankings/ability_scores.csv (one row per player-season-level)
+Output: columns written back into prospect_features.csv in place.
 
 Component weights:
   Fantasy Output  45%  -- PPPA_Z_SL with level discount
@@ -44,7 +44,6 @@ from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
 FEATURES_IN   = DATA_DIR / "rankings" / "prospect_features.csv"
-OUT_PATH      = DATA_DIR / "rankings" / "ability_scores.csv"
 AGE_MULT_PATH = DATA_DIR / "computed"  / "age_mult_rows.csv"
 MIN_PA        = 50    # minimum PA to count toward group z-score params
 MIN_ROWS      = 10    # minimum rows in Season+Level cell before falling back to Level-only
@@ -256,43 +255,29 @@ def main() -> None:
     # 4. Final 50±10 standardization
     ability_score = to_50_10(ability_raw)
 
-    # 5. Assemble output
-    out = df[["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
-              "PPPA_Z_SL", "EraSB"]].copy()
-    out["ABILITY_Score"] = ability_score
-    out["Fantasy_Out"]   = fantasy.round(3)
-    out["Discipline"]    = disc.round(3)
-    out["SB_Talent"]     = sb.round(3)
-    out["Game_Power"]    = gp.round(3)
-    # Key raw inputs for transparency
-    out["PPPA_Z_SL_disc"] = (
+    # 5. Write score columns back into prospect_features.csv in place
+    df["ABILITY_Score"]   = ability_score
+    df["Fantasy_Out"]     = fantasy.round(3)
+    df["ABILITY_Disc"]    = disc.round(3)
+    df["SB_Talent"]       = sb.round(3)
+    df["Game_Power"]      = gp.round(3)
+    df["PPPA_Z_SL_disc"]  = (
         df["PPPA_Z_SL"] * df["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     ).round(4)
-    out["BB_2K"]  = df["BB_2K"]
-    out["SB"]     = df["SB"]
-    out["SB_pct"] = df["SB_pct"]
-    out["HR/FB"]  = df["HR/FB"]
-    out["HR_AB"]  = df["HR_AB"]
 
     # Discipline floor flags — which threshold(s) fired for this row.
-    # "hard" = BB_2K_z <= -0.50; "soft" = -0.50 < BB_2K_z <= -0.29;
-    # "whiff" = Whiff%_adj >= 1.0.  Multiple flags joined with "+".
-    # bb2k_z already computed above (z-score of BB_2K within Season+Level).
-    whiff_z = df["Whiff%_adj"]
-
+    whiff_z   = df["Whiff%_adj"]
     bb2k_flag = pd.Series("", index=df.index)
     bb2k_flag[bb2k_z.notna() & (bb2k_z <= -0.50)] = "hard"
     bb2k_flag[bb2k_z.notna() & (bb2k_z > -0.50) & (bb2k_z <= -0.29)] = "soft"
-
     whiff_flag = pd.Series("", index=df.index)
     whiff_flag[whiff_z.notna() & (whiff_z >= 1.0)] = "whiff"
-
     disc_flag = (bb2k_flag + whiff_flag.apply(lambda w: ("+" if w else "") + w))
     disc_flag = disc_flag.where(bb2k_flag != "", whiff_flag)
-    out["Discipline_Flag"] = disc_flag
+    df["Discipline_Flag"] = disc_flag
 
-    out.to_csv(OUT_PATH, index=False)
-    print(f"Wrote {len(out):,} rows -> {OUT_PATH}\n")
+    df.to_csv(FEATURES_IN, index=False)
+    print(f"Wrote {len(df):,} rows -> {FEATURES_IN}\n")
 
     print(
         f"ABILITY_Score  mean={ability_score.mean():.1f}  "
@@ -302,7 +287,7 @@ def main() -> None:
     )
 
     # Top 20 current prospects (Season >= 2025, most PA row per player)
-    current = out[out["Season"] >= 2025].copy()
+    current = df[df["Season"] >= 2025].copy()
     best = (
         current.sort_values("PA", ascending=False)
                .drop_duplicates("PlayerId")
@@ -311,7 +296,7 @@ def main() -> None:
     print("Top 20 ABILITY (Season >= 2025, one row per player):")
     print(
         best[["Name", "Team", "Level", "Age", "PA", "ABILITY_Score",
-              "Fantasy_Out", "Discipline", "SB_Talent", "Game_Power"]
+              "Fantasy_Out", "ABILITY_Disc", "SB_Talent", "Game_Power"]
              ].to_string(index=False)
     )
 

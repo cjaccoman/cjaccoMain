@@ -17,11 +17,10 @@ from sklearn.tree import DecisionTreeRegressor, export_text
 from sklearn.metrics import silhouette_score, davies_bouldin_score
 from sklearn.model_selection import cross_val_score
 
-DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
-PC_PATH     = DATA_DIR / "computed"  / "player_comps.csv"
-ABILITY_PATH= DATA_DIR / "rankings"  / "ability_scores.csv"
-TOOLS_PATH  = DATA_DIR / "rankings"  / "tools_scores.csv"
-OUT_PATH    = DATA_DIR / "historical" / "archetype_analysis_output.txt"
+DATA_DIR       = Path(__file__).resolve().parent.parent / "data"
+PC_PATH        = DATA_DIR / "computed"  / "player_comps.csv"
+FEATURES_PATH  = DATA_DIR / "rankings"  / "prospect_features.csv"
+OUT_PATH       = DATA_DIR / "historical" / "archetype_analysis_output.txt"
 
 RANDOM_STATE = 42
 FULL_SEASON_LEVELS = {"A", "A+", "AA", "AAA"}
@@ -253,14 +252,14 @@ def main():
     print("SECTION 5 — TOOLS × ABILITY QUADRANT ANALYSIS")
     print("=" * 72)
 
-    ab = pd.read_csv(ABILITY_PATH, usecols=[
+    ab = pd.read_csv(FEATURES_PATH, usecols=[
         "PlayerId", "Season", "Level", "PA",
-        "ABILITY_Score", "Discipline", "SB_Talent", "Game_Power",
-    ])
-    ts = pd.read_csv(TOOLS_PATH, usecols=[
+        "ABILITY_Score", "ABILITY_Disc", "SB_Talent", "Game_Power",
+    ]).rename(columns={"ABILITY_Disc": "Discipline"})
+    ts = pd.read_csv(FEATURES_PATH, usecols=[
         "PlayerId", "Season", "Level", "PA", "TOOLS_Score",
-        "Discipline", "Power", "Athleticism",
-    ])
+        "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+    ]).rename(columns={"TOOLS_Disc": "Discipline", "TOOLS_Power": "Power", "TOOLS_Ath": "Athleticism"})
 
     mlb = pd.read_csv(DATA_DIR / "historical" / "hist_mlb_data.csv",
                       usecols=["PlayerId", "Season"])

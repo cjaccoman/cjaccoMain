@@ -1,7 +1,7 @@
 """Build TOOLS_Score for every player-season row in prospect_features.csv.
 
 TOOLS_Score measures raw physical skills, normalized for era and level.
-Output: data/rankings/tools_scores.csv (one row per player-season-level)
+Output: columns written back into prospect_features.csv in place.
 
 Component weights:
   Discipline   45%
@@ -57,7 +57,6 @@ from pathlib import Path
 
 DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
 FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.csv"
-OUT_PATH    = DATA_DIR / "rankings" / "tools_scores.csv"
 
 # Top-level component weights
 W = dict(discipline=0.45, power=0.35, athleticism=0.20)
@@ -215,29 +214,17 @@ def main() -> None:
     # 5. Final 50±10 standardization
     tools_score = to_50_10(tools_raw)
 
-    # 6. Assemble output
-    out = df[["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
-              "EraK%", "EraHR/FB", "EraSB"]].copy()
-    out["TOOLS_Score"]  = tools_score
-    out["Discipline"]   = disc.round(3)
-    out["Power"]        = power.round(3)
-    out["Athleticism"]  = ath.round(3)
-    # Key inputs for audit
-    out["Whiff%_adj"]   = df["Whiff%_adj"]
-    out["Chase%_adj"]   = df["Chase%_adj"]
-    out["ZContact%_adj"]= df["ZContact%_adj"]
-    out["BB%_adj"]      = df["BB%_adj"]
-    out["HRFB_adj"]        = df["HRFB_adj"]
-    out["career_FBs_est"]  = df["career_FBs_est"]
-    out["prior_FBs_est"]   = df["prior_FBs_est"]
-    out["MaxEV_z"]      = maxev_z.round(3)
-    out["EV90_z"]       = ev90_z.round(3)
-    out["Spd_z"]        = spd_z.round(3)
-    out["3B_PA_adj"]    = df["3B_PA_adj"]
-    out["Age_Z_SL"]     = df["Age_Z_SL"]
+    # 6. Write score columns back into prospect_features.csv in place
+    df["TOOLS_Score"]    = tools_score
+    df["TOOLS_Disc"]     = disc.round(3)
+    df["TOOLS_Power"]    = power.round(3)
+    df["TOOLS_Ath"]      = ath.round(3)
+    df["MaxEV_z"]        = maxev_z.round(3)
+    df["EV90_z"]         = ev90_z.round(3)
+    df["Spd_z"]          = spd_z.round(3)
 
-    out.to_csv(OUT_PATH, index=False)
-    print(f"Wrote {len(out):,} rows -> {OUT_PATH}\n")
+    df.to_csv(FEATURES_IN, index=False)
+    print(f"Wrote {len(df):,} rows -> {FEATURES_IN}\n")
 
     # 7. Summary stats
     print(f"TOOLS_Score  mean={tools_score.mean():.1f}  "
@@ -261,7 +248,7 @@ def main() -> None:
           f"3bpa-only= {(~spd_z.notna() & df['3B_PA_adj'].notna()).sum():,}")
 
     # Top 20 current prospects (Season >= 2025, one row per player)
-    current = out[out["Season"] >= 2025].copy()
+    current = df[df["Season"] >= 2025].copy()
     best    = (
         current.sort_values(["PA"], ascending=False)
                .drop_duplicates("PlayerId")
@@ -270,7 +257,7 @@ def main() -> None:
     print("\nTop 20 TOOLS (Season >= 2025, one row per player):")
     print(
         best[["Name", "Team", "Level", "Age", "TOOLS_Score",
-              "Discipline", "Power", "Athleticism"]
+              "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath"]
              ].to_string(index=False)
     )
 

@@ -28,13 +28,16 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PS_DIR   = DATA_DIR / "prospectSavant"
 OUT_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
 
-PS_FILES = [
+# Level/year combinations to pull from prospect_savant.csv.
+# Only these rows are used for TOOLS scoring; others are excluded because data
+# quality or PS coverage is insufficient for those level/year cells.
+PS_USE = {
     ("AAA", 2023), ("AAA", 2024), ("AAA", 2025), ("AAA", 2026),
     ("AA",  2026),
     ("A+",  2026),
     ("A",   2023), ("A",   2024), ("A",   2025), ("A",   2026),
     ("Rk",  2026),
-]
+}
 PS_LEVEL_MAP = {"Rk": "R"}   # normalise PS level names to pipeline names
 
 
@@ -44,29 +47,25 @@ def _norm(s: str) -> str:
 
 
 def load_ps() -> pd.DataFrame:
-    frames = []
-    for level, year in PS_FILES:
-        safe = level.replace("+", "p")
-        path = PS_DIR / f"ps_{safe}_{year}.csv"
-        if not path.exists():
-            continue
-        df = pd.read_csv(path, usecols=lambda c: c in {
-            "Name", "MLBAMId", "Season", "Level",
-            "Spd", "MaxEV", "EV90",
-            "Chase%", "ZContact%", "Whiff%", "PullAir%",
-        })
-        df["Season"] = year
-        df["Level"]  = PS_LEVEL_MAP.get(level, level)
-        # Align ZContact% to pipeline naming convention
-        if "ZContact%" in df.columns:
-            df = df.rename(columns={"ZContact%": "Z-Contact%"})
-        frames.append(df)
-    if not frames:
+    path = PS_DIR / "prospect_savant.csv"
+    if not path.exists():
         return pd.DataFrame()
-    ps = pd.concat(frames, ignore_index=True)
+    ps = pd.read_csv(path, usecols=lambda c: c in {
+        "Name", "MLBAMId", "Season", "Level",
+        "Spd", "MaxEV", "EV90",
+        "Chase%", "ZContact%", "Whiff%", "PullAir%",
+    })
     ps = ps.rename(columns={"MLBAMId": "MLBAM_ID"})
+    ps["Level"] = ps["Level"].map(PS_LEVEL_MAP).fillna(ps["Level"])
+    # Filter to approved level/year combinations
+    ps = ps[ps.apply(lambda r: (r["Level"], r["Season"]) in PS_USE, axis=1)].copy()
+    if ps.empty:
+        return pd.DataFrame()
     ps["MLBAM_ID"] = pd.to_numeric(ps["MLBAM_ID"], errors="coerce").astype("Int64")
     ps["_norm"] = ps["Name"].apply(_norm)
+    # Align ZContact% to pipeline naming convention
+    if "ZContact%" in ps.columns:
+        ps = ps.rename(columns={"ZContact%": "Z-Contact%"})
 
     # 0.0 is physically impossible for exit velocity (mph) and sprint speed (ft/sec).
     # ProspectSavant outputs 0.0 when it has no tracked data for that player-season,

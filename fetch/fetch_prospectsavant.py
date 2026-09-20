@@ -116,6 +116,7 @@ def main() -> None:
     else:
         seasons = SEASONS
 
+    all_frames = []
     for year in seasons:
         for level in LEVELS:
             print(f"  Fetching {level} {year}...", end=" ", flush=True)
@@ -123,13 +124,19 @@ def main() -> None:
             if df is None:
                 print("0 players")
                 continue
-            safe_level = level.replace("+", "p")
-            out_path = PS_DIR / f"ps_{safe_level}_{year}.csv"
-            df.to_csv(out_path, index=False)
-            print(f"{len(df)} players -> {out_path.name}")
+            all_frames.append(df)
+            print(f"{len(df)} players")
             time.sleep(CALL_DELAY)
 
-    print("\nDone.")
+    if all_frames:
+        merged = pd.concat(all_frames, ignore_index=True)
+        out_path = PS_DIR / "prospect_savant.csv"
+        merged.to_csv(out_path, index=False)
+        print(f"\nWrote {len(merged):,} rows -> {out_path.name}")
+    else:
+        print("\nNo data fetched.")
+
+    print("Done.")
 
 
 if __name__ == "__main__":

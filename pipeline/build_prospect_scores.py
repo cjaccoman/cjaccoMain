@@ -52,8 +52,6 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-TOOLS_PATH     = DATA_DIR / "rankings" / "tools_scores.csv"
-ABILITY_PATH   = DATA_DIR / "rankings" / "ability_scores.csv"
 FEATURES_PATH  = DATA_DIR / "rankings" / "prospect_features.csv"
 MLB_PATH       = DATA_DIR / "historical" / "hist_mlb_data.csv"
 OVR_PATH       = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
@@ -199,16 +197,11 @@ def to_50_10(s: pd.Series) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    tools = pd.read_csv(
-        TOOLS_PATH,
+    scores = pd.read_csv(
+        FEATURES_PATH,
         usecols=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
-                 "TOOLS_Score", "Age_Z_SL"],
+                 "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "Discipline_Flag"],
     )
-    ability = pd.read_csv(
-        ABILITY_PATH,
-        usecols=["PlayerId", "Season", "Level", "ABILITY_Score", "Discipline_Flag"],
-    )
-    scores = tools.merge(ability, on=["PlayerId", "Season", "Level"], how="left")
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
 

@@ -37,8 +37,6 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-TOOLS_PATH    = DATA_DIR / "rankings" / "tools_scores.csv"
-ABILITY_PATH  = DATA_DIR / "rankings" / "ability_scores.csv"
 FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
 MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.csv"
 OVR_PATH      = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
@@ -167,43 +165,25 @@ def _dedup_names(names: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    # Load row-level scores and join on PlayerId + Season + Level
-    tools = pd.read_csv(
-        TOOLS_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA",
-                 "Discipline", "Power", "Athleticism"],
-    ).rename(columns={"Discipline": "TOOLS_Disc",
-                      "Power":      "TOOLS_Power",
-                      "Athleticism":"TOOLS_Ath"})
-
-    ability = pd.read_csv(
-        ABILITY_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA",
-                 "SB_Talent", "Game_Power", "Fantasy_Out"],
-    ).rename(columns={"SB_Talent":  "AB_SB",
-                      "Game_Power": "AB_Power"})
-
-    # BB% and K% as separate dimensions (not combined as BB_2K).
-    # Z-scored within Season+Level so era drift doesn't contaminate clustering.
+    # Load all per-row scores from the consolidated prospect_features.csv
     pf = pd.read_csv(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA", "BB%", "K%"],
+        usecols=["PlayerId", "Season", "Level", "PA",
+                 "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+                 "SB_Talent", "Game_Power", "Fantasy_Out",
+                 "BB%", "K%"],
     )
+    # BB% and K% as separate dimensions (not combined as BB_2K).
+    # Z-scored within Season+Level so era drift doesn't contaminate clustering.
     pf["BB%_z"] = _z_within_sl(pf, "BB%")
     pf["K%_z"]  = _z_within_sl(pf, "K%")
 
-    # Join: PA comes from ability (authoritative for ABILITY rows); tools PA should match
-    rows = ability.merge(
-        tools[["PlayerId", "Season", "Level",
-               "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath"]],
-        on=["PlayerId", "Season", "Level"],
-        how="left",
-    ).merge(
-        pf[["PlayerId", "Season", "Level", "BB%_z", "K%_z"]],
-        on=["PlayerId", "Season", "Level"],
-        how="left",
-    )
-    rows = rows.rename(columns={"BB%_z": "AB_BB", "K%_z": "AB_K"})
+    rows = pf.rename(columns={
+        "SB_Talent":  "AB_SB",
+        "Game_Power": "AB_Power",
+        "BB%_z":      "AB_BB",
+        "K%_z":       "AB_K",
+    })
     print(f"Loaded {len(rows):,} joined rows")
     print(f"  TOOLS coverage:  {rows['TOOLS_Disc'].notna().sum():,} / {len(rows):,} rows")
     print(f"  AB_BB coverage:  {rows['AB_BB'].notna().sum():,} / {len(rows):,} rows")
