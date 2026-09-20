@@ -274,7 +274,7 @@ def main() -> None:
         if OUT_PATH.exists():
             legacy = pd.read_parquet(OUT_PATH)
             legacy = legacy[legacy["Season"] < SEASONS[0]]
-            legacy["PlayerId"] = legacy["PlayerId"].astype(str)
+            legacy["PlayerId"] = pd.to_numeric(legacy["PlayerId"], errors="coerce")
             legacy["MLBAMID"]  = legacy["MLBAMID"].astype(str)
             print(f"  Preserving {len(legacy):,} pre-{SEASONS[0]} rows from existing file")
         else:
@@ -284,7 +284,7 @@ def main() -> None:
     else:
         print(f"\nIncremental mode — refreshing {CURRENT_SEASON} only")
         existing = pd.read_parquet(OUT_PATH)
-        existing["PlayerId"] = existing["PlayerId"].astype(str)
+        existing["PlayerId"] = pd.to_numeric(existing["PlayerId"], errors="coerce")
         existing["MLBAMID"]  = existing["MLBAMID"].astype(str)
         existing = existing[existing["Season"] != CURRENT_SEASON]
         fetch_seasons = [CURRENT_SEASON]
@@ -332,6 +332,14 @@ def main() -> None:
     # Keep any extra columns from existing file that aren't in cols
     extra = [c for c in combined.columns if c not in cols]
     combined = combined[[c for c in cols if c in combined.columns] + extra]
+
+    # MLBAMID: force str (mixed int/str from crosswalk vs API)
+    # PlayerId: force numeric — apply_crosswalk produces str; CSV auto-parsed as int64
+    #   but parquet preserves str, breaking run_pipeline.py int64 merges
+    if "MLBAMID" in combined.columns:
+        combined["MLBAMID"] = combined["MLBAMID"].astype(str)
+    if "PlayerId" in combined.columns:
+        combined["PlayerId"] = pd.to_numeric(combined["PlayerId"], errors="coerce")
 
     combined.to_parquet(OUT_PATH, index=False)
     print(f"Wrote {len(combined):,} rows -> {OUT_PATH}")
