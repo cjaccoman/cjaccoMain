@@ -52,7 +52,7 @@ def assign_era(season: pd.Series, breaks: list[int], names: list[str]) -> pd.Ser
 
 
 def main() -> None:
-    df = pd.read_csv(FEATURES_IN)
+    df = pd.read_parquet(FEATURES_IN)
 
     era_cols = list(ERA_DEFS.keys())
 

@@ -124,9 +124,9 @@ def _pa_weighted_slope(level_nums, pppa_vals, pa_weights):
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    scores = pd.read_csv(
+    scores = pd.read_parquet(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
+        columns=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
                  "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "PPPA_Z_SL", "Discipline_Flag"],
     )
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.39)
@@ -177,7 +177,7 @@ def main() -> None:
     # PA-weighted career MLB PPPA from hist_mlb_data.csv — PlayerId join only.
     # Name fallback omitted: normalized names drop suffixes (Jr./Sr.) and create
     # false matches between different players sharing a family name.
-    mlb = pd.read_csv(MLB_PATH, usecols=["PlayerId", "PA", "PPPA"])
+    mlb = pd.read_parquet(MLB_PATH, columns=["PlayerId", "PA", "PPPA"])
     mlb_by_id = mlb.groupby("PlayerId").apply(
         lambda g: (g["PPPA"] * g["PA"]).sum() / g["PA"].sum(), include_groups=False
     ).rename("Career_PPPA").round(3)
@@ -233,9 +233,9 @@ def main() -> None:
     # Career discipline flag — PA-weighted BB_2K and Whiff%_adj across non-AAA seasons.
     # AAA excluded to avoid survivorship bias: players who reach AAA are already a
     # filtered group; their AAA discipline looks artificially clean vs. true development.
-    feats = pd.read_csv(
+    feats = pd.read_parquet(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj"],
+        columns=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj"],
     )
     sub = feats[feats["Level"] != "AAA"].copy()
 

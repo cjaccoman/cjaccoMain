@@ -184,7 +184,7 @@ def build_athleticism(df: pd.DataFrame, spd_z: pd.Series) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    df = pd.read_csv(FEATURES_IN)
+    df = pd.read_parquet(FEATURES_IN)
     print(f"Loaded {len(df):,} rows\n")
 
     # 1. Z-score raw ProspectSavant metrics within Level

@@ -197,9 +197,9 @@ def to_50_10(s: pd.Series) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    scores = pd.read_csv(
+    scores = pd.read_parquet(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
+        columns=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
                  "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "Discipline_Flag"],
     )
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
@@ -224,7 +224,7 @@ def main() -> None:
     print(f"Loaded {len(scores):,} player-season rows")
 
     # MLB exclusion sets
-    mlb = pd.read_csv(MLB_PATH, usecols=["PlayerId", "Name", "PA"])
+    mlb = pd.read_parquet(MLB_PATH, columns=["PlayerId", "Name", "PA"])
     mlb["_norm"]   = mlb["Name"].apply(_norm)
     mlb_id_pa      = mlb.groupby("PlayerId")["PA"].sum()
     mlb_name_pa    = mlb.groupby("_norm")["PA"].sum()
@@ -286,9 +286,9 @@ def main() -> None:
     # Career discipline flag — PA-weighted BB_2K and Whiff%_adj across non-AAA seasons.
     # AAA excluded to avoid survivorship bias: players who reach AAA are already a
     # filtered group; their AAA discipline looks artificially clean vs. true development.
-    feats = pd.read_csv(
+    feats = pd.read_parquet(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj",
+        columns=["PlayerId", "Season", "Level", "PA", "BB_2K", "Whiff%_adj",
                  "K%", "HR/FB", "SB", "SB_pct", "Age", "PPPA_Z_SL"],
     )
     # Career BB_2K: PA-weighted avg of raw rate, excluding AAA to avoid survivorship bias

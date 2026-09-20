@@ -272,8 +272,10 @@ def main() -> None:
         print(f"\nFull mode — fetching seasons {SEASONS[0]}–{CURRENT_SEASON}")
         # Preserve pre-2006 rows from existing file (legacy data, not re-fetched)
         if OUT_PATH.exists():
-            legacy = pd.read_csv(OUT_PATH, dtype={"PlayerId": str, "MLBAMID": str})
+            legacy = pd.read_parquet(OUT_PATH)
             legacy = legacy[legacy["Season"] < SEASONS[0]]
+            legacy["PlayerId"] = legacy["PlayerId"].astype(str)
+            legacy["MLBAMID"]  = legacy["MLBAMID"].astype(str)
             print(f"  Preserving {len(legacy):,} pre-{SEASONS[0]} rows from existing file")
         else:
             legacy = pd.DataFrame()
@@ -281,7 +283,9 @@ def main() -> None:
         fetch_seasons = SEASONS
     else:
         print(f"\nIncremental mode — refreshing {CURRENT_SEASON} only")
-        existing = pd.read_csv(OUT_PATH, dtype={"PlayerId": str, "MLBAMID": str})
+        existing = pd.read_parquet(OUT_PATH)
+        existing["PlayerId"] = existing["PlayerId"].astype(str)
+        existing["MLBAMID"]  = existing["MLBAMID"].astype(str)
         existing = existing[existing["Season"] != CURRENT_SEASON]
         fetch_seasons = [CURRENT_SEASON]
 

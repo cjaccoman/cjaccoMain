@@ -119,7 +119,7 @@ def print_summary(df: pd.DataFrame, stat_col: str, era_col: str, out_col: str) -
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    df = pd.read_csv(FEATURES_IN)
+    df = pd.read_parquet(FEATURES_IN)
 
     # Drop existing _adj columns to rebuild clean
     stale = [o for _, _, o in ADJUSTMENTS if o in df.columns]

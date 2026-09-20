@@ -182,7 +182,7 @@ def build_game_power(df: pd.DataFrame) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    df = pd.read_csv(FEATURES_IN)
+    df = pd.read_parquet(FEATURES_IN)
     print(f"Loaded {len(df):,} rows\n")
 
     # 1. Raw components

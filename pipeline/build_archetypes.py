@@ -166,9 +166,9 @@ def _dedup_names(names: dict) -> dict:
 
 def main() -> None:
     # Load all per-row scores from the consolidated prospect_features.csv
-    pf = pd.read_csv(
+    pf = pd.read_parquet(
         FEATURES_PATH,
-        usecols=["PlayerId", "Season", "Level", "PA",
+        columns=["PlayerId", "Season", "Level", "PA",
                  "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
                  "SB_Talent", "Game_Power", "Fantasy_Out",
                  "BB%", "K%"],
@@ -189,7 +189,7 @@ def main() -> None:
     print(f"  AB_BB coverage:  {rows['AB_BB'].notna().sum():,} / {len(rows):,} rows")
     print(f"  AB_K  coverage:  {rows['AB_K'].notna().sum():,} / {len(rows):,} rows")
 
-    mlb = pd.read_csv(MLB_PATH, usecols=["PlayerId", "Season", "PA", "PPPA_Z"])
+    mlb = pd.read_parquet(MLB_PATH, columns=["PlayerId", "Season", "PA", "PPPA_Z"])
     debut_year = mlb.groupby("PlayerId")["Season"].min().rename("debut_year")
 
     # Full-season levels, minimum PA per row
@@ -393,7 +393,7 @@ def main() -> None:
         print(corr_by_arch.to_string())
 
     # Career calibration
-    mlb_full = pd.read_csv(MLB_PATH, usecols=["PlayerId", "Season", "PA", "PPPA_Z"])
+    mlb_full = pd.read_parquet(MLB_PATH, columns=["PlayerId", "Season", "PA", "PPPA_Z"])
     career_stats = (
         mlb_full.groupby("PlayerId")
         .apply(lambda g: pd.Series({

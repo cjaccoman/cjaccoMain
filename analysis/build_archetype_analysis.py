@@ -252,11 +252,11 @@ def main():
     print("SECTION 5 — TOOLS × ABILITY QUADRANT ANALYSIS")
     print("=" * 72)
 
-    ab = pd.read_csv(FEATURES_PATH, usecols=[
+    ab = pd.read_parquet(FEATURES_PATH, columns=[
         "PlayerId", "Season", "Level", "PA",
         "ABILITY_Score", "ABILITY_Disc", "SB_Talent", "Game_Power",
     ]).rename(columns={"ABILITY_Disc": "Discipline"})
-    ts = pd.read_csv(FEATURES_PATH, usecols=[
+    ts = pd.read_parquet(FEATURES_PATH, columns=[
         "PlayerId", "Season", "Level", "PA", "TOOLS_Score",
         "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
     ]).rename(columns={"TOOLS_Disc": "Discipline", "TOOLS_Power": "Power", "TOOLS_Ath": "Athleticism"})

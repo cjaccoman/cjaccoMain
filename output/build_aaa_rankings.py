@@ -1,7 +1,7 @@
 """Build data/rankings/aaa_{year}.csv — AAA player data table for power rankings.
 
 Sources:
-  data/prospectSavant/ps_AAA_{year}.csv — fetched via fetch_prospectsavant.py
+  data/prospectSavant/prospect_savant.csv — consolidated PS data (filtered to AAA)
   minorLeagueData.csv — pipeline PPPA and season-accurate Age
 
 Age resolution (priority order):
@@ -102,8 +102,13 @@ PS_COL_MAP = {
 }
 
 
-def build_season(year: int, ml: pd.DataFrame, mlb_veterans: set, mlb_vet_ids: set) -> None:
-    ps = pd.read_csv(PS_DIR / f"ps_AAA_{year}.csv")
+def build_season(year: int, ml: pd.DataFrame, mlb_veterans: set, mlb_vet_ids: set,
+                 ps_all: pd.DataFrame | None = None) -> None:
+    if ps_all is not None:
+        ps = ps_all[(ps_all["Level"] == "AAA") & (ps_all["Season"] == year)].copy()
+    else:
+        ps = pd.read_csv(PS_DIR / f"prospect_savant.csv")
+        ps = ps[(ps["Level"] == "AAA") & (ps["Season"] == year)].copy()
     ps = ps.rename(columns=PS_COL_MAP)
     ps["_norm"] = ps["Name"].apply(normalize_name)
 
@@ -357,9 +362,10 @@ def main() -> None:
     else:
         seasons = AVAILABLE_SEASONS
 
-    ml  = pd.read_parquet(DATA_DIR / "computed" / "minorLeagueData.parquet")
-    mlb = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet",
-                      columns=["Name", "PA", "MLBAMID"])
+    ml     = pd.read_parquet(DATA_DIR / "computed" / "minorLeagueData.parquet")
+    mlb    = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet",
+                             columns=["Name", "PA", "MLBAMID"])
+    ps_all = pd.read_csv(PS_DIR / "prospect_savant.csv")
     mlb["_norm"]      = mlb["Name"].apply(normalize_name)
     mlb_career_pa     = mlb.groupby("_norm")["PA"].sum()
     mlb_veterans      = set(mlb_career_pa[mlb_career_pa >= 50].index)
@@ -367,7 +373,7 @@ def main() -> None:
     mlb_vet_ids       = set(mlb_id_pa[mlb_id_pa >= 50].index)
 
     for year in seasons:
-        build_season(year, ml.copy(), mlb_veterans, mlb_vet_ids)
+        build_season(year, ml.copy(), mlb_veterans, mlb_vet_ids, ps_all=ps_all)
 
     build_combined()
 
