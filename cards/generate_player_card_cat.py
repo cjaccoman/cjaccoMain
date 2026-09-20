@@ -176,7 +176,7 @@ def pct_rank(series: pd.Series, ascending: bool = True) -> pd.Series:
 
 # ── Pool builder (unchanged logic) ────────────────────────────────────────────
 
-def build_pool(ps_raw: pd.DataFrame, ml: pd.DataFrame, hist: pd.DataFrame,
+def build_pool(ps_raw: pd.DataFrame, ml: pd.DataFrame, ps_all: pd.DataFrame,
                level: str, year: int, is_aaa: bool) -> pd.DataFrame:
     ps = ps_raw[ps_raw["AB"] >= MIN_AB].copy()
     ps["_norm"] = ps["Name"].apply(normalize_name)
@@ -194,7 +194,7 @@ def build_pool(ps_raw: pd.DataFrame, ml: pd.DataFrame, hist: pd.DataFrame,
     pppa_lkp["SB_succ"] = (pppa_lkp["SB"] / (pppa_lkp["SB"] + pppa_lkp["CS"])).fillna(0).round(3)
     ps = ps.merge(pppa_lkp[["_norm", "SB_rate", "SB_succ"]], on="_norm", how="left")
 
-    # wRC+ — primary: minorLeaguewrcp.csv; fallback: ovr_hist_data; last resort: xwOBA_R
+    # wRC+ — primary: minorLeaguewrcp.csv; fallback: prospect_savant.csv; last resort: xwOBA_R
     wrcp_path = DATA_DIR / "fangraphs" / "minorLeaguewrcp.csv"
     if wrcp_path.exists():
         wrcp = pd.read_csv(wrcp_path)
@@ -205,24 +205,21 @@ def build_pool(ps_raw: pd.DataFrame, ml: pd.DataFrame, hist: pd.DataFrame,
             .drop_duplicates(subset="_norm", keep="first")
         )[["_norm", "wRC+"]]
         ps = ps.merge(wrcp_lkp, on="_norm", how="left", suffixes=("_ps", ""))
-        if ps["wRC+"].isna().any():
-            hist["_norm"] = hist["Name"].apply(normalize_name)
-            hist_lkp = (
-                hist[(hist["Season"] == year) & (hist["Level"] == lvl_key)]
-                .sort_values("PA", ascending=False)
-                .drop_duplicates(subset="_norm", keep="first")
-            )[["_norm", "wRC+"]].rename(columns={"wRC+": "_hist_wrc"})
-            ps = ps.merge(hist_lkp, on="_norm", how="left")
-            ps["wRC+"] = ps["wRC+"].fillna(ps["_hist_wrc"])
-            ps = ps.drop(columns="_hist_wrc")
-    else:
-        hist["_norm"] = hist["Name"].apply(normalize_name)
-        wrc_lkp = (
-            hist[(hist["Season"] == year) & (hist["Level"] == lvl_key)]
-            .sort_values("PA", ascending=False)
+    if "wRC+" not in ps.columns or ps["wRC+"].isna().any():
+        # PS fallback: wRC+ is in prospect_savant.csv (0 = missing, not a real value)
+        ps_wrc = ps_all[(ps_all["Season"] == year) & (ps_all["Level"] == lvl_key)].copy()
+        ps_wrc = ps_wrc[ps_wrc["wRC+"].notna() & (ps_wrc["wRC+"] > 0)].copy()
+        ps_wrc["_norm"] = ps_wrc["Name"].apply(normalize_name)
+        ps_wrc_lkp = (
+            ps_wrc.sort_values("PA", ascending=False)
             .drop_duplicates(subset="_norm", keep="first")
-        )[["_norm", "wRC+"]]
-        ps = ps.merge(wrc_lkp, on="_norm", how="left", suffixes=("_ps", ""))
+        )[["_norm", "wRC+"]].rename(columns={"wRC+": "_ps_wrc"})
+        ps = ps.merge(ps_wrc_lkp, on="_norm", how="left")
+        if "wRC+" not in ps.columns:
+            ps["wRC+"] = ps["_ps_wrc"]
+        else:
+            ps["wRC+"] = ps["wRC+"].fillna(ps["_ps_wrc"])
+        ps = ps.drop(columns="_ps_wrc")
 
     ps["BB%-K%"] = (ps["BB%"] - ps["K%"]).round(1)
 
@@ -344,9 +341,8 @@ def draw_radar(ax, values, categories, fill_color, border_color):
 # ── Card generator ────────────────────────────────────────────────────────────
 
 def generate_card(player_name: str, year: int = 2026) -> None:
-    ml   = pd.read_csv(DATA_DIR / "computed" / "minorLeagueData.csv")
-    hist = pd.read_csv(DATA_DIR / "historical" / "ovr_hist_data.csv",
-                       usecols=["Season", "Name", "Level", "PA", "wRC+"])
+    ml      = pd.read_csv(DATA_DIR / "computed" / "minorLeagueData.csv")
+    ps_all  = pd.read_csv(PS_DIR / "prospect_savant.csv")
 
     aaa_rank = pd.read_csv(DATA_DIR / "rankings" / f"aaa_{year}.csv")
     rk_rank  = pd.read_csv(DATA_DIR / "rankings" / f"rk_{year}.csv")
@@ -356,7 +352,7 @@ def generate_card(player_name: str, year: int = 2026) -> None:
 
     if p_aaa is not None:
         is_aaa    = True
-        ps_raw    = pd.read_csv(PS_DIR / f"ps_AAA_{year}.csv")
+        ps_raw    = ps_all[(ps_all["Season"] == year) & (ps_all["Level"] == "AAA")].copy()
         level_lbl = f"AAA {year}"
     elif p_rk is not None:
         is_aaa    = False
@@ -366,7 +362,7 @@ def generate_card(player_name: str, year: int = 2026) -> None:
         print(f"Player '{player_name}' not found in aaa_{year} or rk_{year}.")
         return
 
-    pool = build_pool(ps_raw, ml.copy(), hist, "AAA" if is_aaa else "R", year, is_aaa)
+    pool = build_pool(ps_raw, ml.copy(), ps_all, "AAA" if is_aaa else "R", year, is_aaa)
     p = find_player(pool, player_name)
     if p is None:
         print(f"Player '{player_name}' not found after pool build.")

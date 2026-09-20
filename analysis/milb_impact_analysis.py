@@ -31,11 +31,11 @@ MIN_PA_FIRST  = 100   # min first-year MLB PA to include
 MIN_PA_CAREER = 400   # min career MLB PA to include
 MIN_SEASONS   = 2     # min MLB seasons for career outcome
 
-ADV_FEATS  = ["BB%", "K%", "ISO", "AVG", "OBP", "SLG", "BABIP", "wOBA", "wRC+"]
+ADV_FEATS  = ["BB%", "K%", "ISO", "AVG", "OBP", "SLG", "BABIP", "wOBA"]
 BAT_FEATS  = ["GB%", "LD%", "FB%", "IFFB%", "HR/FB", "GB/FB",
               "Pull%", "Cent%", "Oppo%", "SwStr%"]
 BASE_FEATS = ["PPPA", "Age_Z_SL"]
-TRAJ_STATS = ["K%", "PPPA", "BB%", "ISO", "wRC+"]   # priority order: K%/PPPA first
+TRAJ_STATS = ["K%", "PPPA", "BB%", "ISO"]   # priority order: K%/PPPA first
 
 # Phase 4 arc feature constants
 PHASE4_BEST   = ["K%", "PPPA"]   # rate stats for best-season features

@@ -342,7 +342,7 @@ def main() -> None:
         # ABILITY — fantasy output
         "PPPA", "PPPA_Z_SL",
         # ABILITY — contact/discipline
-        "BB%", "K%", "BB_2K", "BB/K",
+        "BB%", "K%", "BB_2K",
         # ABILITY — game power
         "PullAir%", "HR_AB",
         # ABILITY — SB talent
@@ -356,7 +356,7 @@ def main() -> None:
         # TOOLS — dev runway
         "Age_Z_SL",
         # Supporting
-        "ISO", "wRC+", "GB/FB",
+        "ISO", "GB/FB",
         # Raw counting
         "3B", "HR", "BB", "IBB",
         # Situational splits (AAA 2023-2025)

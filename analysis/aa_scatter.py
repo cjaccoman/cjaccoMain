@@ -22,18 +22,19 @@ def normalize_name(name: str) -> str:
 
 # ── MiLB: AA player-seasons, PA ≥ 50 ─────────────────────────────────────────
 ovr = pd.read_csv(DATA_DIR / "historical" / "ovr_hist_data.csv")
+adv = pd.read_csv(DATA_DIR / "api" / "milb_advanced.csv",
+                  usecols=["PlayerId", "Season", "Level", "BB%", "K%"])
+
 aa = ovr[(ovr["Level"] == "AA") & (ovr["PA"] >= 50)].copy()
-aa = aa.dropna(subset=["BB/K", "K%"])
+aa = aa.merge(adv[adv["Level"] == "AA"], on=["PlayerId", "Season", "Level"], how="left")
+aa = aa.dropna(subset=["BB%", "K%"])
 
 # Detect K% scale (decimal vs percentage points)
 k_median = aa["K%"].median()
-if k_median < 1:
-    scale = 100.0   # stored as decimal → convert to pp
-else:
-    scale = 1.0     # already in pp
+scale = 100.0 if k_median < 1 else 1.0
 
-aa["BB_pct"]  = aa["BB/K"] * aa["K%"] * scale   # BB% in pp
-aa["K_pct"]   = aa["K%"] * scale                 # K% in pp
+aa["BB_pct"]  = aa["BB%"] * scale                # BB% in pp
+aa["K_pct"]   = aa["K%"]  * scale                # K% in pp
 aa["BB_m_2K"] = (aa["BB_pct"] - 2 * aa["K_pct"]).round(2)
 
 # Age_R: within each Season+League group at AA (younger = higher percentile)
@@ -42,8 +43,8 @@ aa["Age_R"] = (
       .rank(pct=True, ascending=False) * 100
 ).round(1)
 
-print(f"AA rows (PA≥50, BB/K+K% present): {len(aa):,}")
-print(f"K% scale: {'decimal → *100' if scale == 100 else 'already pp'}")
+print(f"AA rows (PA≥50, BB%+K% present): {len(aa):,}")
+print(f"K% scale: {'decimal → ×100' if scale == 100 else 'already pp'}")
 print(f"BB%-2K% range: {aa['BB_m_2K'].min():.1f} to {aa['BB_m_2K'].max():.1f}")
 
 # ── MLB: rank PPPA within each season, count top-100 finishes ─────────────────

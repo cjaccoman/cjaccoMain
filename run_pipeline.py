@@ -31,10 +31,10 @@ COMPUTED_DIR = DATA_DIR / "computed"
 
 LEVEL_MAP = {"R": 1, "A": 2, "A+": 3, "AA": 4, "AAA": 5}
 JOIN_KEY = ["PlayerId", "Season", "Team", "Level", "PA"]
-SKILL_PREDS    = ["BB/K", "K%", "GB/FB", "SwStr%", "Age_Z_SL", "ISO"]
-ALL_PREDS      = ["BB/K", "K%", "ISO", "wRC+", "GB/FB", "SwStr%", "Age_Z_SL"]
-PRED_REGRESSION = ["BB/K", "K%", "GB/FB", "SwStr%", "Age_Z_SL", "ISO", "level_diff"]
-MLB_PREDS      = ["BB/K", "K%", "GB/FB", "Age_Z_SL", "wRC+", "ISO"]
+SKILL_PREDS    = ["K%", "GB/FB", "SwStr%", "Age_Z_SL", "ISO"]
+ALL_PREDS      = ["K%", "ISO", "GB/FB", "SwStr%", "Age_Z_SL"]
+PRED_REGRESSION = ["K%", "GB/FB", "SwStr%", "Age_Z_SL", "ISO", "level_diff"]
+MLB_PREDS      = ["K%", "GB/FB", "Age_Z_SL", "ISO"]
 MLB_TRAJ       = ["K%"]                  # stats for trajectory (delta) in Phase 2
 
 # Phase 4 arc feature constants
@@ -84,17 +84,17 @@ def _name_fill(out: pd.DataFrame, source: pd.DataFrame, stats: list) -> pd.DataF
 def build_ovr_hist_data() -> pd.DataFrame:
     print("  Building ovr_hist_data.csv...")
     BASE_COLS = ["PlayerId", "Season", "Name", "Level", "League", "Age"]
-    MISS_STATS = ["wRC+", "BB/K", "K%", "ISO", "SwStr%", "GB/FB"]
-    ADV_STATS  = ["BB/K", "K%", "ISO"]
+    MISS_STATS = ["K%", "ISO", "SwStr%", "GB/FB"]
+    ADV_STATS  = ["K%", "ISO"]
     BAT_STATS  = ["GB/FB", "SwStr%"]
 
     ml  = pd.read_csv(COMPUTED_DIR / "minorLeagueData.csv", dtype={"PlayerId": str})
     ml["Level"] = ml["Level"].replace(REMAP_LEVELS)
 
     adv = pd.read_csv(HIST_DIR / "historical_ml_advanced.csv",
-                      usecols=[*JOIN_KEY, "Name", "BB/K", "K%", "ISO"]).drop_duplicates(subset=JOIN_KEY)
+                      usecols=[*JOIN_KEY, "Name", "K%", "ISO"]).drop_duplicates(subset=JOIN_KEY)
     adv["Level"] = adv["Level"].replace(REMAP_LEVELS)
-    adv = adv.rename(columns={"BB/K": "BB/K_adv", "K%": "K%_adv", "ISO": "ISO_adv"})
+    adv = adv.rename(columns={"K%": "K%_adv", "ISO": "ISO_adv"})
 
     bat = pd.read_csv(HIST_DIR / "historical_ml_batted.csv",
                       usecols=[*JOIN_KEY, "Name", "GB/FB", "SwStr%"]).drop_duplicates(subset=JOIN_KEY)
@@ -120,31 +120,28 @@ def build_ovr_hist_data() -> pd.DataFrame:
     out = _name_fill(out, miss_raw[_NAME_KEY + MISS_STATS], MISS_STATS)
 
     # Prefer missing_milb values; fill remaining nulls from historical CSV fallbacks
-    out["BB/K"]   = out["BB/K"].fillna(out["BB/K_adv"])
     out["K%"]     = out["K%"].fillna(out["K%_adv"])
     out["ISO"]    = out["ISO"].fillna(out["ISO_adv"])
     out["SwStr%"] = out["SwStr%"].fillna(out["SwStr%_bat"])
     out["GB/FB"]  = out["GB/FB"].fillna(out["GB/FB_bat"])
 
     # Name fallback for adv/bat: any stats still null after miss fallback
-    adv_src = adv.rename(columns={"BB/K_adv": "BB/K", "K%_adv": "K%", "ISO_adv": "ISO"})
+    adv_src = adv.rename(columns={"K%_adv": "K%", "ISO_adv": "ISO"})
     bat_src = bat.rename(columns={"GB/FB_bat": "GB/FB", "SwStr%_bat": "SwStr%"})
     out = _name_fill(out, adv_src[_NAME_KEY + ADV_STATS], ADV_STATS)
     out = _name_fill(out, bat_src[_NAME_KEY + BAT_STATS], BAT_STATS)
 
-    out = out.drop(columns=["BB/K_adv", "K%_adv", "ISO_adv", "SwStr%_bat", "GB/FB_bat"])
+    out = out.drop(columns=["K%_adv", "ISO_adv", "SwStr%_bat", "GB/FB_bat"])
 
     # ProspectSavant AAA fallback: fill 2026 AAA rows still missing rate stats.
     # K% and SwStr% are percentage-scale in PS (0-100); ISO is decimal. GB/FB excluded (PS returns zeros).
-    # wRC+ always zero from PS API so excluded.
     PS_DIR = DATA_DIR / "prospectSavant"
     ps_path = PS_DIR / "prospect_savant.csv"
-    PS_FILL = ["BB/K", "K%", "ISO", "SwStr%"]
+    PS_FILL = ["K%", "ISO", "SwStr%"]
     if ps_path.exists():
-        ps_all  = pd.read_csv(ps_path, usecols=["Name", "Season", "Level", "BB%", "K%", "ISO", "SwStr%"])
+        ps_all  = pd.read_csv(ps_path, usecols=["Name", "Season", "Level", "K%", "ISO", "SwStr%"])
         ps_aaa  = ps_all[(ps_all["Season"] == 2026) & (ps_all["Level"] == "AAA")].copy()
         ps_aaa["_nn"]   = _strip_accents(ps_aaa["Name"])
-        ps_aaa["BB/K"]  = (ps_aaa["BB%"] / ps_aaa["K%"].replace(0, float("nan"))).round(2)
         ps_aaa["K%"]    = (ps_aaa["K%"]    / 100).round(4)
         ps_aaa["SwStr%"]= (ps_aaa["SwStr%"] / 100).round(4)
         ps_agg = ps_aaa.groupby("_nn")[PS_FILL].mean().round(4).reset_index()
@@ -176,7 +173,7 @@ def build_ovr_hist_data() -> pd.DataFrame:
     else:
         out["BA_Rank"] = None
 
-    out = out[BASE_COLS + ["PA", "SB", "BB/K", "K%", "ISO", "wRC+", "GB/FB", "SwStr%",
+    out = out[BASE_COLS + ["PA", "SB", "K%", "ISO", "GB/FB", "SwStr%",
                             "PPPA", "PPPA_Z_SL", "Age_Z_SL", "BA_Rank"]]
 
     float_cols = out.select_dtypes(include="float").columns
