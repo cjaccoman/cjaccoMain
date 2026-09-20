@@ -32,7 +32,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.csv"
+FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.parquet"
 MIN_PA      = 50    # minimum PA for a row to count toward cell mean/std
 MIN_ROWS    = 10    # minimum qualifying rows for a Level x era cell before falling back
 
@@ -152,7 +152,7 @@ def main() -> None:
         pos = df.columns.get_loc(stat_col) + 1
         df.insert(pos, out_col, adj)
 
-    df.to_csv(FEATURES_IN, index=False)
+    df.to_parquet(FEATURES_IN, index=False)
     adj_cols = [o for _, _, o in ADJUSTMENTS if o in df.columns]
     print(f"Wrote {len(df):,} rows -> {FEATURES_IN.name}")
     print(f"Added columns: {adj_cols}")

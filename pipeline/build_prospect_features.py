@@ -26,7 +26,7 @@ import pandas as pd
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PS_DIR   = DATA_DIR / "prospectSavant"
-OUT_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
+OUT_PATH = DATA_DIR / "rankings" / "prospect_features.parquet"
 
 # Level/year combinations to pull from prospect_savant.csv.
 # Only these rows are used for TOOLS scoring; others are excluded because data
@@ -88,7 +88,7 @@ def load_ps() -> pd.DataFrame:
 
 def main() -> None:
     print("Loading spine (ovr_hist_data)...")
-    spine = pd.read_csv(DATA_DIR / "historical" / "ovr_hist_data.csv")
+    spine = pd.read_parquet(DATA_DIR / "historical" / "ovr_hist_data.parquet")
     spine["_norm"] = spine["Name"].apply(_norm)
     print(f"  {len(spine):,} rows")
 
@@ -375,7 +375,7 @@ def main() -> None:
     float_cols = out.select_dtypes(include="float").columns
     out[float_cols] = out[float_cols].round(4)
 
-    out.to_csv(OUT_PATH, index=False)
+    out.to_parquet(OUT_PATH, index=False)
     print(f"\nWrote {len(out):,} rows -> {OUT_PATH.name}")
     print(f"Columns ({len(out_cols)}): {out_cols}")
 

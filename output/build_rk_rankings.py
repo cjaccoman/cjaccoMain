@@ -86,7 +86,7 @@ def main() -> None:
     ps = ps[ps["AB"] >= MIN_AB].copy()
     ps["_norm"] = ps["Name"].apply(normalize_name)
 
-    ml = pd.read_csv(DATA_DIR / "computed" / "minorLeagueData.csv")
+    ml = pd.read_parquet(DATA_DIR / "computed" / "minorLeagueData.parquet")
     ml["_norm"] = ml["Name"].apply(normalize_name)
 
     rk = (

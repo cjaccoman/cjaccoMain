@@ -63,7 +63,7 @@ XGB_PARAMS = dict(
 # ---------------------------------------------------------------------------
 
 def load_outcomes() -> tuple[pd.DataFrame, pd.DataFrame]:
-    mlb = pd.read_csv(HIST_DIR / "hist_mlb_data.csv", dtype={"PlayerId": str})
+    mlb = pd.read_parquet(HIST_DIR / "hist_mlb_data.parquet")
 
     first_mlb = (
         mlb.sort_values("Season")
@@ -218,9 +218,8 @@ def load_milb_features(first_mlb: pd.DataFrame) -> pd.DataFrame:
                       dtype={"PlayerId": str}).drop_duplicates(subset=JOIN_KEY)
     # ovr_hist_data has no Team column; join on PlayerId+Season+Level+PA
     OVR_KEY = ["PlayerId", "Season", "Level", "PA"]
-    ovr = pd.read_csv(HIST_DIR / "ovr_hist_data.csv",
-                      usecols=[*OVR_KEY, "SB", "PPPA", "Age_Z_SL"],
-                      dtype={"PlayerId": str})
+    ovr = pd.read_parquet(HIST_DIR / "ovr_hist_data.parquet",
+                      columns=[*OVR_KEY, "SB", "PPPA", "Age_Z_SL"])
 
     milb = (adv
             .merge(bat, on=JOIN_KEY, how="outer")

@@ -21,7 +21,7 @@ def normalize_name(name: str) -> str:
 
 
 # ── MiLB: AA player-seasons, PA ≥ 50 ─────────────────────────────────────────
-ovr = pd.read_csv(DATA_DIR / "historical" / "ovr_hist_data.csv")
+ovr = pd.read_parquet(DATA_DIR / "historical" / "ovr_hist_data.parquet")
 adv = pd.read_csv(DATA_DIR / "api" / "milb_advanced.csv",
                   usecols=["PlayerId", "Season", "Level", "BB%", "K%"])
 
@@ -48,7 +48,7 @@ print(f"K% scale: {'decimal → ×100' if scale == 100 else 'already pp'}")
 print(f"BB%-2K% range: {aa['BB_m_2K'].min():.1f} to {aa['BB_m_2K'].max():.1f}")
 
 # ── MLB: rank PPPA within each season, count top-100 finishes ─────────────────
-mlb = pd.read_csv(DATA_DIR / "historical" / "hist_mlb_data.csv")
+mlb = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet")
 mlb = mlb[mlb["PA"] >= 100].copy()
 mlb["season_rank"] = mlb.groupby("Season")["PPPA"].rank(ascending=False, method="min")
 top100 = mlb[mlb["season_rank"] <= 100].copy()

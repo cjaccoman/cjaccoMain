@@ -276,7 +276,7 @@ def apply_level_normalization(knn_out: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     print("=== build_age_grad_model.py (per-row edition) ===\n")
 
-    feat  = pd.read_csv(DATA_DIR / "rankings" / "prospect_features.csv", dtype={"PlayerId": str})
+    feat  = pd.read_parquet(DATA_DIR / "rankings" / "prospect_features.parquet")
     comps = pd.read_csv(DATA_DIR / "computed"  / "player_comps.csv",      dtype={"PlayerId": str})
 
     comps["graduated"] = comps["graduated"].fillna(False).astype(bool)

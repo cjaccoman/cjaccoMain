@@ -64,7 +64,7 @@ def wls_summary(y, X_df, weights, label):
 # Load data
 # -
 
-mlb = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+mlb = pd.read_parquet(DATA / "historical" / "hist_mlb_data.parquet")
 mlb = mlb.rename(columns={"GDP": "GIDP", "MLBAMID": "MLBAM_ID"})
 
 milb = pd.read_csv(DATA / "api" / "milb_hitting.csv")
@@ -488,7 +488,7 @@ out("PART 6: MiLB SPEED-SHARE GROUPS -> MLB SPEED TRANSLATION")
 out("=" * 70)
 
 # Load minorLeagueData for TP, 3B per player-season
-mld = pd.read_csv(DATA / "computed" / "minorLeagueData.csv")
+mld = pd.read_parquet(DATA / "computed" / "minorLeagueData.parquet")
 # Aggregate career MiLB totals per player via MLBAM_ID join
 # minorLeagueData has PlayerId (FG/MLBAM mix); milb_hitting has MLBAM_ID
 # Use milb_hitting as the primary source (has SB, CS, PA, 3B) and
@@ -635,7 +635,7 @@ comps_z = comps[["MLBAM_ID","PPPA_Z_career"]].copy()
 comps_z["MLBAM_ID"] = pd.to_numeric(comps_z["MLBAM_ID"], errors="coerce")
 
 # Debut age: first season in hist_mlb_data
-mlb_raw = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+mlb_raw = pd.read_parquet(DATA / "historical" / "hist_mlb_data.parquet")
 mlb_raw = mlb_raw.rename(columns={"MLBAMID": "MLBAM_ID", "GDP": "GIDP"})
 debut = mlb_raw.sort_values("Season").groupby("MLBAM_ID").first().reset_index()[
     ["MLBAM_ID","Season","Name"]
@@ -1101,7 +1101,7 @@ c8(f"  Mean career PPPA: {mean_c:.4f}  Std: {std_c:.4f}")
 c8("\n--- STEP 2: MiLB component scores (level-discounted PA weights) ---")
 
 # Load minorLeagueData for PPPA_Z_SL; join MLBAM_ID via milb_hitting PlayerId crosswalk
-mld = pd.read_csv(DATA / "computed" / "minorLeagueData.csv")
+mld = pd.read_parquet(DATA / "computed" / "minorLeagueData.parquet")
 milb_id_map = (milb[["PlayerId","MLBAM_ID"]]
                .dropna(subset=["PlayerId","MLBAM_ID"])
                .drop_duplicates("PlayerId"))

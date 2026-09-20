@@ -18,7 +18,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.csv"
+FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.parquet"
 
 # ---------------------------------------------------------------------------
 # Era definitions — MLB-derived (overhaul02.md)
@@ -82,7 +82,7 @@ def main() -> None:
     ordered    = other[:season_pos] + added + other[season_pos:]
     df         = df[ordered]
 
-    df.to_csv(FEATURES_IN, index=False)
+    df.to_parquet(FEATURES_IN, index=False)
     print(f"Wrote {len(df):,} rows -> {FEATURES_IN.name}")
     print(f"Added columns: {added}")
 

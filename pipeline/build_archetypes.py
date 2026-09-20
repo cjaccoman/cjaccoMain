@@ -37,8 +37,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
-MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.csv"
+FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.parquet"
+MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.parquet"
 OVR_PATH      = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
 OUT_PATH      = DATA_DIR / "rankings" / "archetype_labels.csv"
 

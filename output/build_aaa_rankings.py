@@ -357,9 +357,9 @@ def main() -> None:
     else:
         seasons = AVAILABLE_SEASONS
 
-    ml  = pd.read_csv(DATA_DIR / "computed" / "minorLeagueData.csv")
-    mlb = pd.read_csv(DATA_DIR / "historical" / "hist_mlb_data.csv",
-                      usecols=["Name", "PA", "MLBAMID"])
+    ml  = pd.read_parquet(DATA_DIR / "computed" / "minorLeagueData.parquet")
+    mlb = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet",
+                      columns=["Name", "PA", "MLBAMID"])
     mlb["_norm"]      = mlb["Name"].apply(normalize_name)
     mlb_career_pa     = mlb.groupby("_norm")["PA"].sum()
     mlb_veterans      = set(mlb_career_pa[mlb_career_pa >= 50].index)

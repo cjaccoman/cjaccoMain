@@ -49,10 +49,10 @@ def assign_era(season):
 
 
 def main():
-    mil = pd.read_csv(DATA_DIR / "historical" / "ovr_hist_data.csv",
-                      usecols=["PlayerId","Season","Name","Level","PA","SB"])
-    mlb = pd.read_csv(HIST_DIR / "hist_mlb_data.csv",
-                      usecols=["PlayerId","Season","Name","PA","SB"])
+    mil = pd.read_parquet(DATA_DIR / "historical" / "ovr_hist_data.parquet",
+                      columns=["PlayerId","Season","Name","Level","PA","SB"])
+    mlb = pd.read_parquet(HIST_DIR / "hist_mlb_data.parquet",
+                      columns=["PlayerId","Season","Name","PA","SB"])
 
     # Qualifying MiLB seasons
     mil_q = mil[mil["PA"] >= MILB_PA_MIN].copy()

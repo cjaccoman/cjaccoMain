@@ -22,7 +22,7 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 # ---------------------------------------------------------------------------
 # Load data
 # ---------------------------------------------------------------------------
-mlb  = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+mlb  = pd.read_parquet(DATA / "historical" / "hist_mlb_data.parquet")
 milb = pd.read_csv(DATA / "api" / "milb_hitting.csv")
 
 # First MLB season with PA >= 100 per player

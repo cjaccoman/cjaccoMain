@@ -19,7 +19,7 @@ from sklearn.model_selection import cross_val_score
 
 DATA_DIR       = Path(__file__).resolve().parent.parent / "data"
 PC_PATH        = DATA_DIR / "computed"  / "player_comps.csv"
-FEATURES_PATH  = DATA_DIR / "rankings"  / "prospect_features.csv"
+FEATURES_PATH  = DATA_DIR / "rankings"  / "prospect_features.parquet"
 OUT_PATH       = DATA_DIR / "historical" / "archetype_analysis_output.txt"
 
 RANDOM_STATE = 42
@@ -261,8 +261,8 @@ def main():
         "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
     ]).rename(columns={"TOOLS_Disc": "Discipline", "TOOLS_Power": "Power", "TOOLS_Ath": "Athleticism"})
 
-    mlb = pd.read_csv(DATA_DIR / "historical" / "hist_mlb_data.csv",
-                      usecols=["PlayerId", "Season"])
+    mlb = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet",
+                      columns=["PlayerId", "Season"])
     debut_year = mlb.groupby("PlayerId")["Season"].min().rename("debut_year").reset_index()
 
     def agg_scores(df, score_col, extra_cols=None):

@@ -51,7 +51,7 @@ def sep(title):
 # ---------------------------------------------------------------------------
 sep("LOADING DATA")
 
-pf = pd.read_csv(DATA_DIR / "rankings" / "prospect_features.csv")
+pf = pd.read_parquet(DATA_DIR / "rankings" / "prospect_features.parquet")
 print(f"prospect_features: {len(pf):,} rows")
 
 # Null impossible PullAir% values (>1 are bad rows)
@@ -70,7 +70,7 @@ pc = pd.read_csv(DATA_DIR / "computed" / "player_comps.csv")
 pc.loc[pc["HRFB_career"] > 1.0, "HRFB_career"] = np.nan
 print(f"player_comps: {len(pc):,} rows")
 
-mlb = pd.read_csv(DATA_DIR / "historical" / "hist_mlb_data.csv")
+mlb = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet")
 mlb["MLB_HR_AB"] = mlb["HR"] / (mlb["PA"] - mlb["BB"] - mlb["IBB"]).replace(0, np.nan)
 print(f"hist_mlb_data: {len(mlb):,} rows")
 

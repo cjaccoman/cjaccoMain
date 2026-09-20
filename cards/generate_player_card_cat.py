@@ -341,7 +341,7 @@ def draw_radar(ax, values, categories, fill_color, border_color):
 # ── Card generator ────────────────────────────────────────────────────────────
 
 def generate_card(player_name: str, year: int = 2026) -> None:
-    ml      = pd.read_csv(DATA_DIR / "computed" / "minorLeagueData.csv")
+    ml      = pd.read_parquet(DATA_DIR / "computed" / "minorLeagueData.parquet")
     ps_all  = pd.read_csv(PS_DIR / "prospect_savant.csv")
 
     aaa_rank = pd.read_csv(DATA_DIR / "rankings" / f"aaa_{year}.csv")

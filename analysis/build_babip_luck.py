@@ -41,7 +41,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA    = Path(__file__).resolve().parent.parent / "data"
-MLD     = DATA / "computed" / "minorLeagueData.csv"
+MLD     = DATA / "computed" / "minorLeagueData.parquet"
 ADV     = DATA / "fangraphs" / "missing_milb_data.csv"
 ADV2    = DATA / "fangraphs" / "ml_updated_data.csv"   # 2026 override
 OUT     = DATA / "computed"  / "babip_luck.csv"

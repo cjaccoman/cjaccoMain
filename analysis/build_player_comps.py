@@ -74,16 +74,16 @@ SKILL_WEIGHTS = {
 # ---------------------------------------------------------------------------
 
 def build_dataset() -> pd.DataFrame:
-    ovr  = pd.read_csv(DATA / "historical" / "ovr_hist_data.csv")
+    ovr  = pd.read_parquet(DATA / "historical" / "ovr_hist_data.parquet")
     milb = pd.read_csv(DATA / "api" / "milb_hitting.csv")
-    mlb  = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+    mlb  = pd.read_parquet(DATA / "historical" / "hist_mlb_data.parquet")
 
     # ID bridge: ovr.PlayerId (FG) -> milb.PlayerId -> milb.MLBAM_ID -> mlb.MLBAMID
     id_bridge = milb[["PlayerId", "MLBAM_ID", "Name"]].drop_duplicates("PlayerId")
 
     # Aggregate MiLB per player per level — PPPA_Z and Age from ovr_hist_data;
     # BB_2K, Whiff%, SB_talent, HR/FB from prospect_features (has MLBAM_ID directly)
-    pf = pd.read_csv(DATA / "rankings" / "prospect_features.csv")
+    pf = pd.read_parquet(DATA / "rankings" / "prospect_features.parquet")
 
     # PA-weighted aggregator helper
     SKILL_COLS = ["BB_2K", "Whiff%", "SB_pct", "HR/FB"]

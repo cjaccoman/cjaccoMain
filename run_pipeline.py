@@ -88,7 +88,7 @@ def build_ovr_hist_data() -> pd.DataFrame:
     ADV_STATS  = ["K%", "ISO"]
     BAT_STATS  = ["GB/FB", "SwStr%"]
 
-    ml  = pd.read_csv(COMPUTED_DIR / "minorLeagueData.csv", dtype={"PlayerId": str})
+    ml  = pd.read_parquet(COMPUTED_DIR / "minorLeagueData.parquet")
     ml["Level"] = ml["Level"].replace(REMAP_LEVELS)
 
     adv = pd.read_csv(HIST_DIR / "historical_ml_advanced.csv",
@@ -179,7 +179,7 @@ def build_ovr_hist_data() -> pd.DataFrame:
     float_cols = out.select_dtypes(include="float").columns
     out[float_cols] = out[float_cols].round(2)
 
-    out.to_csv(HIST_DIR / "ovr_hist_data.csv", index=False)
+    out.to_parquet(HIST_DIR / "ovr_hist_data.parquet", index=False)
     print(f"    Wrote {len(out)} rows")
     return out
 
@@ -418,7 +418,7 @@ def build_mlb_outcomes_regression(ovr: pd.DataFrame) -> None:
     print("  Building regression_mlb_outcomes.csv...")
     traj_cols = [f"{p}_delta" for p in MLB_TRAJ]
 
-    mlb = pd.read_csv(HIST_DIR / "hist_mlb_data.csv", dtype={"PlayerId": str})
+    mlb = pd.read_parquet(HIST_DIR / "hist_mlb_data.parquet")
     first_mlb = (
         mlb.sort_values("Season")
         .groupby("PlayerId")
@@ -549,8 +549,7 @@ def build_prospect_mlb_proj(ovr: pd.DataFrame) -> None:
         "DSL": 550, "CPX": 550,
     }
     ml_levels = (
-        pd.read_csv(COMPUTED_DIR / "minorLeagueData.csv", usecols=["PlayerId", "Season", "Level", "PA"],
-                    dtype={"PlayerId": str})
+        pd.read_parquet(COMPUTED_DIR / "minorLeagueData.parquet", columns=["PlayerId", "Season", "Level", "PA"])
         .sort_values(["PlayerId", "Season", "PA"], ascending=[True, False, False])
         .drop_duplicates(subset="PlayerId", keep="first")[["PlayerId", "Level"]]
     )

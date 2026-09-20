@@ -41,8 +41,8 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.csv"
-MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.csv"
+FEATURES_PATH = DATA_DIR / "rankings" / "prospect_features.parquet"
+MLB_PATH      = DATA_DIR / "historical" / "hist_mlb_data.parquet"
 OUT_PATH      = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
 
 # Discipline floor thresholds (same as build_ability_score.py)

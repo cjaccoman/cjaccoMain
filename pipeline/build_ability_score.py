@@ -43,7 +43,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN   = DATA_DIR / "rankings" / "prospect_features.csv"
+FEATURES_IN   = DATA_DIR / "rankings" / "prospect_features.parquet"
 AGE_MULT_PATH = DATA_DIR / "computed"  / "age_mult_rows.csv"
 MIN_PA        = 50    # minimum PA to count toward group z-score params
 MIN_ROWS      = 10    # minimum rows in Season+Level cell before falling back to Level-only
@@ -276,7 +276,7 @@ def main() -> None:
     disc_flag = disc_flag.where(bb2k_flag != "", whiff_flag)
     df["Discipline_Flag"] = disc_flag
 
-    df.to_csv(FEATURES_IN, index=False)
+    df.to_parquet(FEATURES_IN, index=False)
     print(f"Wrote {len(df):,} rows -> {FEATURES_IN}\n")
 
     print(

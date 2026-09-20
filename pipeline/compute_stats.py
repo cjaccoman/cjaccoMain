@@ -15,7 +15,7 @@ import pandas as pd
 DATA_DIR     = Path(__file__).resolve().parent.parent / "data"
 COMPUTED_DIR = DATA_DIR / "computed"
 API_CSV  = DATA_DIR / "api" / "milb_hitting.csv"
-OUT_CSV  = COMPUTED_DIR / "minorLeagueData.csv"
+OUT_PATH  = COMPUTED_DIR / "minorLeagueData.parquet"
 LEAGUES_DIR = DATA_DIR / "Leagues"
 AVG_SEASON_LEAGUE_CSV     = COMPUTED_DIR / "averages_season_league.csv"
 AVG_SEASON_LEAGUE_AGE_CSV = COMPUTED_DIR / "averages_season_league_age.csv"
@@ -187,7 +187,7 @@ def main() -> None:
 
     df = attach_z_scores(df, season_league, season_league_age)
     df = df[OUTPUT_COLS]
-    df.to_csv(OUT_CSV, index=False)
+    df.to_parquet(OUT_PATH, index=False)
 
     scores = compute_player_scores(df)
     scores.to_csv(PLAYER_SCORES_CSV, index=False)

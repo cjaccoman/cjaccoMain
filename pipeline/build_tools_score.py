@@ -56,7 +56,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR    = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.csv"
+FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.parquet"
 
 # Top-level component weights
 W = dict(discipline=0.45, power=0.35, athleticism=0.20)
@@ -223,7 +223,7 @@ def main() -> None:
     df["EV90_z"]         = ev90_z.round(3)
     df["Spd_z"]          = spd_z.round(3)
 
-    df.to_csv(FEATURES_IN, index=False)
+    df.to_parquet(FEATURES_IN, index=False)
     print(f"Wrote {len(df):,} rows -> {FEATURES_IN}\n")
 
     # 7. Summary stats

@@ -34,7 +34,7 @@ API_DIR.mkdir(parents=True, exist_ok=True)
 
 BASE_URL        = "https://statsapi.mlb.com/api/v1"
 CHADWICK_CACHE  = API_DIR / "chadwick.csv"
-OUT_PATH        = HIST_DIR / "hist_mlb_data.csv"
+OUT_PATH        = HIST_DIR / "hist_mlb_data.parquet"
 
 MLB_SPORT_ID    = 1
 SEASONS         = list(range(2006, 2027))
@@ -329,7 +329,7 @@ def main() -> None:
     extra = [c for c in combined.columns if c not in cols]
     combined = combined[[c for c in cols if c in combined.columns] + extra]
 
-    combined.to_csv(OUT_PATH, index=False)
+    combined.to_parquet(OUT_PATH, index=False)
     print(f"Wrote {len(combined):,} rows -> {OUT_PATH}")
 
     # Summary

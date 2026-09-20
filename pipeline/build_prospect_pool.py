@@ -150,7 +150,7 @@ def _tbc_org_ranks_for_year(year: int) -> tuple[pd.DataFrame, pd.DataFrame]:
 
 def main() -> None:
     bw = pd.read_csv(DATA_DIR / "rankings" / "bwRankings.csv", encoding="latin-1")
-    ml = pd.read_csv(DATA_DIR / "computed" / "minorLeagueData.csv")
+    ml = pd.read_parquet(DATA_DIR / "computed" / "minorLeagueData.parquet")
 
     bw["_norm"] = bw["Name"].apply(normalize_name)
     ml["_norm"] = ml["Name"].apply(normalize_name)
@@ -193,7 +193,7 @@ def main() -> None:
     # Exclude players with ≥50 career MLB PA.
     # ID systems may not align (hist_mlb uses FanGraphs IDs; pool may have MLBAM IDs for recent
     # players not yet in the Chadwick crosswalk), so filter on both PlayerId and normalized Name.
-    mlb = pd.read_csv(DATA_DIR / "historical" / "hist_mlb_data.csv", usecols=["PlayerId", "Name", "PA"])
+    mlb = pd.read_parquet(DATA_DIR / "historical" / "hist_mlb_data.parquet", columns=["PlayerId", "Name", "PA"])
     mlb["_norm"]    = mlb["Name"].apply(normalize_name)
     mlb_id_pa       = mlb.groupby("PlayerId")["PA"].sum()
     mlb_name_pa     = mlb.groupby("_norm")["PA"].sum()
@@ -284,8 +284,8 @@ def main() -> None:
     # PPPA_Score: PA-weighted PPPA_Z_SL across all career seasons, level-discounted.
     # Level weights from chained SB translation factors (2023+ era, normalized AAA=1.0).
     LEVEL_PPPA_WEIGHT = {"AAA": 1.00, "AA": 0.84, "A+": 0.71, "A": 0.57, "R": 0.39}
-    hist = pd.read_csv(HIST_DIR / "ovr_hist_data.csv",
-                       usecols=["PlayerId", "Level", "PA", "PPPA_Z_SL"])
+    hist = pd.read_parquet(HIST_DIR / "ovr_hist_data.parquet",
+                       columns=["PlayerId", "Level", "PA", "PPPA_Z_SL"])
     hist = hist[hist["PPPA_Z_SL"].notna()].copy()
     hist["_lvl_wt"]  = hist["Level"].map(LEVEL_PPPA_WEIGHT).fillna(0.57)
     hist["_wt"]      = hist["PA"] * hist["_lvl_wt"]

@@ -42,7 +42,7 @@ LEVELS  = ["AAA", "AA", "A+", "A", "R"]
 # ---------------------------------------------------------------------------
 # Load
 # ---------------------------------------------------------------------------
-mlb  = pd.read_csv(DATA / "historical" / "hist_mlb_data.csv")
+mlb  = pd.read_parquet(DATA / "historical" / "hist_mlb_data.parquet")
 milb = pd.read_csv(DATA / "api" / "milb_hitting.csv")
 prospects = pd.read_csv(DATA / "rankings" / "prospect_scores.csv")
 
