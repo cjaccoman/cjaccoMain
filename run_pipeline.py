@@ -134,31 +134,15 @@ def build_ovr_hist_data() -> pd.DataFrame:
 
     out = out.drop(columns=["BB/K_adv", "K%_adv", "ISO_adv", "SwStr%_bat", "GB/FB_bat"])
 
-    # ml_updated_data.csv: override 2026 rate stats with the most current season data
-    upd = pd.read_csv(FG_DIR / "ml_updated_data.csv", dtype={"PlayerId": str})
-    upd = upd.drop(columns=["BB/K.1"], errors="ignore")
-    upd["Level"] = upd["Level"].replace(REMAP_LEVELS)
-    upd = upd[upd["Level"].isin(STD_LEVELS)].copy()
-    upd["_nn"] = _strip_accents(upd["Name"])
-    out["_nn"] = _strip_accents(out["Name"])
-    upd_agg = upd.groupby(_NORM_KEY)[MISS_STATS].mean().round(2).reset_index()
-    upd_agg = upd_agg.rename(columns={c: f"_upd_{c}" for c in MISS_STATS})
-    out = out.merge(upd_agg, on=_NORM_KEY, how="left").drop(columns="_nn")
-    upd_mask = (out["Season"] == 2026) & out[[f"_upd_{c}" for c in MISS_STATS]].notna().any(axis=1)
-    for col in MISS_STATS:
-        mask = (out["Season"] == 2026) & out[f"_upd_{col}"].notna()
-        out.loc[mask, col] = out.loc[mask, f"_upd_{col}"]
-    out = out.drop(columns=[f"_upd_{c}" for c in MISS_STATS])
-    print(f"    Overrode {upd_mask.sum()} 2026 rows from ml_updated_data.csv")
-
     # ProspectSavant AAA fallback: fill 2026 AAA rows still missing rate stats.
     # K% and SwStr% are percentage-scale in PS (0-100); ISO is decimal. GB/FB excluded (PS returns zeros).
     # wRC+ always zero from PS API so excluded.
     PS_DIR = DATA_DIR / "prospectSavant"
-    ps_path = PS_DIR / "ps_AAA_2026.csv"
+    ps_path = PS_DIR / "prospect_savant.csv"
     PS_FILL = ["BB/K", "K%", "ISO", "SwStr%"]
     if ps_path.exists():
-        ps_aaa = pd.read_csv(ps_path, usecols=["Name", "BB%", "K%", "ISO", "SwStr%"])
+        ps_all  = pd.read_csv(ps_path, usecols=["Name", "Season", "Level", "BB%", "K%", "ISO", "SwStr%"])
+        ps_aaa  = ps_all[(ps_all["Season"] == 2026) & (ps_all["Level"] == "AAA")].copy()
         ps_aaa["_nn"]   = _strip_accents(ps_aaa["Name"])
         ps_aaa["BB/K"]  = (ps_aaa["BB%"] / ps_aaa["K%"].replace(0, float("nan"))).round(2)
         ps_aaa["K%"]    = (ps_aaa["K%"]    / 100).round(4)
