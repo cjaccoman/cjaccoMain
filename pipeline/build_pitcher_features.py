@@ -1,9 +1,8 @@
 """Build pitcher_features.csv — one row per player-season-level, 2006-2026.
 
 Sources:
-  milb_pitching.csv          — counting stats (IP, K, BB, ER, HR, W, L, SV, HLD, ...)
-  milb_pitching_advanced.csv — rate stats (K%, BB%, K-BB%, Whiff%, GB/FB, QS, ...)
-  player_birthdays.csv       — for Age_Z_SL
+  milb_pitching_combined.parquet — counting + rate stats + ProspectSavant metrics
+  player_birthdays.csv           — for Age_Z_SL
 
 Derived columns:
   ERA       = 9 × ER / IP
@@ -12,7 +11,7 @@ Derived columns:
   BB9       = 9 × BB / IP
   HR9       = 9 × HRA / IP
   PPI_skill = 2×K/IP - 0.5×BB/IP - 1×ER/IP - 2×HRA/IP + 0.75  (controllable rate PPI)
-  Role      = 'SP' if GS/G >= 0.5 else 'RP'
+  Role      = PS Role where available; GS/G >= 0.5 fallback
   Age_Z_SL  = age z-scored within Season × Level peers
 
 Era labels (same MLB-derived breaks as hitter model):
@@ -21,8 +20,9 @@ Era labels (same MLB-derived breaks as hitter model):
   EraPPPA: 2010, 2021
 
 Era-adjusted z-scores (within Level × Era cell, using players with IP >= 20):
-  K%_adj, BB%_adj, KBB_adj, Whiff%_adj, ERA_adj, GB%_adj
-  All positive = better (ERA_adj inverted: lower ERA → higher z)
+  K%_adj, BB%_adj, KBB_adj, Whiff%_adj, ERA_adj, GB%_adj, PPI_adj
+  MaxVelo_adj, SpinRate_adj, Chase%_adj, ZContact%_adj (PS tiers, 2023-2026)
+  All positive = better (ERA_adj, BB%_adj, ZContact%_adj inverted)
 """
 
 import unicodedata
@@ -32,8 +32,7 @@ import numpy as np
 import pandas as pd
 
 DATA_DIR   = Path(__file__).resolve().parent.parent / "data"
-PIT_PATH   = DATA_DIR / "api" / "milb_pitching.csv"
-ADV_PATH   = DATA_DIR / "api" / "milb_pitching_advanced.csv"
+PIT_PATH   = DATA_DIR / "api" / "milb_pitching_combined.parquet"
 BIRTH_PATH = DATA_DIR / "api" / "player_birthdays.csv"
 OUT_PATH   = DATA_DIR / "rankings" / "pitcher_features.csv"
 
@@ -89,13 +88,11 @@ def main() -> None:
     # -----------------------------------------------------------------------
     # Load data
     # -----------------------------------------------------------------------
-    print("Loading milb_pitching.csv ...")
-    pit = pd.read_csv(PIT_PATH, dtype={"PlayerId": str, "MLBAM_ID": str})
-    print(f"  {len(pit):,} rows")
-
-    print("Loading milb_pitching_advanced.csv ...")
-    adv = pd.read_csv(ADV_PATH, dtype={"PlayerId": str, "MLBAM_ID": str})
-    print(f"  {len(adv):,} rows")
+    print("Loading milb_pitching_combined.parquet ...")
+    df = pd.read_parquet(PIT_PATH)
+    df["PlayerId"] = df["PlayerId"].astype(str)
+    df["MLBAM_ID"] = df["MLBAM_ID"].astype(str)
+    print(f"  {len(df):,} rows")
 
     print("Loading player_birthdays.csv ...")
     bdays = pd.read_csv(BIRTH_PATH, dtype={"MLBAM_ID": str})
@@ -104,20 +101,9 @@ def main() -> None:
     # -----------------------------------------------------------------------
     # Filter minimum IP
     # -----------------------------------------------------------------------
-    pit = pit[pit["IP"].fillna(0) >= MIN_IP_FEAT].copy()
-    print(f"\nAfter IP >= {MIN_IP_FEAT} filter: {len(pit):,} rows")
-
-    # -----------------------------------------------------------------------
-    # Merge counting + advanced
-    # Advanced uses BF as the join anchor (both files have MLBAM_ID + Season + Level + Team)
-    # -----------------------------------------------------------------------
-    merge_keys = ["MLBAM_ID", "Season", "Level", "Team"]
-    adv_cols = ["K%", "BB%", "K-BB%", "Whiff%", "BABIP", "QS", "GB%", "LD%", "FB%", "GB/FB"]
-    adv_sub = adv[merge_keys + adv_cols].copy()
-
-    df = pit.merge(adv_sub, on=merge_keys, how="left")
-    print(f"After merge with advanced: {len(df):,} rows "
-          f"({df['K%'].notna().sum():,} with K% coverage)")
+    df = df[df["IP"].fillna(0) >= MIN_IP_FEAT].copy()
+    print(f"\nAfter IP >= {MIN_IP_FEAT} filter: {len(df):,} rows")
+    print(f"K% coverage: {df['K%'].notna().sum():,} rows")
 
     # -----------------------------------------------------------------------
     # Age from birth dates
@@ -135,7 +121,7 @@ def main() -> None:
     df = df.drop(columns=["MLBAM_ID_num", "BirthDate"], errors="ignore")
 
     # -----------------------------------------------------------------------
-    # Derived stats
+    # Derived stats (computed from counting — override any PS values)
     # -----------------------------------------------------------------------
     df["ERA"]       = (9 * df["ER"] / df["IP"]).where(df["IP"] > 0)
     df["WHIP"]      = ((df["H"] + df["BB"]) / df["IP"]).where(df["IP"] > 0)
@@ -150,7 +136,7 @@ def main() -> None:
         + 0.75
     ).where(df["IP"] > 0)
 
-    # K% from counting if not available from advanced
+    # K%/BB% from counting if not available from advanced
     if "K%" not in df.columns or df["K%"].isna().all():
         df["K%"] = (df["K"] / df["BF"]).where(df["BF"] > 0)
     if "BB%" not in df.columns or df["BB%"].isna().all():
@@ -158,11 +144,15 @@ def main() -> None:
     if "K-BB%" not in df.columns or df["K-BB%"].isna().all():
         df["K-BB%"] = df["K%"] - df["BB%"]
 
-    # Role
-    df["Role"] = np.where(
+    # Role: use PS Role where available; fall back to GS/G ratio
+    role_computed = np.where(
         df["GS"].fillna(0) / df["G"].clip(lower=1) >= 0.5,
         "SP", "RP"
     )
+    if "Role" in df.columns:
+        df["Role"] = df["Role"].where(df["Role"].notna(), pd.Series(role_computed, index=df.index))
+    else:
+        df["Role"] = role_computed
 
     # -----------------------------------------------------------------------
     # Age_Z_SL: age z-scored within Season × Level
@@ -214,23 +204,53 @@ def main() -> None:
     # PPI_skill_adj: higher = better → positive z
     df["PPI_adj"] = z_within_group(df_adj, "PPI_skill", ["Level", "EraPPPA"]).reindex(df.index)
 
+    # ── PS-sourced era-adjusted z-scores (2023-2026 where PS data present) ──
+    # MaxVelo_adj: higher velo = better → positive z
+    if "MaxVelo" in df.columns:
+        df["MaxVelo_adj"] = z_within_group(df_adj, "MaxVelo", ["Level", "EraK%"]).reindex(df.index)
+
+    # SpinRate_adj: higher spin = more movement = better → positive z
+    if "SpinRate" in df.columns:
+        df["SpinRate_adj"] = z_within_group(df_adj, "SpinRate", ["Level", "EraK%"]).reindex(df.index)
+
+    # Chase%_adj: batters chasing = pitcher inducing bad swings = better → positive z
+    if "Chase%" in df.columns:
+        df["Chase%_adj"] = z_within_group(df_adj, "Chase%", ["Level", "EraK%"]).reindex(df.index)
+
+    # ZContact%_adj: lower in-zone contact = better for pitcher → invert
+    if "ZContact%" in df.columns:
+        df["ZContact%_adj"] = z_within_group(df_adj, "ZContact%", ["Level", "EraK%"]).reindex(df.index) * -1
+
     print("\nEra-adjusted z-score coverage:")
-    for col in ["K%_adj", "BB%_adj", "KBB_adj", "Whiff%_adj", "ERA_adj", "GB%_adj", "PPI_adj"]:
-        n = df[col].notna().sum()
-        print(f"  {col}: {n:,} rows ({100*n/len(df):.1f}%)")
+    adj_cols = ["K%_adj", "BB%_adj", "KBB_adj", "Whiff%_adj", "ERA_adj", "GB%_adj", "PPI_adj",
+                "MaxVelo_adj", "SpinRate_adj", "Chase%_adj", "ZContact%_adj"]
+    for col in adj_cols:
+        if col in df.columns:
+            n = df[col].notna().sum()
+            print(f"  {col}: {n:,} rows ({100*n/len(df):.1f}%)")
 
     # -----------------------------------------------------------------------
     # Column order + save
     # -----------------------------------------------------------------------
     col_order = [
         "PlayerId", "MLBAM_ID", "Season", "Name", "Team", "Level", "League",
-        "Age", "Age_Z_SL", "Role",
-        "G", "GS", "IP", "BF", "ER", "K", "BB", "IBB", "HRA", "H", "HBP",
+        "Age", "Age_Z_SL", "Role", "Throws",
+        "G", "GS", "IP", "BF", "TBF", "ER", "K", "BB", "IBB", "HRA", "H", "HBP",
         "W", "L", "SV", "SVO", "HLD", "BS", "CG", "SHO", "QS", "WP",
         "ERA", "WHIP", "K9", "BB9", "HR9", "PPI_skill",
         "K%", "BB%", "K-BB%", "Whiff%", "BABIP", "GB%", "LD%", "FB%", "GB/FB",
+        # ProspectSavant columns (2023-2026)
+        "MaxVelo", "AvgVelo", "EffVelo", "SpinRate", "Extension", "ArmAngle",
+        "HBreak_Arm", "IVBreak", "TVBreak",
+        "SwStr%", "Chase%", "ZContact%", "Zone%", "ZSwing%", "Strike%",
+        "FIP", "xFIP", "xwOBA", "xBA", "xSLG", "wOBA",
+        "Barrel%BBE", "Barrel%PA", "HardHit%", "LA", "AvgEV",
+        "PSScore",
+        # Era labels
         "EraK%", "EraHRFB", "EraPPPA",
+        # Era-adjusted z-scores
         "K%_adj", "BB%_adj", "KBB_adj", "Whiff%_adj", "ERA_adj", "GB%_adj", "PPI_adj",
+        "MaxVelo_adj", "SpinRate_adj", "Chase%_adj", "ZContact%_adj",
     ]
     col_order = [c for c in col_order if c in df.columns]
     df = df[col_order]
