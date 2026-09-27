@@ -40,9 +40,11 @@ DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
 FEATURES_PATH = DATA_DIR / "rankings" / "pitcher_features.csv"
 OUT_PATH      = DATA_DIR / "rankings" / "pitcher_scores.csv"
 
-MAX_PROSPECT_AGE = 25
-MIN_SEASON       = 2025
-MIN_IP_CAREER    = 10   # minimum career IP to be included in current pool
+MAX_PROSPECT_AGE  = 25
+MIN_SEASON        = 2025
+MIN_IP_CAREER     = 10   # minimum career MiLB IP to be included in current pool
+MLB_IP_THRESHOLD  = 50   # career MLB IP >= this → graduated; mirrors hitters' 50 PA rule
+MLB_PITCHING_PATH = DATA_DIR / "historical" / "hist_mlb_pitching.parquet"
 
 LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 
@@ -210,12 +212,23 @@ def main() -> None:
     eligible_pids = eligible[eligible].index.tolist()
     curr = df[df["PlayerId"].isin(eligible_pids)].copy()
 
-    # Age at most recent season
+    # Age at most recent season — use last row for Age/Role/Name/Team, but
+    # resolve Level to the highest level reached in that most recent season
+    # (avoids showing a rehab A-ball stint when a player also pitched at AAA).
+    _LEVEL_ORD2 = {"R": 0, "A": 1, "A+": 2, "AA": 3, "AAA": 4}
     age_at_last = (
         df.sort_values("Season")
         .groupby("PlayerId")
         .last()[["Age", "Age_Z_SL", "Role", "Name", "Team", "Level"]]
     )
+    # Override Level with highest level in each player's most recent season
+    last_sea_lvl = (
+        df.merge(last_sea.reset_index(name="LastSeason"), on="PlayerId")
+        .query("Season == LastSeason")
+        .groupby("PlayerId")["Level"]
+        .apply(lambda s: max(s, key=lambda v: _LEVEL_ORD2.get(v, -1)))
+    )
+    age_at_last["Level"] = last_sea_lvl.reindex(age_at_last.index).fillna(age_at_last["Level"])
     age_at_last = age_at_last[age_at_last["Age"].fillna(99) <= MAX_PROSPECT_AGE]
     eligible_pids = list(set(eligible_pids) & set(age_at_last.index))
     curr = curr[curr["PlayerId"].isin(eligible_pids)]
@@ -223,11 +236,64 @@ def main() -> None:
     print(f"\nCurrent pool: {len(eligible_pids)} pitchers "
           f"(age <= {MAX_PROSPECT_AGE}, most recent season >= {MIN_SEASON})")
 
-    # Career IP filter
+    # Career MiLB IP filter
     career_ip = curr.groupby("PlayerId")["IP"].sum()
     eligible_pids = [p for p in eligible_pids if career_ip.get(p, 0) >= MIN_IP_CAREER]
     curr = curr[curr["PlayerId"].isin(eligible_pids)]
     print(f"  After >= {MIN_IP_CAREER} career IP filter: {len(eligible_pids)} pitchers")
+
+    # ── MLB graduation filter ─────────────────────────────────────────────────
+    # Mirrors the hitter model's 50 PA rule: pitchers with career MLB IP >= 50
+    # are treated as graduated and excluded from the prospect pool.
+    if MLB_PITCHING_PATH.exists():
+        mlb_pit = pd.read_parquet(MLB_PITCHING_PATH)
+        mlb_pit["PlayerId"] = pd.to_numeric(mlb_pit["PlayerId"], errors="coerce")
+        career_mlb_ip = mlb_pit.groupby("PlayerId")["IP"].sum()
+        graduated = set(
+            career_mlb_ip[career_mlb_ip >= MLB_IP_THRESHOLD].index.astype(str)
+        )
+        n_before = len(eligible_pids)
+        eligible_pids = [p for p in eligible_pids if str(p) not in graduated]
+        print(f"  After MLB graduation filter (>= {MLB_IP_THRESHOLD} career MLB IP): "
+              f"{len(eligible_pids)} pitchers  (removed {n_before - len(eligible_pids)})")
+    else:
+        print(f"  MLB graduation filter: hist_mlb_pitching.parquet not found — skipped")
+
+    # ── Level advancement gate ────────────────────────────────────────────────
+    # Players age >= 22 must have reached A-ball or higher at some point in
+    # their career.  This filters out organizational arms who have spent
+    # multiple years recycling through Rookie ball without advancing.
+    _LEVEL_ORD = {"R": 0, "A": 1, "A+": 2, "AA": 3, "AAA": 4}
+    career_best_level = (
+        curr.groupby("PlayerId")["Level"]
+        .apply(lambda s: s.map(_LEVEL_ORD).max())
+        .fillna(0)
+    )
+    age_ser = age_at_last["Age"].reindex(eligible_pids).fillna(99)
+    level_ok = pd.Series(
+        {p: (age_ser.get(p, 99) < 22) or (career_best_level.get(p, 0) >= 1)
+         for p in eligible_pids}
+    )
+    n_before = len(eligible_pids)
+    eligible_pids = [p for p in eligible_pids if level_ok.get(p, True)]
+    print(f"  After level advancement gate (age>=22 requires A+ career): "
+          f"{len(eligible_pids)} pitchers  (removed {n_before - len(eligible_pids)})")
+
+    # ── Recency gate ─────────────────────────────────────────────────────────
+    # Players age >= 24 must have pitched in 2026.  A 24-25 year old who sat
+    # out the entire 2026 season is almost certainly injured, released, or
+    # graduated — not a viable prospect for ranking purposes.
+    has_2026 = df[df["Season"] == 2026].groupby("PlayerId").size()
+    recency_ok = pd.Series(
+        {p: (age_ser.get(p, 99) < 24) or (has_2026.get(p, 0) > 0)
+         for p in eligible_pids}
+    )
+    n_before = len(eligible_pids)
+    eligible_pids = [p for p in eligible_pids if recency_ok.get(p, True)]
+    print(f"  After recency gate (age>=24 requires 2026 data): "
+          f"{len(eligible_pids)} pitchers  (removed {n_before - len(eligible_pids)})")
+
+    curr = curr[curr["PlayerId"].isin(eligible_pids)]
 
     # Career-aggregated scores for current pool
     stuff_curr = wt_avg_shrunk(curr, "STUFF_Score",       STUFF_IP_THRESH)
