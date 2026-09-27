@@ -93,11 +93,13 @@ def build_ovr_hist_data() -> pd.DataFrame:
 
     adv = pd.read_csv(HIST_DIR / "historical_ml_advanced.csv",
                       usecols=[*JOIN_KEY, "Name", "K%", "ISO"]).drop_duplicates(subset=JOIN_KEY)
+    adv["PlayerId"] = pd.to_numeric(adv["PlayerId"], errors="coerce")
     adv["Level"] = adv["Level"].replace(REMAP_LEVELS)
     adv = adv.rename(columns={"K%": "K%_adv", "ISO": "ISO_adv"})
 
     bat = pd.read_csv(HIST_DIR / "historical_ml_batted.csv",
                       usecols=[*JOIN_KEY, "Name", "GB/FB", "SwStr%"]).drop_duplicates(subset=JOIN_KEY)
+    bat["PlayerId"] = pd.to_numeric(bat["PlayerId"], errors="coerce")
     bat["Level"] = bat["Level"].replace(REMAP_LEVELS)
     bat = bat.rename(columns={"GB/FB": "GB/FB_bat", "SwStr%": "SwStr%_bat"})
 
@@ -106,6 +108,7 @@ def build_ovr_hist_data() -> pd.DataFrame:
     miss_raw = pd.read_csv(FG_DIR / "missing_milb_data.csv",
                            usecols=[*MISS_KEY, "Name", *MISS_STATS],
                            dtype={"PlayerId": str})
+    miss_raw["PlayerId"] = pd.to_numeric(miss_raw["PlayerId"], errors="coerce")
     miss_raw["Level"] = miss_raw["Level"].replace(REMAP_LEVELS)
     miss_raw = miss_raw[miss_raw["Level"].isin(STD_LEVELS)].copy()
     miss_agg = (miss_raw.groupby(MISS_KEY)[MISS_STATS].mean().round(2).reset_index())
