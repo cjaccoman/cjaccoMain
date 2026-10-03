@@ -74,6 +74,27 @@ TREND_THRESHOLD   =  0.02   # raw BB_2K rate shift to trigger slope modifier
 TREND_IMPROVE_MUL =  0.60   # soften penalty when visibly improving
 TREND_WORSEN_MUL  =  1.25   # harden penalty when visibly worsening
 
+# Power Ceiling Gate — applied post-blend to Combined_Score.
+# Fires for confirmed zero-power / mid-K profiles (no realistic path to elite PPPA).
+# From Power×Discipline Interaction Analysis (Oct 2026): HRFB<5% + K%>20% = 0% Elite,
+# 45-65% Replaceable in historical graduated data. Requires POWER_CEIL_PA_MIN non-AAA
+# career PA to fire — avoids penalizing players with very small samples who happen to
+# not have hit HRs yet. Distinct from Hard Floor gate (K%>=25% + HRFB<15% + SBTalent<3%).
+POWER_CEIL_HRFB_MAX  = 0.05   # < 5% career HR/FB (non-AAA, PA-weighted)
+POWER_CEIL_K_MIN     = 0.20   # > 20% career K% (non-AAA)
+POWER_CEIL_PENALTY   = 2.5    # pts deducted from Combined_Score
+POWER_CEIL_PA_MIN    = 300    # min non-AAA PA to fire (confirmed sample, not a cameo)
+
+# Power Compensation Modifier — softens discipline gate for elite-power mid-K profiles.
+# From Power×Discipline Interaction Analysis (Oct 2026): HRFB>=17% + K% 21-24% is the
+# only window where power genuinely compensates for discipline risk (16% Elite,
+# 0.435 median Career Z). Above K%=24% the compensation effect collapses (5% Elite,
+# -0.020 median Z) — the cliff is real and confirmed by cross-tab analysis.
+POWER_COMP_HRFB_MIN  = 0.17   # >= 17% career HR/FB
+POWER_COMP_K_MIN     = 0.21   # lower bound of compensation window (K% >= 21%)
+POWER_COMP_K_MAX     = 0.24   # upper bound — no compensation above this threshold
+POWER_COMP_DISC_MUL  = 0.50   # reduce discipline penalty to 50% within window
+
 # Hard Floor gate — empirical zero-success combination from the Tiered MiLB
 # Outcome Study (Sept 2026, see CLAUDE.md): K%>=25% + HRFB<15% + SBTalent<3%
 # produced zero Career_PPPA_Z >= 0.65 outcomes in our own reconstruction of the
@@ -197,10 +218,14 @@ def to_50_10(s: pd.Series) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    import pyarrow.parquet as _pq
+    _avail_cols = set(_pq.read_schema(FEATURES_PATH).names)
+    _want_cols  = ["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
+                   "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "Discipline_Flag",
+                   "MLBAM_ID", "Height", "HeightIn", "Weight", "Bats"]
     scores = pd.read_parquet(
         FEATURES_PATH,
-        columns=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
-                 "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "Discipline_Flag"],
+        columns=[c for c in _want_cols if c in _avail_cols],
     )
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
@@ -327,6 +352,10 @@ def main() -> None:
         / sbt_rows.groupby("PlayerId")["PA"].sum()
     )
     pool["Career_SBTalent"] = pool["PlayerId"].map(career_sbtalent)
+
+    # Career non-AAA PA total — used by Power Ceiling Gate to avoid firing on tiny samples.
+    career_nonAAA_pa = non_aaa.groupby("PlayerId")["PA"].sum()
+    pool["Career_nonAAA_PA"] = pool["PlayerId"].map(career_nonAAA_pa).fillna(0)
 
     # Hard Floor: all three career stats must be present and cross their
     # threshold. Missing data -> flag does not fire (insufficient evidence).
@@ -507,6 +536,20 @@ def main() -> None:
     worsening = trend.notna() & (trend <= -TREND_THRESHOLD) & (disc_pen > 0)
     disc_pen[improving] *= TREND_IMPROVE_MUL
     disc_pen[worsening] *= TREND_WORSEN_MUL
+
+    # Power compensation modifier — HRFB>=17% + K% 21-24% is the only window where
+    # power empirically compensates for discipline risk (Power×Discipline Analysis
+    # Oct 2026: 16% Elite, 0.435 median Career Z in this cell vs. 0% / 0.245 outside).
+    # Collapses at K%>=24% — no softening above that threshold.
+    power_comp_mask = (
+        pool["Career_HRFB"].notna() & pool["Career_K%"].notna()
+        & (pool["Career_HRFB"] >= POWER_COMP_HRFB_MIN)
+        & (pool["Career_K%"] >= POWER_COMP_K_MIN)
+        & (pool["Career_K%"] < POWER_COMP_K_MAX)
+        & (disc_pen > 0)
+    )
+    disc_pen[power_comp_mask] *= POWER_COMP_DISC_MUL
+
     disc_pen = disc_pen.clip(upper=DISC_PENALTY_CAP)
 
     pool["Combined_Score"] = (pool["Combined_Score"] - disc_pen).round(2)
@@ -517,12 +560,32 @@ def main() -> None:
     gate_flag[has_dc & (dcz > DISC_HARD_FLOOR) & (dcz <= DISC_SOFT_FLOOR)] = "soft"
     gate_flag[improving & (gate_flag != "")] += "+improving"
     gate_flag[worsening & (gate_flag != "")] += "+worsening"
+    gate_flag[power_comp_mask & (gate_flag != "")] += "+power-comp"
     pool["Career_Disc_Flag"] = gate_flag
 
     n_gated = (disc_pen > 0).sum()
+    n_power_comp = power_comp_mask.sum()
     print(f"Discipline gate fired: {n_gated:,} / {len(pool):,} players")
+    print(f"  Power compensation modifier: {n_power_comp:,} players (HRFB>={POWER_COMP_HRFB_MIN:.0%}, K% {POWER_COMP_K_MIN:.0%}–{POWER_COMP_K_MAX:.0%})")
     print(f"  {pool['Career_Disc_Flag'].value_counts().to_dict()}")
     print(f"  Slope data available for {pool['Disc_Slope'].notna().sum():,} / {len(pool):,} players")
+
+    # Power Ceiling Gate — fires post-discipline-gate to Combined_Score.
+    # Requires career non-AAA PA >= POWER_CEIL_PA_MIN to avoid penalizing
+    # players who simply haven't had enough AB to hit HRs yet.
+    power_ceil_mask = (
+        pool["Career_HRFB"].notna() & pool["Career_K%"].notna()
+        & (pool["Career_nonAAA_PA"] >= POWER_CEIL_PA_MIN)
+        & (pool["Career_HRFB"] < POWER_CEIL_HRFB_MAX)
+        & (pool["Career_K%"] > POWER_CEIL_K_MIN)
+    )
+    pool["Power_Ceiling_Flag"] = power_ceil_mask.map({True: "Power Ceiling", False: ""})
+    pool["Combined_Score"] = (
+        pool["Combined_Score"] - power_ceil_mask.astype(float) * POWER_CEIL_PENALTY
+    ).round(2)
+    n_ceil = power_ceil_mask.sum()
+    print(f"Power Ceiling gate fired: {n_ceil:,} / {len(pool):,} players "
+          f"(HRFB<{POWER_CEIL_HRFB_MAX:.0%}, K%>{POWER_CEIL_K_MIN:.0%}, nonAAA PA>={POWER_CEIL_PA_MIN:,})")
 
     # Hard Floor players are demoted to the bottom of the rank column via a large
     # rank-key penalty; Combined_Score itself is left untouched.
@@ -586,18 +649,19 @@ def main() -> None:
     pool["Pos_Adj_Rank"]  = pos_adj_rank_key.rank(ascending=False, method="min").astype(int)
 
     out_cols = [
-        "Combined_Rank", "Pos_Adj_Rank", "PlayerId", "Name", "Pos", "FantasyPos",
-        "Team", "Level", "Age",
+        "Combined_Rank", "Pos_Adj_Rank", "PlayerId", "MLBAM_ID", "Name", "Pos", "FantasyPos",
+        "Team", "Level", "Age", "Bats", "Height", "HeightIn", "Weight",
         "Last_Season", "Career_PA", "Total_Weighted_PA",
         "TOOLS_Score", "ABILITY_Score", "Current_Score", "OVR_Score",
         "Archetype", "Archetype_Adj", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag",
         "Disc_Composite_Z", "Disc_Slope",
-        "Career_K%", "Career_HRFB", "Career_SBTalent", "Hard_Floor_Flag",
+        "Career_K%", "Career_HRFB", "Career_SBTalent", "Career_nonAAA_PA",
+        "Hard_Floor_Flag", "Power_Ceiling_Flag",
         "Below_OVR_Floor",
         "Age_AA_Debut", "AA_PPPAZ_Combo", "AgeAA_Combo_Bonus", "AgeAA_Combo_Flag_Label",
     ]
-    out = pool[out_cols].sort_values("Combined_Rank").reset_index(drop=True)
+    out = pool[[c for c in out_cols if c in pool.columns]].sort_values("Combined_Rank").reset_index(drop=True)
     out.to_csv(OUT_PATH, index=False)
     print(f"Wrote {len(out):,} prospects -> {OUT_PATH}")
     print(f"  TOOLS_Score    mean={out['TOOLS_Score'].mean():.1f}  std={out['TOOLS_Score'].std():.1f}")

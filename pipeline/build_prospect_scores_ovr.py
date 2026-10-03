@@ -145,22 +145,25 @@ def main() -> None:
     scores = scores[~scores["PlayerId"].isin(pre2006_pids)]
     print(f"Excluded {len(pre2006_pids):,} players with likely pre-2006 career")
 
-    # Most-recent row per player — within the same season prefer highest level,
-    # then most PA as a final tiebreaker.
+    # Most-recent PROSPECT-ELIGIBLE row per player (age <= MAX_PROSPECT_AGE).
+    # Filter BEFORE picking latest so that a player who continued playing AAA
+    # at age 25+ (or graduated and returned) doesn't get dropped from the OVR
+    # entirely. Their post-24 seasons still contribute to career score averaging
+    # via the `hist` filter below (which uses all seasons for players in pool).
     LEVEL_ORDER = {"AAA": 5, "AA": 4, "A+": 3, "A": 2, "R": 1}
-    scores["_level_ord"] = scores["Level"].map(LEVEL_ORDER).fillna(0)
+    eligible = scores[scores["Age"] <= MAX_PROSPECT_AGE].copy()
+    eligible["_level_ord"] = eligible["Level"].map(LEVEL_ORDER).fillna(0)
     latest = (
-        scores
+        eligible
         .sort_values(["Season", "_level_ord", "PA"], ascending=[False, False, False])
         .groupby("PlayerId", sort=False)
         .first()
         .reset_index()
         .drop(columns="_level_ord")
     )
-    scores = scores.drop(columns="_level_ord")
+    scores = scores.drop(columns=["_level_ord"], errors="ignore")
 
-    # Eligibility: age cap only (no season floor, no MLB exclusion)
-    pool = latest[latest["Age"] <= MAX_PROSPECT_AGE].copy()
+    pool = latest.copy()
     print(f"Eligible (Age<={MAX_PROSPECT_AGE}): {len(pool):,}")
     print("MLB exclusion skipped (OVR historical mode)")
 
