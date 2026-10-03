@@ -4,10 +4,10 @@ ABILITY_Score measures demonstrated production, normalized for era and level.
 Output: columns written back into prospect_features.csv in place.
 
 Component weights:
-  Fantasy Output  45%  -- PPPA_Z_SL with level discount
-  Discipline      25%  -- BB% − 2×K% (BB_2K), z-scored within Season+Level
-  SB Talent       15%  -- SB_pct × (SB/PA), z-scored within Season+Level
-  Game Power      15%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level
+  Fantasy Output  47%  -- PPPA_Z_SL with level discount
+  Discipline      28%  -- BB% − 2×K% (BB_2K), z-scored within Season+Level
+  SB Talent        8%  -- SB_pct × (SB/PA), z-scored within Season+Level
+  Game Power      17%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level
 
 Age adjustment (AGE_ALPHA = 0.11):
   Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
@@ -49,7 +49,7 @@ MIN_PA        = 50    # minimum PA to count toward group z-score params
 MIN_ROWS      = 10    # minimum rows in Season+Level cell before falling back to Level-only
 
 # Component weights
-W = dict(fantasy=0.47, discipline=0.30, sb=0.08, power=0.15)
+W = dict(fantasy=0.47, discipline=0.28, sb=0.08, power=0.17)
 
 # Piecewise age multiplier (empirically derived from career PPPA_Z regression, N=4,655):
 #   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)

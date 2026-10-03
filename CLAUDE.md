@@ -62,7 +62,7 @@ Added best-season K% and peer-relative PPPA (PPPA_Z_SL_best) as arc features to 
 Added `build_aaa_rankings.py` (ProspectSavant-based AAA power rankings) and `sb_translation_analysis.py` (chained level-to-level SB discount factors). 2023+ era chained factors (normalized AAA=1.0): AA=0.84, A+=0.71, A=0.57, R=0.39. These became the PPPA_Score level weights in Phase 3. Also added `build_rk_rankings.py` for Rookie ball. **Superseded in v1.0**: level discounts rederived from Skill_PPPA full-population study (`analysis/skill_pppa_translation.py`); see current values below.
 
 ### v1.2 — TOOLS Discipline Expanded (September 2026)
-Two fixes to the TOOLS Discipline model. (1) **PS scale bug fixed**: ProspectSavant exports Chase%/Z-Contact%/Whiff% in percent form (0–100); game-feed values are decimal (0–1). `load_ps()` in `build_prospect_features.py` now divides all three by 100 before the fill-null merge. This activated the full Discipline tier (Chase%+ZContact%+Whiff%) for all levels in 2026 where PS data is available — not just AAA 2023+. (2) **Fallback tier now blends Whiff%+BB%**: for seasons without Chase%/Z-Contact% (pre-2026 non-AAA, pre-2023 AAA), the fallback changed from `−Whiff%_adj (100%)` to `−Whiff%_adj (60%) + BB%_adj (40%)`. BB% adds pitch recognition signal (walk rate, era+level adjusted) that Whiff% alone cannot capture — a player who makes contact on everything including bad pitches no longer looks identical to one with genuine plate discipline. `BB%_adj` added to `add_tools_era_adjustment.py` ADJUSTMENTS. (3) **Chase%/Z-Contact% era cells consolidated**: pre-2015 Contact Era had only ~34 total rows across both stats; those cells are folded into High-K Era so a single well-populated baseline per Level is used.
+Two fixes to the TOOLS Discipline model. (1) **PS scale bug fixed**: ProspectSavant exports Chase%/Z-Contact%/Whiff% in percent form (0–100); game-feed values are decimal (0–1). `load_ps()` in `build_prospect_features.py` now divides all three by 100 before the fill-null merge. This activated the full Discipline tier (Chase%+ZContact%+Whiff%) for PS_USE rows. Note: PS actually has Chase%/Z-Contact% for **all levels 2023–2026** (verified Oct 2026) — `PS_USE` was set to 2026-only for AA/A+/Rk at the time of this fix; those earlier years are usable if PS_USE is expanded. (2) **Fallback tier now blends Whiff%+BB%**: for seasons without Chase%/Z-Contact% (non-PS_USE rows), the fallback changed from `−Whiff%_adj (100%)` to `−Whiff%_adj (60%) + BB%_adj (40%)`. BB% adds pitch recognition signal (walk rate, era+level adjusted) that Whiff% alone cannot capture — a player who makes contact on everything including bad pitches no longer looks identical to one with genuine plate discipline. `BB%_adj` added to `add_tools_era_adjustment.py` ADJUSTMENTS. (3) **Chase%/Z-Contact% era cells consolidated**: pre-2015 Contact Era had only ~34 total rows across both stats; those cells are folded into High-K Era so a single well-populated baseline per Level is used.
 
 ### v1.1 — Pitcher Rankings (August 2026)
 Added complete pitcher prospect scoring system with separate SP and RP rankings. Two new composites mirroring the hitter model: STUFF_Score (raw stuff / physical skills) and PERFORMANCE_Score (demonstrated production). Data fetched via MLB Stats API pitching endpoints. Key design decisions: age cutoff ≤ 25 (vs. ≤ 24 for hitters); IP shrinkage thresholds STUFF=167 IP, PERFORMANCE=120 IP; level discounts same as hitters; no pool re-standardization after career averaging (avoids double-standardization amplification). New files: `fetch/fetch_milb_pitching.py`, `pipeline/build_pitcher_features.py`, `pipeline/build_pitcher_scores.py`, `data/api/milb_pitching.csv`, `data/api/milb_pitching_advanced.csv`, `data/rankings/pitcher_features.csv`, `data/rankings/pitcher_scores.csv`.
@@ -105,32 +105,34 @@ Measures what a player *can do* — raw physical skills, normalized for era and 
 
 | Tier | Available when | Components |
 |------|---------------|------------|
-| Full | Chase%_adj and ZContact%_adj both non-null — AAA 2023–2026 (game feeds) + all levels 2026 (ProspectSavant) | −Chase%_adj (40%) + ZContact%_adj (35%) + −Whiff%_adj (25%) |
+| Full | Chase%_adj and ZContact%_adj both non-null — AAA 2023–2026 (game feeds) + PS_USE rows (see coverage table) | −Chase%_adj (40%) + ZContact%_adj (35%) + −Whiff%_adj (25%) |
 | Fallback | All other rows (no Chase%/Z-Contact% data) | −Whiff%_adj (60%) + BB%_adj (40%) |
 
 **Power:**
 
 | Tier | Available when | Components |
 |------|---------------|------------|
-| Full | ProspectSavant rows (MaxEV + EV90 available) | MaxEV_z (35%) + EV90_z (35%) + HRFB_adj (30%) |
-| Fallback | All other rows | HRFB_adj (100%) |
+| Full | MaxEV + EV90 non-null (AAA 2023–2026 only; see coverage table) | MaxEV_z (35%) + EV90_z (35%) + HRFB_adj (30%) |
+| Fallback | All other rows — includes **all AA and A+ seasons** | HRFB_adj (100%) |
 
 **Athleticism:**
 
 | Tier | Available when | Components |
 |------|---------------|------------|
-| Full | ProspectSavant rows with Spd | Spd_z (50%) + 3B_PA_adj (50%) |
+| Full | Spd non-null (available all levels 2023–2026 in PS; see PS_USE) | Spd_z (50%) + 3B_PA_adj (50%) |
 | Fallback | All other rows | 3B_PA_adj (100%) |
 
-**ProspectSavant coverage by level:**
+**ProspectSavant coverage by level (empirically verified Oct 2026):**
 
-| Level | Spd / MaxEV / EV90 | Chase% / Z-Contact% |
-|-------|--------------------|--------------------|
-| AAA | 2023–2026 | 2023–2026 (also from game feeds) |
-| AA | 2026 only | 2026 only |
-| A+ | 2026 only | 2026 only |
-| A | 2023–2026 | 2023–2026 |
-| Rk | 2026 only | 2026 only |
+| Level | MaxEV / EV90 | Spd | Chase% / Z-Contact% |
+|-------|-------------|-----|---------------------|
+| AAA | 2023–2026 (100%) | 2023–2026 (~99%) | 2023–2026 (100%) |
+| AA | **None — zero rows in any year** | 2023–2026 (100%) | 2023–2026 (100%) |
+| A+ | **None — zero rows in any year** | 2023–2026 (100%) | 2023–2026 (100%) |
+| A | 2023–2026 (~32–34% partial) | 2023–2026 (~97–100%) | 2023–2026 (100%) |
+| Rk | 2023–2026 (6–37% partial, growing) | 2023–2026 (100%) | 2023–2026 (100%) |
+
+**PS_USE in `build_prospect_features.py`** controls which level/year rows are actually loaded. Current setting activates AA/A+/Rk only for 2026, discarding 2023–2025 Spd and Chase%/ZContact% for those levels even though the data is complete. AAA and A are loaded for all available years (2023–2026). Expanding AA/A+/Rk to 2023–2026 would give the full Discipline and Athleticism tiers to a much larger fraction of historical player-seasons.
 
 **PS scale convention:** PS exports Chase%, Z-Contact%, and Whiff% in **percent form (0–100)**. Game-feed values in `milb_pitches_agg.csv` are **decimal (0–1)**. `load_ps()` in `build_prospect_features.py` divides all three by 100 before the fill-null merge so both sources are on the same scale. Spd/MaxEV/EV90 are already in raw units (ft/sec, mph) from both sources and are not divided.
 
@@ -146,7 +148,7 @@ A-ball game-feed Chase%/Z-Contact% (2021–2026) are park-specific Trackman only
 
 Measures what a player *has done* — demonstrated production, adjusted for era and level. Output: `data/rankings/ability_scores.csv`.
 
-**Component weights:** Fantasy Output 45% / Discipline 25% / SB Talent 15% / Game Power 15%
+**Component weights:** Fantasy Output 47% / Discipline 28% / SB Talent 8% / Game Power 17%
 
 | Component | Metric | Normalization |
 |-----------|--------|---------------|

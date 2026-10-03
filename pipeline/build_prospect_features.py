@@ -33,10 +33,10 @@ OUT_PATH = DATA_DIR / "rankings" / "prospect_features.parquet"
 # quality or PS coverage is insufficient for those level/year cells.
 PS_USE = {
     ("AAA", 2023), ("AAA", 2024), ("AAA", 2025), ("AAA", 2026),
-    ("AA",  2026),
-    ("A+",  2026),
+    ("AA",  2023), ("AA",  2024), ("AA",  2025), ("AA",  2026),
+    ("A+",  2023), ("A+",  2024), ("A+",  2025), ("A+",  2026),
     ("A",   2023), ("A",   2024), ("A",   2025), ("A",   2026),
-    ("Rk",  2026),
+    ("Rk",  2023), ("Rk",  2024), ("Rk",  2025), ("Rk",  2026),
 }
 PS_LEVEL_MAP = {"Rk": "R"}   # normalise PS level names to pipeline names
 
@@ -334,11 +334,27 @@ def main() -> None:
         split_cols = []
 
     # ------------------------------------------------------------------
+    # Player bios — height / weight
+    # ------------------------------------------------------------------
+    bios_path = DATA_DIR / "api" / "player_bios.csv"
+    if bios_path.exists():
+        bios = pd.read_csv(bios_path, usecols=["MLBAM_ID", "Height", "HeightIn", "Weight", "Bats"],
+                           low_memory=False)
+        bios["MLBAM_ID"] = pd.to_numeric(bios["MLBAM_ID"], errors="coerce").astype("Int64")
+        merged = merged.merge(bios, on="MLBAM_ID", how="left")
+        n_ht = merged["HeightIn"].notna().sum()
+        print(f"  Height populated: {n_ht:,} / {len(merged):,} rows")
+    else:
+        print("  player_bios.csv not found — skipping (run fetch/fetch_player_bios.py)")
+
+    # ------------------------------------------------------------------
     # Final column order and output
     # ------------------------------------------------------------------
     out_cols = [
         # Identity
         "PlayerId", "MLBAM_ID", "Season", "Name", "Team", "Level", "League", "Age", "PA",
+        # Bio
+        "Height", "HeightIn", "Weight", "Bats",
         # ABILITY — fantasy output
         "PPPA", "PPPA_Z_SL",
         # ABILITY — contact/discipline
