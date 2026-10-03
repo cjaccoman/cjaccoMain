@@ -342,6 +342,21 @@ def main() -> None:
     out = out.sort_values("Combined_Score", ascending=False).reset_index(drop=True)
     out["Combined_Rank"] = out.index + 1
 
+    # Player bios — height / weight
+    bios_path = DATA_DIR / "api" / "player_bios.csv"
+    pit_path  = DATA_DIR / "api" / "milb_pitching.csv"
+    if bios_path.exists() and pit_path.exists():
+        bios = pd.read_csv(bios_path, usecols=["MLBAM_ID", "Height", "HeightIn", "Weight", "Throws"],
+                           low_memory=False)
+        pit  = pd.read_csv(pit_path, usecols=["PlayerId", "MLBAM_ID"], low_memory=False)
+        pit  = pit.dropna(subset=["MLBAM_ID"]).drop_duplicates("PlayerId")
+        pit["PlayerId"] = pit["PlayerId"].astype(out["PlayerId"].dtype)
+        bios["MLBAM_ID"] = pd.to_numeric(bios["MLBAM_ID"], errors="coerce")
+        pit["MLBAM_ID"]  = pd.to_numeric(pit["MLBAM_ID"],  errors="coerce")
+        pid_to_mlbam = dict(zip(pit["PlayerId"], pit["MLBAM_ID"]))
+        out["MLBAM_ID"] = out["PlayerId"].map(pid_to_mlbam)
+        out = out.merge(bios, on="MLBAM_ID", how="left")
+
     # Separate SP / RP ranks
     sp_mask = out["Role"] == "SP"
     rp_mask = out["Role"] == "RP"

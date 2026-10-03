@@ -3,11 +3,17 @@
 ABILITY_Score measures demonstrated production, normalized for era and level.
 Output: columns written back into prospect_features.csv in place.
 
-Component weights:
+Component weights (base — power and discipline are dynamic, see below):
   Fantasy Output  47%  -- PPPA_Z_SL with level discount
-  Discipline      28%  -- BB% − 2×K% (BB_2K), z-scored within Season+Level
+  Discipline      28%  -- BB% − 2×K% (BB_2K), z-scored within Season+Level (base)
   SB Talent        8%  -- SB_pct × (SB/PA), z-scored within Season+Level
-  Game Power      17%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level
+  Game Power      17%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level (base)
+
+Dynamic power/discipline scaling (POWER_SCALE_PER_SD = 0.03, one-directional):
+  Above-average power: power_weight = 0.17 + gp×0.03, disc_weight = 0.28 − gp×0.03
+  Average or below:    both stay at base (0.17 / 0.28)
+  Total always sums to 1.0. gp winsorized at ±3 SD → max shift = +0.09.
+  Missing power → shift = 0 (base weights used).
 
 Age adjustment (AGE_ALPHA = 0.11):
   Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
@@ -244,12 +250,21 @@ def main() -> None:
     disc     = disc    * age_mult
     gp       = gp      * age_mult
 
-    # 3. Blend — missing component fills with 0 (peer-average neutral)
+    # 3. Blend — one-directional power/discipline scaling.
+    # For above-average power: power weight rises +0.03/SD, discipline drops −0.03/SD.
+    # For average or below: both stay at base. Total always sums to 1.0.
+    # gp winsorized at ±3 SD → max shift = +0.09 (power 0.17→0.26, disc 0.28→0.19).
+    # Missing power → shift = 0, base weights used.
+    POWER_SCALE_PER_SD = 0.03
+    power_shift = gp.fillna(0).clip(lower=0) * POWER_SCALE_PER_SD
+    w_power_dyn = W["power"]      + power_shift   # [0.17, 0.26]
+    w_disc_dyn  = W["discipline"] - power_shift   # [0.19, 0.28]
+
     ability_raw = (
-        W["fantasy"]    * fantasy.fillna(0)
-        + W["discipline"] * disc.fillna(0)
-        + W["sb"]         * sb.fillna(0)
-        + W["power"]      * gp.fillna(0)
+        W["fantasy"]  * fantasy.fillna(0)
+        + w_disc_dyn  * disc.fillna(0)
+        + W["sb"]     * sb.fillna(0)
+        + w_power_dyn * gp.fillna(0)
     )
 
     # 4. Final 50±10 standardization

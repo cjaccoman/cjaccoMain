@@ -148,7 +148,9 @@ A-ball game-feed Chase%/Z-Contact% (2021–2026) are park-specific Trackman only
 
 Measures what a player *has done* — demonstrated production, adjusted for era and level. Output: `data/rankings/ability_scores.csv`.
 
-**Component weights:** Fantasy Output 47% / Discipline 28% / SB Talent 8% / Game Power 17%
+**Component weights (base):** Fantasy Output 47% / Discipline 28% / SB Talent 8% / Game Power 17%
+
+**Dynamic power/discipline scaling (one-directional):** For above-average power, power weight rises +0.03/SD and discipline drops −0.03/SD symmetrically. For average or below, both stay at base. `power_weight = 0.17 + max(0, gp)×0.03`; `disc_weight = 0.28 − max(0, gp)×0.03`. gp winsorized at ±3 SD → max shift +0.09 (power [0.17, 0.26]; disc [0.19, 0.28]). Total always sums to 1.0. Rewards elite power ceilings without affecting zero-power players' weights.
 
 | Component | Metric | Normalization |
 |-----------|--------|---------------|

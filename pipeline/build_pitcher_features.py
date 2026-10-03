@@ -230,11 +230,28 @@ def main() -> None:
             print(f"  {col}: {n:,} rows ({100*n/len(df):.1f}%)")
 
     # -----------------------------------------------------------------------
+    # Player bios — height / weight
+    # -----------------------------------------------------------------------
+    bios_path = DATA_DIR / "api" / "player_bios.csv"
+    if bios_path.exists():
+        bios = pd.read_csv(bios_path, usecols=["MLBAM_ID", "Height", "HeightIn", "Weight"],
+                           low_memory=False)
+        bios["MLBAM_ID"] = pd.to_numeric(bios["MLBAM_ID"], errors="coerce")
+        df["MLBAM_ID_num"] = pd.to_numeric(df["MLBAM_ID"], errors="coerce")
+        df = df.merge(bios.rename(columns={"MLBAM_ID": "MLBAM_ID_num"}),
+                      on="MLBAM_ID_num", how="left")
+        df = df.drop(columns=["MLBAM_ID_num"])
+        n_ht = df["HeightIn"].notna().sum()
+        print(f"  Height populated: {n_ht:,} / {len(df):,} rows")
+    else:
+        print("  player_bios.csv not found — skipping (run fetch/fetch_player_bios.py)")
+
+    # -----------------------------------------------------------------------
     # Column order + save
     # -----------------------------------------------------------------------
     col_order = [
         "PlayerId", "MLBAM_ID", "Season", "Name", "Team", "Level", "League",
-        "Age", "Age_Z_SL", "Role", "Throws",
+        "Age", "Age_Z_SL", "Role", "Throws", "Height", "HeightIn", "Weight",
         "G", "GS", "IP", "BF", "TBF", "ER", "K", "BB", "IBB", "HRA", "H", "HBP",
         "W", "L", "SV", "SVO", "HLD", "BS", "CG", "SHO", "QS", "WP",
         "ERA", "WHIP", "K9", "BB9", "HR9", "PPI_skill",
