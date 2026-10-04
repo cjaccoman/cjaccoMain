@@ -9,10 +9,17 @@ Component weights (base — power and discipline are dynamic, see below):
   SB Talent        8%  -- SB_pct × (SB/PA), z-scored within Season+Level
   Game Power      17%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level (base)
 
-Dynamic power/discipline scaling (POWER_SCALE_PER_SD = 0.05, one-directional):
-  Above-average power: power_weight = 0.17 + gp×0.05, disc_weight = 0.28 − gp×0.05
-  Average or below:    both stay at base (0.17 / 0.28)
-  Total always sums to 1.0. gp winsorized at ±3 SD → max shift = +0.15.
+Dynamic power/discipline scaling (POWER_SCALE_PER_SD = 0.05, fully symmetric):
+  Discipline weight decays by 0.05 per SD of |power deviation| in either direction.
+  Power weight rises 0.05 per SD above average only (one-directional up).
+  Fantasy weight rises 0.05 per SD below average to absorb the discipline reduction.
+    Above-average power (gp > 0): power +0.05/SD, disc −0.05/SD, fantasy unchanged
+    Below-average power (gp < 0): disc −0.05/SD, fantasy +0.05/SD, power unchanged
+  Rationale: discipline without power has a capped MLB ceiling — the walk rate is
+  less independently valuable when there is no HR threat. Fantasy_Out already
+  captures the full PPPA picture, so it absorbs the weight when disc is discounted.
+  Total always sums to 1.0. gp winsorized at ±3 SD → max disc shift = −0.15;
+  power range [0.17, 0.32]; disc range [0.13, 0.28]; fantasy range [0.47, 0.62].
   Missing power → shift = 0 (base weights used).
 
 Age adjustment (AGE_ALPHA = 0.11):
@@ -250,18 +257,26 @@ def main() -> None:
     disc     = disc    * age_mult
     gp       = gp      * age_mult
 
-    # 3. Blend — one-directional power/discipline scaling.
-    # For above-average power: power weight rises +0.05/SD, discipline drops −0.05/SD.
-    # For average or below: both stay at base. Total always sums to 1.0.
-    # gp winsorized at ±3 SD → max shift = +0.15 (power 0.17→0.32, disc 0.28→0.13).
-    # Missing power → shift = 0, base weights used.
+    # 3. Blend — symmetric power/discipline scaling.
+    # Discipline weight decays by 0.05/SD for every SD of power deviation in either
+    # direction. Power weight rises only for above-average power. Fantasy weight rises
+    # only for below-average power to absorb the freed discipline weight.
+    #   Above-average (gp > 0): power ↑, disc ↓, fantasy unchanged → sum=1.0
+    #   Below-average (gp < 0): disc ↓, fantasy ↑, power unchanged → sum=1.0
+    # gp winsorized at ±3 SD → max disc shift = −0.15; power [0.17,0.32];
+    # disc [0.13,0.28]; fantasy [0.47,0.62]. Missing power → shift=0, base weights.
     POWER_SCALE_PER_SD = 0.05
-    power_shift = gp.fillna(0).clip(lower=0) * POWER_SCALE_PER_SD
-    w_power_dyn = W["power"]      + power_shift   # [0.17, 0.32]
-    w_disc_dyn  = W["discipline"] - power_shift   # [0.13, 0.28]
+    gp_filled     = gp.fillna(0)
+    power_shift   = gp_filled.clip(lower=0) * POWER_SCALE_PER_SD   # [0, 0.15]
+    disc_shift    = gp_filled.abs()          * POWER_SCALE_PER_SD   # [0, 0.15]
+    fantasy_shift = gp_filled.clip(upper=0).abs() * POWER_SCALE_PER_SD  # [0, 0.15]
+
+    w_power_dyn   = W["power"]      + power_shift    # [0.17, 0.32]
+    w_disc_dyn    = W["discipline"] - disc_shift     # [0.13, 0.28]
+    w_fantasy_dyn = W["fantasy"]    + fantasy_shift  # [0.47, 0.62]
 
     ability_raw = (
-        W["fantasy"]  * fantasy.fillna(0)
+        w_fantasy_dyn * fantasy.fillna(0)
         + w_disc_dyn  * disc.fillna(0)
         + W["sb"]     * sb.fillna(0)
         + w_power_dyn * gp.fillna(0)
