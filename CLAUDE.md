@@ -150,7 +150,7 @@ Measures what a player *has done* — demonstrated production, adjusted for era 
 
 **Component weights (base):** Fantasy Output 47% / Discipline 28% / SB Talent 8% / Game Power 17%
 
-**Dynamic power/discipline scaling (fully symmetric):** Discipline weight decays by 0.05/SD for every SD of power deviation in either direction. Power weight rises only for above-average power; fantasy weight rises for below-average power to absorb the freed discipline weight. Above-average (gp > 0): power +0.05/SD, disc −0.05/SD, fantasy unchanged. Below-average (gp < 0): disc −0.05/SD, fantasy +0.05/SD, power unchanged. gp winsorized at ±3 SD → max disc shift −0.15; power [0.17, 0.32]; disc [0.13, 0.28]; fantasy [0.47, 0.62]. Total always sums to 1.0. Rationale: discipline without power has a capped MLB ceiling — walk rate is less independently valuable without an HR threat; Fantasy_Out already captures the full PPPA picture and absorbs the weight.
+**Dynamic power/discipline scaling (one-directional):** For above-average power, power weight rises +0.05/SD and discipline drops −0.05/SD symmetrically. For average or below, both stay at base. `power_weight = 0.17 + max(0, gp)×0.05`; `disc_weight = 0.28 − max(0, gp)×0.05`. gp winsorized at ±3 SD → max shift +0.15 (power [0.17, 0.32]; disc [0.13, 0.28]). Total always sums to 1.0. Rewards elite power ceilings without affecting zero-power players' weights.
 
 | Component | Metric | Normalization |
 |-----------|--------|---------------|
