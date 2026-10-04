@@ -177,6 +177,7 @@ TOOLS_Score and ABILITY_Score are built at the player-season-level. `pipeline/bu
 - **Per-level shrinkage**: `shrink = min(PA_eff / threshold, 1.0)`; `shrunk = 50 + shrink × (level_avg − 50)`. Thresholds (in AAA-equivalent PA): TOOLS=250, ABILITY=175. Small-sample levels contribute near-neutral; full-season data contributes at face value.
 - Level weights (discount factors, normalized to AAA=1.0): AAA=1.00, AA=0.59, A+=0.34, A=0.23, R=0.10.
 - Eligibility (current pool): most recent season ≥ 2025, age ≤ 24, career MLB PA < 50.
+- **Gated luck adjustment (ABILITY only):** For the single season-row that is simultaneously a player's career-best PPPA_Z_SL (> 1.5) AND their career-luckiest (Luck_Score > 1.0), `PA_luck_weight` from `babip_luck.csv` replaces raw PA in the ABILITY weight. All other rows use raw PA. 323 season-rows gated across the full dataset. Broad discount removed Oct 2026 — see `babip_luck.csv` note above for empirical basis.
 
 ### Post-Blend Discipline Gate
 
@@ -381,7 +382,7 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `averages_season_league.csv` | Season+League baseline averages |
 | `averages_season_league_age.csv` | Season+League+Age baseline averages |
 | `player_comps.csv` | One row per player (20,367 total); PA-weighted PPPA_Z_SL and age at each MiLB level, plus first-year and career MLB PPPA_Z outcomes. Used by `analysis/build_player_comps.py` comparator. |
-| `babip_luck.csv` | One row per player-season (PA ≥ 80); BABIP and HR/FB deviation from each player's own career leave-one-out baseline. Columns: BABIP, BABIP_career, BABIP_delta, BABIP_delta_z, HR/FB, HRFB_career, HRFB_delta, HRFB_delta_z, Luck_Score (0.60×BABIP_delta_z + 0.40×HRFB_delta_z). Positive = lucky, negative = unlucky. Built by `analysis/build_babip_luck.py`. |
+| `babip_luck.csv` | One row per player-season (PA ≥ 80); BABIP and HR/FB deviation from each player's own career leave-one-out baseline. Columns: BABIP, BABIP_career, BABIP_delta, BABIP_delta_z, HR/FB, HRFB_career, HRFB_delta, HRFB_delta_z, Luck_Score (0.60×BABIP_delta_z + 0.40×HRFB_delta_z), PA_luck_weight (discounted PA for lucky seasons). Positive = lucky, negative = unlucky. Built by `analysis/build_babip_luck.py`. **PA_luck_weight is used in `build_prospect_scores.py` with a gate: discount fires only for the specific season that is simultaneously a player's career-best PPPA_Z_SL (> 1.5) AND their career-luckiest (Luck_Score > 1.0). Broad discount removed Oct 2026 — analysis showed negligible global effect (delta-r = +0.0018) and lucky careers don't predict worse MLB outcomes (partial r = −0.010, p = 0.73). The gated case is empirically supported: elite lucky breakouts have Career_PPPA_Z 0.334 lower than clean peers (p = 0.005).** |
 
 ### `data/rankings/` — Scores & Rankings
 
