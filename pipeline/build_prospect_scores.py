@@ -297,6 +297,29 @@ def main() -> None:
     pool["Career_PA"]         = pool["PlayerId"].map(career_pa).astype(int)
     pool["Last_Season"]       = pool["PlayerId"].map(last_season).astype(int)
 
+    # Sub-component career averages (PA × level_wt weighted, standardized 50±10 within pool).
+    # These are on the native ±2 z-score scale from build_tools/ability_score.py;
+    # pool-standardization makes them interpretable relative to peers.
+    _SUB_TOOLS   = ["TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath"]
+    _SUB_ABILITY = ["Fantasy_Out", "ABILITY_Disc", "SB_Talent", "Game_Power"]
+    _sub_want    = [c for c in _SUB_TOOLS + _SUB_ABILITY if c in _avail_cols]
+    if _sub_want:
+        sub_feats = pd.read_parquet(
+            FEATURES_PATH,
+            columns=["PlayerId", "Season", "Level", "PA"] + _sub_want,
+        )
+        sub_feats["_wt"] = sub_feats["PA"] * sub_feats["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
+        sub_hist = sub_feats[sub_feats["PlayerId"].isin(pool["PlayerId"])]
+        for c in _sub_want:
+            valid = sub_hist.dropna(subset=[c])
+            num   = (valid[c] * valid["_wt"]).groupby(valid["PlayerId"]).sum()
+            den   = valid["_wt"].groupby(valid["PlayerId"]).sum()
+            avg   = num / den
+            pool[c] = pool["PlayerId"].map(avg)
+            mu, sig = pool[c].mean(), pool[c].std()
+            if sig > 0:
+                pool[c] = (50 + 10 * (pool[c] - mu) / sig).clip(lower=0).round(1)
+
     # Discipline_Flag from most-recent Season>=2025 row per player.
     # Shows which thresholds fired in their latest qualifying season.
     recent_flags = (
@@ -652,7 +675,9 @@ def main() -> None:
         "Combined_Rank", "Pos_Adj_Rank", "PlayerId", "MLBAM_ID", "Name", "Pos", "FantasyPos",
         "Team", "Level", "Age", "Bats", "Height", "HeightIn", "Weight",
         "Last_Season", "Career_PA", "Total_Weighted_PA",
-        "TOOLS_Score", "ABILITY_Score", "Current_Score", "OVR_Score",
+        "TOOLS_Score", "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+        "ABILITY_Score", "Fantasy_Out", "ABILITY_Disc", "SB_Talent", "Game_Power",
+        "Current_Score", "OVR_Score",
         "Archetype", "Archetype_Adj", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag",
         "Disc_Composite_Z", "Disc_Slope",

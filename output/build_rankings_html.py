@@ -26,14 +26,19 @@ ps["Below_OVR_Floor"] = ps["Below_OVR_Floor"].fillna(False)
 ps["AgeAA_Combo_Flag_Label"] = ps["AgeAA_Combo_Flag_Label"].fillna("")
 ps["Pos"] = ps["Pos"].fillna("")
 ps["Age"] = ps["Age"].fillna("").astype(str).str.replace(".0", "", regex=False)
-for c in ["Total_Weighted_PA", "TOOLS_Score", "ABILITY_Score",
+for c in ["Total_Weighted_PA", "TOOLS_Score", "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+          "ABILITY_Score", "Fantasy_Out", "ABILITY_Disc", "SB_Talent", "Game_Power",
           "Current_Score", "OVR_Score", "Combined_Score"]:
-    ps[c] = ps[c].round(1)
+    if c in ps.columns:
+        ps[c] = ps[c].round(1)
 
 ps["Pos_Adj_Score"] = ps["Pos_Adj_Score"].round(1)
+_sub_cols = [c for c in ["TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+                          "Fantasy_Out", "ABILITY_Disc", "SB_Talent", "Game_Power"]
+             if c in ps.columns]
 cols = ["Combined_Rank", "Pos_Adj_Rank", "Name", "Pos", "Team", "Level", "Age", "Last_Season",
-        "Career_PA", "TOOLS_Score", "ABILITY_Score", "Current_Score",
-        "OVR_Score", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
+        "Career_PA", "TOOLS_Score"] + _sub_cols[:3] + ["ABILITY_Score"] + _sub_cols[3:] + [
+        "Current_Score", "OVR_Score", "Combined_Score", "Pos_Bonus", "Pos_Adj_Score",
         "Discipline_Flag", "Career_Disc_Flag", "Hard_Floor_Flag", "Below_OVR_Floor",
         "AgeAA_Combo_Flag_Label"]
 raw = json.dumps(ps[cols].to_dict(orient="records"), separators=(",", ":"))
@@ -295,6 +300,20 @@ tbody tr:hover{background:var(--row-hover)}
 
 .no-results{text-align:center;padding:48px;color:var(--muted);font-size:13px}
 .null-cell{color:var(--muted)}
+
+/* ── Expandable detail row ── */
+tbody tr.data-row{cursor:pointer}
+tbody tr.data-row:hover td{background:var(--row-hover)}
+tr.detail-row td{padding:0;border-bottom:2px solid var(--accent);background:var(--surface)!important}
+tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.comp-group{display:flex;flex-direction:column;gap:4px;min-width:160px}
+.comp-group-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:2px}
+.comp-row{display:flex;align-items:center;gap:7px;font-size:11px}
+.comp-name{width:72px;color:var(--muted);white-space:nowrap}
+.comp-val{width:30px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.bar-sm{width:60px;height:5px;border-radius:3px;background:var(--surface2);overflow:hidden;display:inline-block;vertical-align:middle}
+.bar-sm-fill{height:100%;border-radius:3px;background:var(--accent)}
 
 /* ── Luck score coloring ── */
 .luck-hot2{background:#ff4d0022;color:#c0392b;font-weight:700}
@@ -627,6 +646,38 @@ function bar(v){
     `<span class="bar"><span class="bar-fill" style="width:${p.toFixed(1)}%"></span></span></div>`;
 }
 
+function compBar(v){
+  if(v==null)return'';
+  const p=Math.max(0,Math.min(100,((v-30)/70)*100));
+  return`<span class="comp-val">${v.toFixed(1)}</span>`+
+    `<span class="bar-sm"><span class="bar-sm-fill" style="width:${p.toFixed(1)}%"></span></span>`;
+}
+function detailHTML(r){
+  const tCols=[['Disc',r.TOOLS_Disc],['Power',r.TOOLS_Power],['Ath',r.TOOLS_Ath]];
+  const aCols=[['Fantasy',r.Fantasy_Out],['Disc',r.ABILITY_Disc],['SB',r.SB_Talent],['Power',r.Game_Power]];
+  const hasT=tCols.some(([,v])=>v!=null), hasA=aCols.some(([,v])=>v!=null);
+  if(!hasT&&!hasA)return'';
+  let html='<div class="detail-inner">';
+  if(hasT){
+    html+='<div class="comp-group"><div class="comp-group-label">TOOLS breakdown</div>';
+    tCols.forEach(([n,v])=>{
+      if(v!=null)html+=`<div class="comp-row"><span class="comp-name">${n}</span>${compBar(v)}</div>`;
+    });
+    html+='</div>';
+  }
+  if(hasA){
+    html+='<div class="comp-group"><div class="comp-group-label">ABILITY breakdown</div>';
+    aCols.forEach(([n,v])=>{
+      if(v!=null)html+=`<div class="comp-row"><span class="comp-name">${n}</span>${compBar(v)}</div>`;
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+let expandedIdx=null;
+
 function render(){
   const tbody=document.getElementById('tbody');
   document.getElementById('count').textContent=filtered.length.toLocaleString()+' players';
@@ -634,12 +685,13 @@ function render(){
     tbody.innerHTML='<tr><td colspan="17" class="no-results">No players match.</td></tr>';
     return;
   }
-  tbody.innerHTML=filtered.map(r=>{
+  expandedIdx=null;
+  tbody.innerHTML=filtered.map((r,i)=>{
     const rankVal=posAdj?r.Pos_Adj_Rank:r.Combined_Rank;
     const scoreCell=posAdj
       ?`${bar(r.Pos_Adj_Score)}<span class="pos-bonus" title="Pos bonus">${r.Pos_Bonus>=0?'+':''}${r.Pos_Bonus}</span>`
       :bar(r.Combined_Score);
-    return `<tr>
+    return `<tr class="data-row" data-i="${i}">
     <td class="rank">${rankVal}</td>
     <td class="name">${r.Name}</td>
     <td>${r.Pos||''}</td>
@@ -659,7 +711,29 @@ function render(){
     ${fcell(r.AgeAA_Combo_Flag_Label)}
   </tr>`;
   }).join('');
+
 }
+
+document.getElementById('tbody').addEventListener('click',function(e){
+  const row=e.target.closest('tr.data-row');
+  if(!row)return;
+  const i=parseInt(row.dataset.i);
+  const detail=detailHTML(filtered[i]);
+  if(!detail)return;
+  const existing=row.nextElementSibling;
+  if(existing&&existing.classList.contains('detail-row')){
+    existing.remove();
+    expandedIdx=null;
+    return;
+  }
+  document.getElementById('tbody').querySelectorAll('tr.detail-row').forEach(d=>d.remove());
+  expandedIdx=i;
+  const cols=row.querySelectorAll('td').length;
+  const dr=document.createElement('tr');
+  dr.className='detail-row';
+  dr.innerHTML=`<td colspan="${cols}">${detail}</td>`;
+  row.after(dr);
+});
 
 function applyFilters(){
   const q=document.getElementById('search').value.trim().toLowerCase();
