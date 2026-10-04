@@ -230,20 +230,56 @@ def main() -> None:
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
 
-    # Join luck-adjusted PA weights from babip_luck.csv.
-    # PA_luck_weight discounts lucky seasons (high BABIP/HR-FB vs career baseline)
-    # so they pull the ABILITY career average less. Rows without a luck score
-    # (< 2 career qualifying seasons) retain PA as-is (no adjustment).
+    # Gated luck adjustment: discount only elite lucky breakout seasons.
+    # Analysis (Oct 2026) found the PA discount has negligible global effect
+    # (delta-r = +0.0018) and lucky careers don't predict worse MLB outcomes
+    # in aggregate (partial r = -0.010, p = 0.73). The only statistically
+    # significant signal: players whose best-ever season (PPPA_Z_SL > 1.5)
+    # coincides with their luckiest season (Luck_Score > 1.0) have Career_PPPA_Z
+    # 0.334 lower than equally elite clean-breakout peers (p = 0.005, N=93/21).
+    # Gate: discount fires ONLY for that specific season row. All others use raw PA.
+    scores["PA_luck_weight"] = scores["PA"].astype(float)   # default: no adjustment
     if LUCK_PATH.exists():
         luck = pd.read_csv(
             LUCK_PATH,
-            usecols=["PlayerId", "Season", "Level", "PA_luck_weight"],
+            usecols=["PlayerId", "Season", "Level", "PA_luck_weight",
+                     "PPPA_Z_SL", "Luck_Score"],
         )
         luck["PlayerId"] = luck["PlayerId"].astype(scores["PlayerId"].dtype)
-        scores = scores.merge(luck, on=["PlayerId", "Season", "Level"], how="left")
-        scores["PA_luck_weight"] = scores["PA_luck_weight"].fillna(scores["PA"])
-    else:
-        scores["PA_luck_weight"] = scores["PA"]
+
+        # Identify each player's luckiest season and best PPPA_Z_SL season
+        luck_q = luck[luck["PA_luck_weight"].notna() & luck["Luck_Score"].notna()
+                      & luck["PPPA_Z_SL"].notna()]
+        best_pppa_idx  = luck_q.groupby("PlayerId")["PPPA_Z_SL"].idxmax()
+        luckiest_idx   = luck_q.groupby("PlayerId")["Luck_Score"].idxmax()
+
+        best_rows  = luck_q.loc[best_pppa_idx,  ["PlayerId", "Season", "Level",
+                                                  "PPPA_Z_SL", "Luck_Score"]]
+        lucky_rows = luck_q.loc[luckiest_idx,   ["PlayerId", "Season"]].rename(
+            columns={"Season": "LuckiestSeason"})
+
+        elite_luck = best_rows.merge(lucky_rows, on="PlayerId", how="inner")
+        # Gate conditions: best season IS luckiest season, PPPA_Z_SL > 1.5,
+        # Luck_Score > 1.0 at that season
+        elite_luck = elite_luck[
+            (elite_luck["Season"] == elite_luck["LuckiestSeason"])
+            & (elite_luck["PPPA_Z_SL"] > 1.5)
+            & (elite_luck["Luck_Score"] > 1.0)
+        ][["PlayerId", "Season", "Level"]].copy()
+        elite_luck["_gate"] = True
+
+        # Merge full luck weight back, then apply only to gated rows
+        luck_wt = luck[["PlayerId", "Season", "Level", "PA_luck_weight"]].copy()
+        scores = scores.merge(luck_wt, on=["PlayerId", "Season", "Level"], how="left",
+                              suffixes=("", "_from_luck"))
+        scores = scores.merge(elite_luck, on=["PlayerId", "Season", "Level"], how="left")
+        gated = scores["_gate"].fillna(False)
+        scores.loc[gated, "PA_luck_weight"] = (
+            scores.loc[gated, "PA_luck_weight_from_luck"].fillna(scores.loc[gated, "PA"])
+        )
+        scores = scores.drop(columns=["PA_luck_weight_from_luck", "_gate"])
+        print(f"  Elite lucky breakout gate: {gated.sum():,} season-rows discounted "
+              f"({gated.sum()} players)")
     scores["wt_luck"] = scores["PA_luck_weight"] * scores["level_wt"]
 
     print(f"Loaded {len(scores):,} player-season rows")
