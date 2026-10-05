@@ -375,8 +375,8 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
 }
 
 /* ── Comps tab ── */
-#comps-table{width:100%;border-collapse:collapse;min-width:760px}
-#comps-table th,#comps-table td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#comps-table{width:100%;border-collapse:collapse}
+#comps-table th,#comps-table td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
 #comps-table th{background:var(--surface);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;position:sticky;top:0;z-index:1;user-select:none}
 #comps-table th:hover{color:var(--text)}
 #comps-table tr.comp-row:hover td{background:var(--row-hover);cursor:pointer}
@@ -410,6 +410,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
 .grad-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;vertical-align:middle}
 .grad-badge.yes{background:var(--flag-good-bg);color:var(--flag-good-text)}
 .grad-badge.no{background:var(--surface2);color:var(--muted)}
+.muted-sm{font-size:11px;color:var(--muted)}
 </style>
 
 <!-- ══ Tab bar ══ -->
@@ -663,15 +664,15 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
   <div class="table-wrap">
     <table id="comps-table">
       <thead><tr>
-        <th style="width:52px" data-comps-col="rank" data-type="num">Rank</th>
-        <th style="width:160px" data-comps-col="name" data-type="str">Name</th>
-        <th style="width:50px" data-comps-col="team" data-type="str">Team</th>
-        <th style="width:46px" data-comps-col="level" data-type="level">Lvl</th>
-        <th style="width:38px" data-comps-col="age" data-type="num">Age</th>
-        <th style="min-width:180px" data-comps-col="median" data-type="num">Projection  <span style="font-weight:400;font-size:10px">(floor — median — ceiling)</span></th>
-        <th style="width:130px" data-comps-col="archetype" data-type="str">Archetype</th>
-        <th style="width:60px" data-comps-col="grad_pct" data-type="num" title="Fraction of top-10 comps that reached MLB — proxy for graduation odds">Grad%</th>
-        <th style="width:50px" data-comps-col="n_grads" data-type="num"># Grads</th>
+        <th class="num" data-comps-col="rank" data-type="num">Rank</th>
+        <th data-comps-col="name" data-type="str">Name</th>
+        <th data-comps-col="team" data-type="str">Team</th>
+        <th data-comps-col="level" data-type="level">Lvl</th>
+        <th class="num" data-comps-col="age" data-type="num">Age</th>
+        <th data-comps-col="median" data-type="num">Projection <span style="font-weight:400;font-size:10px">(floor — median — ceiling)</span></th>
+        <th data-comps-col="archetype" data-type="str">Archetype</th>
+        <th class="num" data-comps-col="grad_pct" data-type="num" title="Fraction of top-10 comps that reached MLB — proxy for graduation odds">Grad%</th>
+        <th class="num" data-comps-col="n_grads" data-type="num"># Grads</th>
       </tr></thead>
       <tbody id="comps-tbody"></tbody>
     </table>
@@ -1264,7 +1265,7 @@ function renderComps(){
       <td><span class="${lclass(d.level)}">${d.level||'—'}</span></td>
       <td class="num">${d.age??'—'}</td>
       <td>${projBarHtml(d.projection)}</td>
-      <td style="font-size:11px;color:var(--muted)">${d.archetype||'—'}</td>
+      <td class="muted-sm">${d.archetype||'—'}</td>
       <td class="num">${gradPct!=null?gradPct+'%':'—'}</td>
       <td class="num">${nGrads}</td>
     </tr>`);
