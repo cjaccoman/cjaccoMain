@@ -158,6 +158,17 @@ luck_records = [
 raw_luck = json.dumps(luck_records, separators=(",", ":"))
 print(f"Luck tracker: {len(luck_records)} prospects")
 
+# ── Comps data ────────────────────────────────────────────────────────────────
+_comps_path = DATA_DIR / "rankings" / "prospect_comps.json"
+if _comps_path.exists():
+    with open(_comps_path, "r", encoding="utf-8") as _f:
+        raw_comps = _f.read()
+    _n_comps = raw_comps.count('"rank"')
+    print(f"Comps: {_n_comps} prospects loaded")
+else:
+    raw_comps = "{}"
+    print("prospect_comps.json not found — Comps tab will be empty")
+
 HTML = """\
 <title>2026 Prospect Rankings</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -362,6 +373,43 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
   #luck-table th:nth-child(11),#luck-table td:nth-child(11),
   #luck-table th:nth-child(14),#luck-table td:nth-child(14){display:none}
 }
+
+/* ── Comps tab ── */
+#comps-table{width:100%;border-collapse:collapse;table-layout:fixed}
+#comps-table th,#comps-table td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#comps-table th{background:var(--surface);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;position:sticky;top:0;z-index:1;user-select:none}
+#comps-table th:hover{color:var(--text)}
+#comps-table tr.comp-row:hover td{background:var(--row-hover);cursor:pointer}
+#comps-table tr.comp-row.expanded td{background:var(--surface)}
+.proj-bar-wrap{display:flex;align-items:center;gap:6px;min-width:0}
+.proj-bar-outer{flex:1;height:10px;background:var(--surface2);border-radius:5px;position:relative;overflow:visible;min-width:60px}
+.proj-bar-fill{position:absolute;top:0;height:100%;background:#3fb950;border-radius:5px;opacity:.75}
+.proj-bar-median{position:absolute;top:-2px;width:3px;height:14px;background:var(--text);border-radius:2px;transform:translateX(-50%)}
+.proj-label{font-size:11px;color:var(--muted);white-space:nowrap;min-width:90px}
+.comp-detail{display:none;padding:0}
+.comp-detail.open{display:table-row}
+.comp-detail-inner{padding:14px 16px;background:var(--surface);border-bottom:2px solid var(--border);display:flex;gap:24px;flex-wrap:wrap}
+.comp-detail-section{flex:1;min-width:260px}
+.comp-detail-section h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.mini-table{width:100%;border-collapse:collapse;font-size:12px}
+.mini-table th,.mini-table td{padding:4px 8px;border-bottom:1px solid var(--border);text-align:right}
+.mini-table th:first-child,.mini-table td:first-child{text-align:left}
+.mini-table th{background:var(--surface2);font-weight:600;color:var(--muted);font-size:11px}
+.mini-table td.match-hi{color:#3fb950;font-weight:700}
+.mini-table td.match-med{color:var(--accent)}
+.mini-table td.grad-yes{color:#3fb950}
+.mini-table td.grad-no{color:var(--muted)}
+.mini-table tr:hover td{background:var(--row-hover)}
+.proj-summary{display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+.proj-stat{display:flex;flex-direction:column;align-items:center;background:var(--surface2);border-radius:6px;padding:6px 12px;min-width:60px}
+.proj-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.proj-stat-val{font-size:15px;font-weight:700;margin-top:2px}
+.proj-stat-val.ceiling{color:#3fb950}
+.proj-stat-val.median{color:var(--accent)}
+.proj-stat-val.floor{color:var(--muted)}
+.grad-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;vertical-align:middle}
+.grad-badge.yes{background:var(--flag-good-bg);color:var(--flag-good-text)}
+.grad-badge.no{background:var(--surface2);color:var(--muted)}
 </style>
 
 <!-- ══ Tab bar ══ -->
@@ -371,6 +419,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
   <button class="tab-btn" data-tab="rp">RP Prospects</button>
   <button class="tab-btn" data-tab="aaa">AAA 2026</button>
   <button class="tab-btn" data-tab="luck">Luck Tracker</button>
+  <button class="tab-btn" data-tab="comps">Comps</button>
 </div>
 
 <!-- ══ Prospects panel ══ -->
@@ -597,6 +646,32 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
         <th class="num" data-luck-col="PPPA_Jump" data-type="num" title="PPPA_Z change vs prior season">PPPA Δ</th>
       </tr></thead>
       <tbody id="luck-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ Comps panel ══ -->
+<div class="panel" id="panel-comps">
+  <div class="controls">
+    <span class="controls-title">Prospect Comps</span>
+    <span class="controls-count" id="comps-count"></span>
+    <input type="search" id="comps-search" placeholder="Search player…" autocomplete="off" />
+    <div class="spacer"></div>
+    <span style="font-size:11px;color:var(--muted)">Top 250 prospects · click row to expand</span>
+  </div>
+  <div class="table-wrap">
+    <table id="comps-table">
+      <thead><tr>
+        <th style="width:52px" data-comps-col="rank" data-type="num">Rank</th>
+        <th style="width:160px" data-comps-col="name" data-type="str">Name</th>
+        <th style="width:50px" data-comps-col="team" data-type="str">Team</th>
+        <th style="width:46px" data-comps-col="level" data-type="level">Lvl</th>
+        <th style="width:38px" data-comps-col="age" data-type="num">Age</th>
+        <th style="min-width:180px" data-comps-col="median" data-type="num">Projection  <span style="font-weight:400;font-size:10px">(floor — median — ceiling)</span></th>
+        <th style="width:60px" data-comps-col="grad_pct" data-type="num" title="Fraction of top-10 comps that reached MLB — proxy for graduation odds">Grad%</th>
+        <th style="width:50px" data-comps-col="n_grads" data-type="num"># Grads</th>
+      </tr></thead>
+      <tbody id="comps-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -1132,6 +1207,185 @@ document.querySelector('th[data-luck-col="Luck_PPPA"]').classList.add('sort-desc
 applyLuckFilters();
 
 /* ════════════════════════════════════════════
+   COMPS TAB
+   ════════════════════════════════════════════ */
+const COMPS_RAW = COMPS_DATA_PLACEHOLDER;
+// Convert object-by-PlayerId to sorted array
+const COMPS_ARR = Object.entries(COMPS_RAW).map(([pid,d])=>({...d,pid}))
+  .sort((a,b)=>a.rank-b.rank);
+
+let compsSortCol='rank', compsSortDir=1, compsFiltered=COMPS_ARR.slice();
+let compsOpenPid=null;
+
+const PROJ_MIN=-1.5, PROJ_MAX=2.5, PROJ_RANGE=PROJ_MAX-PROJ_MIN;
+
+function projPct(v){return Math.max(0,Math.min(100,((v-PROJ_MIN)/PROJ_RANGE)*100));}
+
+function projBarHtml(proj){
+  if(!proj||proj.n_grads<2)return'<span style="color:var(--muted);font-size:11px">— not enough comps</span>';
+  const fl=proj.floor, med=proj.median, ceil=proj.ceiling;
+  if(fl==null||med==null||ceil==null)return'<span style="color:var(--muted);font-size:11px">—</span>';
+  const left=projPct(fl), right=projPct(ceil), medPct=projPct(med);
+  const width=Math.max(right-left,2);
+  const sign=v=>(v>=0?'+':'')+v.toFixed(2);
+  return`<div class="proj-bar-wrap">
+    <div class="proj-bar-outer">
+      <div class="proj-bar-fill" style="left:${left}%;width:${width}%"></div>
+      <div class="proj-bar-median" style="left:${medPct}%"></div>
+    </div>
+    <span class="proj-label">${sign(fl)} / <strong>${sign(med)}</strong> / ${sign(ceil)}</span>
+  </div>`;
+}
+
+function renderComps(){
+  const tbody=document.getElementById('comps-tbody');
+  document.getElementById('comps-count').textContent=compsFiltered.length.toLocaleString()+' prospects';
+  if(!compsFiltered.length){
+    tbody.innerHTML='<tr><td colspan="8" class="no-results">No prospects match.</td></tr>';
+    return;
+  }
+  const rows=[];
+  compsFiltered.forEach(d=>{
+    const open=d.pid===compsOpenPid;
+    const gradPct=d.projection?Math.round(d.projection.grad_pct*100):null;
+    const nGrads=d.projection?d.projection.n_grads:0;
+    rows.push(`<tr class="comp-row${open?' expanded':''}" data-pid="${d.pid}">
+      <td class="rank num">${d.rank}</td>
+      <td class="name">${d.name}</td>
+      <td>${d.team||'—'}</td>
+      <td><span class="${lclass(d.level)}">${d.level||'—'}</span></td>
+      <td class="num">${d.age??'—'}</td>
+      <td>${projBarHtml(d.projection)}</td>
+      <td class="num">${gradPct!=null?gradPct+'%':'—'}</td>
+      <td class="num">${nGrads}</td>
+    </tr>`);
+    if(open){
+      rows.push(`<tr class="comp-detail open"><td colspan="8"><div class="comp-detail-inner">${buildDetailHtml(d)}</div></td></tr>`);
+    }
+  });
+  tbody.innerHTML=rows.join('');
+  tbody.querySelectorAll('tr.comp-row').forEach(tr=>{
+    tr.addEventListener('click',()=>{
+      const pid=tr.dataset.pid;
+      compsOpenPid=(compsOpenPid===pid)?null:pid;
+      renderComps();
+    });
+  });
+}
+
+function fmtZ(v){if(v==null)return'—';return(v>=0?'+':'')+v.toFixed(2);}
+function fmtPct(v){if(v==null)return'—';return(v*100).toFixed(1)+'%';}
+function fmtN(v,d=0){if(v==null)return'—';return(+v).toFixed(d);}
+
+function buildDetailHtml(d){
+  // ── Projection summary ────────────────────────────────────────────────
+  const proj=d.projection||{};
+  const gradRate=proj.grad_pct!=null?Math.round(proj.grad_pct*100)+'%':'—';
+  const hasDist=proj.n_grads>=2;
+  let projHtml=`<div class="proj-summary">
+    <div class="proj-stat"><span class="proj-stat-label">Grad Rate</span><span class="proj-stat-val" style="color:var(--text)">${gradRate}</span></div>
+    <div class="proj-stat"><span class="proj-stat-label">Grads</span><span class="proj-stat-val" style="color:var(--text)">${proj.n_grads??0}/10</span></div>`;
+  if(hasDist){
+    projHtml+=`
+    <div class="proj-stat"><span class="proj-stat-label">Ceiling p75</span><span class="proj-stat-val ceiling">${fmtZ(proj.ceiling)}</span></div>
+    <div class="proj-stat"><span class="proj-stat-label">Median p50</span><span class="proj-stat-val median">${fmtZ(proj.median)}</span></div>
+    <div class="proj-stat"><span class="proj-stat-label">Floor p25</span><span class="proj-stat-val floor">${fmtZ(proj.floor)}</span></div>`;
+  }
+  projHtml+='</div>';
+
+  // ── Player profile ────────────────────────────────────────────────────
+  let profileRows='';
+  (d.profile||[]).forEach(lv=>{
+    profileRows+=`<tr>
+      <td><span class="${lclass(lv.level)}">${lv.level}</span></td>
+      <td>${fmtZ(lv.pppa_z)}</td>
+      <td>${fmtN(lv.age,1)}</td>
+      <td>${fmtN(lv.pa,0)}</td>
+      <td>${lv.bb2k!=null?(lv.bb2k>=0?'+':'')+fmtPct(lv.bb2k):'—'}</td>
+      <td>${lv.kpct!=null?fmtPct(lv.kpct):'—'}</td>
+      <td>${lv.hrfb!=null?fmtPct(lv.hrfb):'—'}</td>
+      <td>${lv.sbtalent!=null?(+lv.sbtalent*100).toFixed(2)+'%':'—'}</td>
+    </tr>`;
+  });
+  const playerSection=`<div class="comp-detail-section">
+    <h4>${d.name} — MiLB Profile</h4>
+    ${projHtml}
+    <table class="mini-table">
+      <thead><tr><th>Lvl</th><th>PPPA Z</th><th>Age</th><th>PA</th><th>BB−2K</th><th>K%</th><th>HR/FB</th><th>SB Tal</th></tr></thead>
+      <tbody>${profileRows||'<tr><td colspan="8" style="color:var(--muted)">No level data</td></tr>'}</tbody>
+    </table>
+  </div>`;
+
+  // ── Comp table ────────────────────────────────────────────────────────
+  let compRows='';
+  (d.comps||[]).forEach((c,i)=>{
+    const matchCls=c.match_pct>=75?'match-hi':c.match_pct>=60?'match-med':'';
+    const gradCls=c.graduated?'grad-yes':'grad-no';
+    const gradBadge=c.graduated
+      ?'<span class="grad-badge yes">MLB</span>'
+      :'<span class="grad-badge no">MiLB</span>';
+    // Show comp's level stats at shared levels (profile entries)
+    let statsCell='';
+    if(c.profile&&c.profile.length){
+      statsCell=c.profile.map(lv=>`<span style="font-size:11px;margin-right:8px"><span class="${lclass(lv.level)}">${lv.level}</span> ${fmtZ(lv.pppa_z)}</span>`).join('');
+    }
+    compRows+=`<tr>
+      <td class="num">${i+1}</td>
+      <td>${c.name}</td>
+      <td class="num ${matchCls}">${c.match_pct!=null?(+c.match_pct).toFixed(0)+'%':'—'}</td>
+      <td class="num">${c.shared??'—'}</td>
+      <td>${gradBadge}</td>
+      <td class="num ${gradCls}">${fmtZ(c.career_z)}</td>
+      <td class="num">${fmtZ(c.firstyr_z)}</td>
+      <td style="font-size:11px">${statsCell||'—'}</td>
+    </tr>`;
+  });
+  const compSection=`<div class="comp-detail-section" style="flex:2;min-width:340px">
+    <h4>Top 10 Historical Comps</h4>
+    <table class="mini-table">
+      <thead><tr><th>#</th><th>Name</th><th>Match</th><th>Shared</th><th>Status</th><th>Career Z</th><th>1st Yr Z</th><th>Level PPPA Z</th></tr></thead>
+      <tbody>${compRows||'<tr><td colspan="8" style="color:var(--muted)">No comps found</td></tr>'}</tbody>
+    </table>
+  </div>`;
+
+  return playerSection+compSection;
+}
+
+function applyCompsFilters(){
+  const q=(document.getElementById('comps-search').value||'').toLowerCase();
+  compsFiltered=COMPS_ARR.filter(d=>{
+    if(q&&!d.name.toLowerCase().includes(q)&&!(d.team||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+  // sort
+  compsFiltered.sort((a,b)=>{
+    let av,bv;
+    if(compsSortCol==='rank'){av=a.rank;bv=b.rank;}
+    else if(compsSortCol==='name'){av=a.name;bv=b.name;return compsSortDir*(av<bv?-1:av>bv?1:0);}
+    else if(compsSortCol==='team'){av=a.team||'';bv=b.team||'';return compsSortDir*(av<bv?-1:av>bv?1:0);}
+    else if(compsSortCol==='level'){const LV={R:1,A:2,'A+':3,AA:4,AAA:5};av=LV[a.level]||0;bv=LV[b.level]||0;}
+    else if(compsSortCol==='age'){av=a.age??999;bv=b.age??999;}
+    else if(compsSortCol==='median'){av=a.projection?.median??-99;bv=b.projection?.median??-99;}
+    else if(compsSortCol==='grad_pct'){av=a.projection?.grad_pct??-1;bv=b.projection?.grad_pct??-1;}
+    else if(compsSortCol==='n_grads'){av=a.projection?.n_grads??-1;bv=b.projection?.n_grads??-1;}
+    else{av=a.rank;bv=b.rank;}
+    return compsSortDir*(av-bv);
+  });
+  renderComps();
+}
+
+document.getElementById('comps-search').addEventListener('input',applyCompsFilters);
+document.querySelectorAll('#comps-table th[data-comps-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.compsCol;
+    if(compsSortCol===col)compsSortDir*=-1;
+    else{compsSortCol=col;compsSortDir=col==='name'||col==='team'?1:-1;}
+    applyCompsFilters();
+  });
+});
+applyCompsFilters();
+
+/* ════════════════════════════════════════════
    TAB SWITCHING
    ════════════════════════════════════════════ */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -1150,7 +1404,8 @@ html = HTML \
     .replace('SP_DATA_PLACEHOLDER', raw_sp) \
     .replace('RP_DATA_PLACEHOLDER', raw_rp) \
     .replace('AAA_DATA_PLACEHOLDER', raw_aaa) \
-    .replace('LUCK_DATA_PLACEHOLDER', raw_luck)
+    .replace('LUCK_DATA_PLACEHOLDER', raw_luck) \
+    .replace('COMPS_DATA_PLACEHOLDER', raw_comps)
 
 SCRATCHPAD.mkdir(parents=True, exist_ok=True)
 with open(OUT_PATH, 'w', encoding='utf-8') as f:
