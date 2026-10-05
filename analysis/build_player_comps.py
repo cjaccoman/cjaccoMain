@@ -106,17 +106,96 @@ def build_dataset() -> pd.DataFrame:
             grp.drop(columns=[f"PAn_{col}"], inplace=True)
         return grp
 
+    # ── End-of-season promotional stint detection ─────────────────────────────
+    # Upper-tier prospects are often promoted at season's end purely to get ABs,
+    # not due to performance. These stints contaminate per-level PPPA_Z (small
+    # sample at a harder level) and mislead the trajectory signal (player looks
+    # like they "reached" the higher level when their real developmental level
+    # is one below).
+    #
+    # Detection: within a player-season, a stint at level L is "promotional" if:
+    #   (a) the player had more PA at a lower level in that same season, AND
+    #   (b) this stint has < 150 PA AND < 20% of the player's season total PA
+    #
+    # Promotional stints are excluded from per-level aggregates. They are also
+    # excluded from the trajectory calculation.
+    LEVEL_RANK = {"R": 1, "A": 2, "A+": 3, "AA": 4, "AAA": 5}
+    PROMO_PA_ABS = 150    # hard cap: fewer than this = promotional regardless of %
+    PROMO_PA_PCT = 0.20   # also must be < 20% of player's total PA that season
+
     ovr_valid = ovr[ovr["PA"] >= 10].copy()
-    ovr_valid["PA_x_PPPA_Z"] = ovr_valid["PA"] * ovr_valid["PPPA_Z_SL"]
-    ovr_valid["PA_x_Age"]    = ovr_valid["PA"] * ovr_valid["Age"]
+    ovr_valid["_lvl_rank"] = ovr_valid["Level"].map(LEVEL_RANK).fillna(0)
+
+    # Season total PA per player (to compute fraction)
+    season_pa = (
+        ovr_valid.groupby(["PlayerId", "Season"])["PA"]
+        .sum()
+        .rename("_season_pa")
+        .reset_index()
+    )
+    ovr_valid = ovr_valid.merge(season_pa, on=["PlayerId", "Season"], how="left")
+
+    # Primary level per player-season = level with most PA
+    primary_lvl = (
+        ovr_valid.sort_values("PA", ascending=False)
+        .groupby(["PlayerId", "Season"])
+        .first()[["_lvl_rank"]]
+        .rename(columns={"_lvl_rank": "_primary_rank"})
+        .reset_index()
+    )
+    ovr_valid = ovr_valid.merge(primary_lvl, on=["PlayerId", "Season"], how="left")
+
+    # Flag promotional: higher than primary level AND small sample
+    ovr_valid["_is_promo"] = (
+        (ovr_valid["_lvl_rank"] > ovr_valid["_primary_rank"])
+        & (ovr_valid["PA"] < PROMO_PA_ABS)
+        & (ovr_valid["PA"] / ovr_valid["_season_pa"] < PROMO_PA_PCT)
+    )
+
+    n_promo = ovr_valid["_is_promo"].sum()
+    print(f"  Promotional stints flagged: {n_promo:,} / {len(ovr_valid):,} "
+          f"({100*n_promo/len(ovr_valid):.1f}%)")
+
+    # Use only non-promotional rows for per-level aggregates
+    ovr_core = ovr_valid[~ovr_valid["_is_promo"]].copy()
+
+    ovr_core["PA_x_PPPA_Z"] = ovr_core["PA"] * ovr_core["PPPA_Z_SL"]
+    ovr_core["PA_x_Age"]    = ovr_core["PA"] * ovr_core["Age"]
     level_agg = (
-        ovr_valid.groupby(["PlayerId", "Level"], observed=True)
+        ovr_core.groupby(["PlayerId", "Level"], observed=True)
         .agg(PA_total=("PA","sum"), PA_x_PPPA_Z=("PA_x_PPPA_Z","sum"),
              PA_x_Age=("PA_x_Age","sum"), Name=("Name","first"))
         .reset_index()
     )
     level_agg["PPPA_Z_wt"] = level_agg["PA_x_PPPA_Z"] / level_agg["PA_total"]
     level_agg["Age_wt"]    = level_agg["PA_x_Age"]    / level_agg["PA_total"]
+
+    # ── Trajectory: PPPA_Z slope across primary levels ────────────────────────
+    # For each player, fit OLS of PPPA_Z_SL on Level_Rank across their primary
+    # level seasons (≥ 80 PA, non-promotional). Positive = improving as they
+    # advance; negative = declining. Requires ≥ 2 qualifying primary seasons.
+    traj_rows = ovr_core[
+        (ovr_core["PA"] >= 80) & ovr_core["PPPA_Z_SL"].notna()
+        & ovr_core["Level"].isin(LEVEL_RANK)
+    ].copy()
+    traj_rows["_lvl_rank"] = traj_rows["Level"].map(LEVEL_RANK)
+
+    def _traj_slope(g):
+        if len(g) < 2:
+            return np.nan
+        x = g["_lvl_rank"].values.astype(float)
+        y = g["PPPA_Z_SL"].values.astype(float)
+        if x.std() < 1e-9:
+            return np.nan
+        return float(np.polyfit(x, y, 1)[0])
+
+    traj = (
+        traj_rows.groupby("PlayerId")
+        .apply(_traj_slope)
+        .rename("PPPA_Z_trajectory")
+        .reset_index()
+    )
+    print(f"  Trajectory computed for {traj['PPPA_Z_trajectory'].notna().sum():,} players")
 
     # Skill metrics from prospect_features (keyed on MLBAM_ID)
     pf_valid = pf[pf["PA"] >= 10].copy()
@@ -257,9 +336,16 @@ def build_dataset() -> pd.DataFrame:
         .reset_index()
     )
 
+    # Coerce MLBAM_ID to the same nullable int type so the merge doesn't fail
+    # when the parquet was written with a different dtype (e.g. str vs Int64).
+    for _df in (career_agg, first_yr):
+        _df["MLBAM_ID"] = pd.to_numeric(_df["MLBAM_ID"], errors="coerce").astype("Int64")
+    wide["MLBAM_ID"] = pd.to_numeric(wide["MLBAM_ID"], errors="coerce").astype("Int64")
+
     wide = wide.merge(career_agg, on="MLBAM_ID", how="left")
     wide = wide.merge(first_yr,   on="MLBAM_ID", how="left")
     wide = wide.merge(span,       on="PlayerId",  how="left")
+    wide = wide.merge(traj,       on="PlayerId",  how="left")
     wide["graduated"] = wide["FirstYr_PPPA_Z"].notna()
 
     # MLB EV fallback: for graduated players with no MiLB EV, use career MLB MaxEV
@@ -298,6 +384,7 @@ def build_dataset() -> pd.DataFrame:
         + ["PPPA_Z_career", "BB2K_career", "Whiff_career", "SBTalent_career",
            "HRFB_career", "PullAir_career", "Kpct_career", "BBpct_career",
            "MaxEV_career", "EV90_career", "Chase_career", "ZContact_career"]
+        + ["PPPA_Z_trajectory"]
         + ["MiLB_First", "MiLB_Last", "graduated", "MLB_Season",
            "FirstYr_PPPA_Z", "FirstYr_PA", "Career_PPPA_Z", "Career_MLB_PA"]
     )
@@ -341,6 +428,8 @@ def build_dataset() -> pd.DataFrame:
         wide["Career_MLB_PA"] = wide["Career_MLB_PA"].round(0)
     if "FirstYr_PA" in wide.columns:
         wide["FirstYr_PA"] = wide["FirstYr_PA"].round(0)
+    if "PPPA_Z_trajectory" in wide.columns:
+        wide["PPPA_Z_trajectory"] = wide["PPPA_Z_trajectory"].round(3)
 
     return wide
 
@@ -348,6 +437,9 @@ def build_dataset() -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Comparator
 # ---------------------------------------------------------------------------
+
+TRAJ_WEIGHT = 0.30  # relative weight of trajectory vs. PPPA_Z=1.0 in distance
+
 
 def _prep_pool(df: pd.DataFrame):
     """Pre-compute level-wise z-score params for all distance features."""
@@ -363,6 +455,10 @@ def _prep_pool(df: pd.DataFrame):
                 continue
             vals = df.loc[mask, col].dropna()
             params[(lvl, feat)] = (vals.mean(), vals.std()) if len(vals) >= 5 else (0.0, 1.0)
+    # Trajectory is a career-level feature — z-scored across the whole pool
+    if "PPPA_Z_trajectory" in df.columns:
+        vals = df["PPPA_Z_trajectory"].dropna()
+        params[("career", "trajectory")] = (vals.mean(), vals.std()) if len(vals) >= 5 else (0.0, 1.0)
     return params
 
 
@@ -446,6 +542,13 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
     if not q_feats:
         raise ValueError("Query player has no qualifying level data (PA >= MIN_COMP_PA)")
 
+    # Trajectory z-score for query player
+    q_traj_z = None
+    q_traj_raw = query.get("PPPA_Z_trajectory", np.nan)
+    if pd.notna(q_traj_raw):
+        mu_t, sig_t = params.get(("career", "trajectory"), (0.0, 1.0))
+        q_traj_z = _z(q_traj_raw, mu_t, sig_t)
+
     results = []
     for _, cand in pool.iterrows():
         if exclude_self and cand["PlayerId"] == query["PlayerId"]:
@@ -479,8 +582,8 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
                     mu_s, sig_s = params.get((lvl, sk), (0.0, 1.0))
                     skill_term += sw * (_z(c_sv, mu_s, sig_s) - q_sk) ** 2
 
-            # Equal weight per level — qualification is binary (both ≥ MIN_COMP_PA)
-            wt = 1.0
+            # Level weight: higher levels count proportionally more
+            wt = LEVEL_DISCOUNT[lvl]
 
             dist_sq    += wt * (d_pppa**2 + AGE_WEIGHT * d_age**2 + skill_term)
             weight_sum += wt
@@ -488,6 +591,17 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
 
         if shared < min_shared_levels or weight_sum == 0:
             continue
+
+        # Trajectory term: career-level signal added after level loop
+        # Weighted by TRAJ_WEIGHT relative to PPPA_Z=1.0; uses the same effective
+        # normalization as the per-level PPPA_Z terms so scale is consistent.
+        if q_traj_z is not None:
+            c_traj_raw = cand.get("PPPA_Z_trajectory", np.nan)
+            if pd.notna(c_traj_raw):
+                mu_t, sig_t = params.get(("career", "trajectory"), (0.0, 1.0))
+                c_traj_z = _z(c_traj_raw, mu_t, sig_t)
+                dist_sq    += weight_sum * TRAJ_WEIGHT * (c_traj_z - q_traj_z) ** 2
+                weight_sum += weight_sum * TRAJ_WEIGHT  # keep denominator consistent
 
         d = np.sqrt(dist_sq / weight_sum)
         results.append({
