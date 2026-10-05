@@ -668,6 +668,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
         <th style="width:46px" data-comps-col="level" data-type="level">Lvl</th>
         <th style="width:38px" data-comps-col="age" data-type="num">Age</th>
         <th style="min-width:180px" data-comps-col="median" data-type="num">Projection  <span style="font-weight:400;font-size:10px">(floor — median — ceiling)</span></th>
+        <th style="width:130px" data-comps-col="archetype" data-type="str">Archetype</th>
         <th style="width:60px" data-comps-col="grad_pct" data-type="num" title="Fraction of top-10 comps that reached MLB — proxy for graduation odds">Grad%</th>
         <th style="width:50px" data-comps-col="n_grads" data-type="num"># Grads</th>
       </tr></thead>
@@ -1256,6 +1257,7 @@ function renderComps(){
       <td><span class="${lclass(d.level)}">${d.level||'—'}</span></td>
       <td class="num">${d.age??'—'}</td>
       <td>${projBarHtml(d.projection)}</td>
+      <td style="font-size:11px;color:var(--muted)">${d.archetype||'—'}</td>
       <td class="num">${gradPct!=null?gradPct+'%':'—'}</td>
       <td class="num">${nGrads}</td>
     </tr>`);
@@ -1363,6 +1365,7 @@ function applyCompsFilters(){
     if(compsSortCol==='rank'){av=a.rank;bv=b.rank;}
     else if(compsSortCol==='name'){av=a.name;bv=b.name;return compsSortDir*(av<bv?-1:av>bv?1:0);}
     else if(compsSortCol==='team'){av=a.team||'';bv=b.team||'';return compsSortDir*(av<bv?-1:av>bv?1:0);}
+    else if(compsSortCol==='archetype'){av=a.archetype||'';bv=b.archetype||'';return compsSortDir*(av<bv?-1:av>bv?1:0);}
     else if(compsSortCol==='level'){const LV={R:1,A:2,'A+':3,AA:4,AAA:5};av=LV[a.level]||0;bv=LV[b.level]||0;}
     else if(compsSortCol==='age'){av=a.age??999;bv=b.age??999;}
     else if(compsSortCol==='median'){av=a.projection?.median??-99;bv=b.projection?.median??-99;}

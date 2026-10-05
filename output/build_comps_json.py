@@ -303,6 +303,7 @@ def main():
             "team":       str(score_row.get("Team", "")),
             "level":      str(score_row.get("Level", "")),
             "age":        _nan(score_row.get("Age")),
+            "archetype":  str(score_row.get("Archetype", "")) if pd.notna(score_row.get("Archetype")) else "",
             "projection": {
                 "grad_pct": round(proj["grad_pct"], 2),
                 "n_grads":  proj["n_grads"],
