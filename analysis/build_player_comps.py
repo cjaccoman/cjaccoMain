@@ -50,7 +50,7 @@ OUT   = DATA / "computed" / "player_comps.csv"
 
 LEVELS         = ["AAA", "AA", "A+", "A", "R"]
 LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
-MIN_COMP_PA    = 80    # minimum PA at a level to count in distance calculation
+MIN_COMP_PA    = 40    # minimum PA at a level to count in distance calculation
 PA_THRESHOLD   = 300   # PA at which level gets full weight in distance
 AGE_WEIGHT     = 0.5   # relative weight of age vs. PPPA_Z in distance per level
 
@@ -582,8 +582,12 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
                     mu_s, sig_s = params.get((lvl, sk), (0.0, 1.0))
                     skill_term += sw * (_z(c_sv, mu_s, sig_s) - q_sk) ** 2
 
-            # Level weight: higher levels count proportionally more
-            wt = LEVEL_DISCOUNT[lvl]
+            # Level weight: level discount × sample confidence.
+            # min(query_pa, cand_pa) is the effective sample — you're only as
+            # confident as the smaller of the two. Capped at PA_THRESHOLD so
+            # extra-large seasons don't over-dominate.
+            pa_eff = min(qf["pa"], c_pa)
+            wt = LEVEL_DISCOUNT[lvl] * min(pa_eff, PA_THRESHOLD) / PA_THRESHOLD
 
             dist_sq    += wt * (d_pppa**2 + AGE_WEIGHT * d_age**2 + skill_term)
             weight_sum += wt
