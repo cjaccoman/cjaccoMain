@@ -348,6 +348,73 @@ def main() -> None:
         print("  player_bios.csv not found — skipping (run fetch/fetch_player_bios.py)")
 
     # ------------------------------------------------------------------
+    # L/R platoon splits — milb_hitting_lr_splits.csv
+    # Pivot vsLHP → *_vsL, vsRHP → *_vsR; join on PlayerId+Season+Level.
+    # ------------------------------------------------------------------
+    lr_path = DATA_DIR / "api" / "milb_hitting_lr_splits.csv"
+    _LR_STATS = ["PA", "K_pct", "BB_pct", "BB_2K", "BABIP", "AVG", "OBP", "SLG"]
+    if lr_path.exists():
+        print("Joining L/R splits...")
+        lr = pd.read_csv(lr_path, usecols=[
+            "PlayerId", "MLBAM_ID", "Name", "Season", "Level", "Split",
+        ] + _LR_STATS)
+        lr["_norm_lr"] = lr["Name"].apply(_norm)
+
+        lhp = (lr[lr["Split"] == "vsLHP"].drop(columns=["Split"])
+               .rename(columns={c: f"{c}_vsL" for c in _LR_STATS})
+               .drop_duplicates(subset=["PlayerId", "Season", "Level"]))
+        rhp = (lr[lr["Split"] == "vsRHP"].drop(columns=["Split"])
+               .rename(columns={c: f"{c}_vsR" for c in _LR_STATS})
+               .drop_duplicates(subset=["PlayerId", "Season", "Level"]))
+
+        _vsL_cols = [f"{c}_vsL" for c in _LR_STATS]
+        _vsR_cols = [f"{c}_vsR" for c in _LR_STATS]
+
+        # Primary join: PlayerId + Season + Level
+        merged = merged.merge(
+            lhp[["PlayerId", "Season", "Level"] + _vsL_cols],
+            on=["PlayerId", "Season", "Level"], how="left",
+        )
+        merged = merged.merge(
+            rhp[["PlayerId", "Season", "Level"] + _vsR_cols],
+            on=["PlayerId", "Season", "Level"], how="left",
+        )
+
+        # Name fallback for rows that didn't match on PlayerId
+        _lr_unmatched = merged["PA_vsL"].isna() & merged["PA_vsR"].isna()
+        if _lr_unmatched.any():
+            lhp_name = lhp.drop_duplicates(subset=["_norm_lr", "Season", "Level"])
+            rhp_name = rhp.drop_duplicates(subset=["_norm_lr", "Season", "Level"])
+            fill_idx = merged.index[_lr_unmatched]
+
+            fill_l = merged.loc[_lr_unmatched, ["_norm", "Season", "Level"]].merge(
+                lhp_name[["_norm_lr", "Season", "Level"] + _vsL_cols],
+                left_on=["_norm", "Season", "Level"],
+                right_on=["_norm_lr", "Season", "Level"], how="left",
+            )
+            fill_r = merged.loc[_lr_unmatched, ["_norm", "Season", "Level"]].merge(
+                rhp_name[["_norm_lr", "Season", "Level"] + _vsR_cols],
+                left_on=["_norm", "Season", "Level"],
+                right_on=["_norm_lr", "Season", "Level"], how="left",
+            )
+            for col in _vsL_cols:
+                merged.loc[fill_idx, col] = fill_l[col].values
+            for col in _vsR_cols:
+                merged.loc[fill_idx, col] = fill_r[col].values
+
+        # Derived platoon gaps (positive = better vs RHP — normal for LHH)
+        merged["Platoon_BB2K_gap"] = (merged["BB_2K_vsR"] - merged["BB_2K_vsL"]).round(4)
+        merged["Platoon_OBP_gap"]  = (merged["OBP_vsR"]   - merged["OBP_vsL"]).round(4)
+
+        n_l = merged["PA_vsL"].notna().sum()
+        n_r = merged["PA_vsR"].notna().sum()
+        print(f"  PA_vsL populated: {n_l:,} / {len(merged):,}")
+        print(f"  PA_vsR populated: {n_r:,} / {len(merged):,}")
+    else:
+        _vsL_cols, _vsR_cols = [], []
+        print("  milb_hitting_lr_splits.csv not found — skipping (run fetch/fetch_milb_lr_splits.py)")
+
+    # ------------------------------------------------------------------
     # Final column order and output
     # ------------------------------------------------------------------
     out_cols = [
@@ -372,14 +439,20 @@ def main() -> None:
         # TOOLS — dev runway
         "Age_Z_SL",
         # Supporting
-        "ISO", "GB/FB",
+        "GB/FB",
         # Raw counting
         "3B", "HR", "BB", "IBB",
-        # Situational splits (AAA 2023-2025)
+        # Situational splits (AAA 2023-2025, Statcast)
         "RISP_PA", "RISP_K_pct", "RISP_xwOBA",
         "LHP_PA", "LHP_xwOBA", "LHP_K_pct",
         "RHP_PA", "RHP_xwOBA", "RHP_K_pct",
         "Platoon_Gap", "Count02_PA", "Count02_K_pct", "Overall_xwOBA",
+        # L/R platoon splits — all levels/seasons (MLB Stats API)
+        "PA_vsL", "K_pct_vsL", "BB_pct_vsL", "BB_2K_vsL", "BABIP_vsL",
+        "AVG_vsL", "OBP_vsL", "SLG_vsL",
+        "PA_vsR", "K_pct_vsR", "BB_pct_vsR", "BB_2K_vsR", "BABIP_vsR",
+        "AVG_vsR", "OBP_vsR", "SLG_vsR",
+        "Platoon_BB2K_gap", "Platoon_OBP_gap",
     ]
     # Drop working columns not in final output
     for drop_col in ["InZoneSwings", "OutsideSwings", "Pitches_adv", "SwStr%_adv", "Whiff%_adv"]:
