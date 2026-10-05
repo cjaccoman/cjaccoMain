@@ -375,7 +375,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
 }
 
 /* ── Comps tab ── */
-#comps-table{width:100%;border-collapse:collapse;table-layout:fixed}
+#comps-table{width:100%;border-collapse:collapse;min-width:760px}
 #comps-table th,#comps-table td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #comps-table th{background:var(--surface);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;position:sticky;top:0;z-index:1;user-select:none}
 #comps-table th:hover{color:var(--text)}
