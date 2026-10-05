@@ -732,6 +732,56 @@ def find_career_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
     return query, comps
 
 
+def project_from_comps(comps: pd.DataFrame) -> dict:
+    """Derive projection distribution from a comps result table.
+
+    Separates two independent signals:
+      grad_pct  — fraction of top-N comps that reached MLB (proxy for
+                  probability of making it; independent of production)
+      ceiling / median / floor — 75th / 50th / 25th percentile of
+                  Career_PPPA_Z *among graduated comps only*, weighted
+                  by match quality (match_pct)
+
+    Keeping them separate lets you say "70% graduation odds, +0.64 median
+    if they get there" rather than collapsing into a single blended number
+    that mixes together two very different questions.
+    """
+    n_total = len(comps)
+    grad = comps[comps["graduated"] & comps["Career_PPPA_Z"].notna()].copy()
+    grad_pct = len(grad) / n_total if n_total > 0 else 0.0
+
+    if len(grad) == 0:
+        return {"grad_pct": grad_pct, "n_grads": 0,
+                "ceiling": np.nan, "median": np.nan, "floor": np.nan,
+                "mean_wt": np.nan}
+
+    # Weight by match quality — closer comps count more
+    weights = grad["match_pct"].values.astype(float)
+    weights = np.maximum(weights, 0.1)   # floor to avoid zero-weight comps
+    weights = weights / weights.sum()
+
+    vals = grad["Career_PPPA_Z"].values.astype(float)
+
+    def _weighted_quantile(v, w, q):
+        """Weighted quantile via sorted cumulative-weight interpolation."""
+        idx = np.argsort(v)
+        sv, sw = v[idx], w[idx]
+        cum_w = np.cumsum(sw) / sw.sum()
+        # Extend left boundary so interpolation works at q < min cumulative weight
+        cum_ext = np.concatenate([[0.0], cum_w])
+        val_ext = np.concatenate([[sv[0]], sv])
+        return float(np.interp(q, cum_ext, val_ext))
+
+    return {
+        "grad_pct": grad_pct,
+        "n_grads":  len(grad),
+        "ceiling":  round(_weighted_quantile(vals, weights, 0.75), 2),
+        "median":   round(_weighted_quantile(vals, weights, 0.50), 2),
+        "floor":    round(_weighted_quantile(vals, weights, 0.25), 2),
+        "mean_wt":  round(float(np.sum(vals * weights)), 2),
+    }
+
+
 def print_comps(query, comps, n_shown=10):
     name   = query["Name"]
     levels_shown = []
@@ -749,10 +799,6 @@ def print_comps(query, comps, n_shown=10):
         print(f"  {l}")
     graduated = comps["graduated"].sum()
     print(f"\nTop {len(comps)} comps  ({graduated}/{len(comps)} graduated to MLB)")
-    grad_z = comps.loc[comps["graduated"], "Career_PPPA_Z"]
-    if len(grad_z):
-        print(f"  Among graduates — Career_PPPA_Z: "
-              f"mean={grad_z.mean():.2f}  median={grad_z.median():.2f}")
     print()
     print(f"  {'#':>2}  {'Name':<25} {'Shared':>7}  {'Dist':>5}  "
           f"{'Grad':>5}  {'1stYr_Z':>8}  {'CareerZ':>8}  {'MLB_PA':>7}")
@@ -763,6 +809,17 @@ def print_comps(query, comps, n_shown=10):
         mpa  = f"{row['Career_MLB_PA']:.0f}"   if pd.notna(row["Career_MLB_PA"])  else "  N/A"
         print(f"  {i:>2}  {row['Name']:<25} {row['shared_levels']:>7}  "
               f"{row['dist']:>5.3f}  {grad_str:>5}  {fyr:>8}  {carz:>8}  {mpa:>7}")
+
+    proj = project_from_comps(comps)
+    print(f"\nProjection  (grad rate: {proj['grad_pct']:.0%} of comps reached MLB | "
+          f"{proj['n_grads']} graduated comps)")
+    if proj["n_grads"] >= 2:
+        print(f"  Ceiling (p75): {proj['ceiling']:+.2f}")
+        print(f"  Median  (p50): {proj['median']:+.2f}")
+        print(f"  Floor   (p25): {proj['floor']:+.2f}")
+        print(f"  Wtd mean:      {proj['mean_wt']:+.2f}")
+    else:
+        print(f"  Too few graduated comps ({proj['n_grads']}) for a reliable distribution.")
 
 
 # ---------------------------------------------------------------------------
