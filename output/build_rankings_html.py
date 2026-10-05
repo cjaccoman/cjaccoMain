@@ -656,6 +656,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
     <span class="controls-title">Prospect Comps</span>
     <span class="controls-count" id="comps-count"></span>
     <input type="search" id="comps-search" placeholder="Search player…" autocomplete="off" />
+    <select id="comps-archetype-filter"><option value="">All archetypes</option></select>
     <div class="spacer"></div>
     <span style="font-size:11px;color:var(--muted)">Top 250 prospects · click row to expand</span>
   </div>
@@ -1218,6 +1219,12 @@ const COMPS_ARR = Object.entries(COMPS_RAW).map(([pid,d])=>({...d,pid}))
 let compsSortCol='rank', compsSortDir=1, compsFiltered=COMPS_ARR.slice();
 let compsOpenPid=null;
 
+const compsArchFilter=document.getElementById('comps-archetype-filter');
+[...new Set(COMPS_ARR.map(d=>d.archetype||'').filter(Boolean))].sort().forEach(a=>{
+  const o=document.createElement('option');o.value=a;o.textContent=a;compsArchFilter.appendChild(o);
+});
+compsArchFilter.addEventListener('change',applyCompsFilters);
+
 const PROJ_MIN=-1.5, PROJ_MAX=2.5, PROJ_RANGE=PROJ_MAX-PROJ_MIN;
 
 function projPct(v){return Math.max(0,Math.min(100,((v-PROJ_MIN)/PROJ_RANGE)*100));}
@@ -1355,8 +1362,10 @@ function buildDetailHtml(d){
 
 function applyCompsFilters(){
   const q=(document.getElementById('comps-search').value||'').toLowerCase();
+  const arch=(document.getElementById('comps-archetype-filter').value||'');
   compsFiltered=COMPS_ARR.filter(d=>{
     if(q&&!d.name.toLowerCase().includes(q)&&!(d.team||'').toLowerCase().includes(q))return false;
+    if(arch&&(d.archetype||'')!==arch)return false;
     return true;
   });
   // sort
