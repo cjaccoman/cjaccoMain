@@ -320,7 +320,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
 .comp-group{display:flex;flex-direction:column;gap:4px;min-width:160px}
 .comp-group-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   color:var(--muted);margin-bottom:2px}
-.comp-row{display:flex;align-items:center;gap:7px;font-size:11px}
+.comp-stat-row{display:flex;align-items:center;gap:7px;font-size:11px}
 .comp-name{width:72px;color:var(--muted);white-space:nowrap}
 .comp-val{width:30px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .bar-sm{width:60px;height:5px;border-radius:3px;background:var(--surface2);overflow:hidden;display:inline-block;vertical-align:middle}
@@ -375,8 +375,17 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
 }
 
 /* ── Comps tab ── */
-#comps-table{width:100%;border-collapse:collapse}
-#comps-table th,#comps-table td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+#comps-table{width:100%;border-collapse:collapse;table-layout:fixed}
+#comps-table th,#comps-table td{padding:6px 10px;border-bottom:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#comps-table th:nth-child(1),#comps-table td:nth-child(1){width:5%}
+#comps-table th:nth-child(2),#comps-table td:nth-child(2){width:16%}
+#comps-table th:nth-child(3),#comps-table td:nth-child(3){width:6%}
+#comps-table th:nth-child(4),#comps-table td:nth-child(4){width:5%}
+#comps-table th:nth-child(5),#comps-table td:nth-child(5){width:5%}
+#comps-table th:nth-child(6),#comps-table td:nth-child(6){width:32%;white-space:normal}
+#comps-table th:nth-child(7),#comps-table td:nth-child(7){width:16%}
+#comps-table th:nth-child(8),#comps-table td:nth-child(8){width:8%}
+#comps-table th:nth-child(9),#comps-table td:nth-child(9){width:7%}
 #comps-table th{background:var(--surface);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;position:sticky;top:0;z-index:1;user-select:none}
 #comps-table th:hover{color:var(--text)}
 #comps-table tr.comp-row:hover td{background:var(--row-hover);cursor:pointer}
@@ -739,14 +748,14 @@ function detailHTML(r){
   if(hasT){
     html+='<div class="comp-group"><div class="comp-group-label">TOOLS breakdown</div>';
     tCols.forEach(([n,v])=>{
-      if(v!=null)html+=`<div class="comp-row"><span class="comp-name">${n}</span>${compBar(v)}</div>`;
+      if(v!=null)html+=`<div class="comp-stat-row"><span class="comp-name">${n}</span>${compBar(v)}</div>`;
     });
     html+='</div>';
   }
   if(hasA){
     html+='<div class="comp-group"><div class="comp-group-label">ABILITY breakdown</div>';
     aCols.forEach(([n,v])=>{
-      if(v!=null)html+=`<div class="comp-row"><span class="comp-name">${n}</span>${compBar(v)}</div>`;
+      if(v!=null)html+=`<div class="comp-stat-row"><span class="comp-name">${n}</span>${compBar(v)}</div>`;
     });
     html+='</div>';
   }
@@ -1270,7 +1279,7 @@ function renderComps(){
       <td class="num">${nGrads}</td>
     </tr>`);
     if(open){
-      rows.push(`<tr class="comp-detail open"><td colspan="8"><div class="comp-detail-inner">${buildDetailHtml(d)}</div></td></tr>`);
+      rows.push(`<tr class="comp-detail open"><td colspan="9"><div class="comp-detail-inner">${buildDetailHtml(d)}</div></td></tr>`);
     }
   });
   tbody.innerHTML=rows.join('');

@@ -542,6 +542,16 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
     if not q_feats:
         raise ValueError("Query player has no qualifying level data (PA >= MIN_COMP_PA)")
 
+    # Minimum weight a comp must accumulate to be valid.
+    # Require 20% of the query player's own total weight — self-scaling so
+    # Rookie-only prospects still find comps while high-level prospects don't
+    # match against thin single-level candidates.
+    query_weight_sum = sum(
+        LEVEL_DISCOUNT[lvl] * min(qf["pa"], PA_THRESHOLD) / PA_THRESHOLD
+        for lvl, qf in q_feats.items()
+    )
+    min_comp_weight = max(0.25 * query_weight_sum, 0.05)
+
     # Trajectory z-score for query player
     q_traj_z = None
     q_traj_raw = query.get("PPPA_Z_trajectory", np.nan)
@@ -593,7 +603,7 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
             weight_sum += wt
             shared     += 1
 
-        if shared < min_shared_levels or weight_sum == 0:
+        if shared < min_shared_levels or weight_sum < min_comp_weight:
             continue
 
         # Trajectory term: career-level signal added after level loop

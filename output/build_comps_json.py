@@ -124,6 +124,12 @@ def _find_comps_fast(query_rec, pool_records, pool_df, params, n=N_COMPS):
     if not q_feats:
         return pd.DataFrame()
 
+    query_weight_sum = sum(
+        LEVEL_DISCOUNT[lvl] * min(qf["pa"], PA_THRESHOLD) / PA_THRESHOLD
+        for lvl, qf in q_feats.items()
+    )
+    min_comp_weight = max(0.25 * query_weight_sum, 0.05)
+
     # Trajectory
     q_traj_z = None
     q_traj_raw = query_rec.get("PPPA_Z_trajectory")
@@ -191,7 +197,7 @@ def _find_comps_fast(query_rec, pool_records, pool_df, params, n=N_COMPS):
             weight_sum += wt
             shared     += 1
 
-        if shared < 1 or weight_sum == 0:
+        if shared < 1 or weight_sum < min_comp_weight:
             continue
 
         if q_traj_z is not None:
@@ -246,6 +252,11 @@ def main():
     pool_records = pool_df.to_dict("records")
     pool_by_pid  = {str(r["PlayerId"]): r for r in pool_records}
 
+    # Exclude current prospects from comp candidates — they haven't graduated yet
+    current_pids = {str(pid) for pid in scores["PlayerId"].dropna()}
+    comp_pool_records = [r for r in pool_records if str(r["PlayerId"]) not in current_pids]
+    print(f"Comp pool: {len(pool_records)} total → {len(comp_pool_records)} after excluding {len(current_pids)} current prospects")
+
     top_scores = (
         scores[scores["Combined_Rank"] <= TOP_N]
         .sort_values("Combined_Rank")
@@ -270,7 +281,7 @@ def main():
             print(f"  [{i:>3}] {name}: not found in player_comps.csv — skipped")
             continue
 
-        result = _find_comps_fast(query_rec, pool_records, pool_df, params)
+        result = _find_comps_fast(query_rec, comp_pool_records, pool_df, params)
         if isinstance(result, pd.DataFrame):  # empty
             print(f"  [{i:>3}] {name}: no comps found — skipped")
             continue
