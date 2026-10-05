@@ -1,12 +1,20 @@
-"""Fetch MiLB pitch-level data from game feeds to compute Chase%, Z-Contact%, PullAir%.
+"""Fetch MiLB pitch-level data from game feeds to compute Chase%, Z-Contact%, PullAir%,
+and velocity-bucketed metrics (P95+).
 
 Data source: MLB Stats API game feeds (/api/v1.1/game/{gamePk}/feed/live)
 Coverage: all affiliated MiLB levels (AAA through R), 2006-present
 
 Metric definitions:
-  Chase%     = swings at out-of-zone pitches (zones 11-14) / total out-of-zone pitches
-  Z-Contact% = contact (non-miss) on in-zone swings (zones 1-9) / total in-zone swings
-  PullAir%   = pulled fly balls + line drives / total batted balls in play
+  Chase%      = swings at out-of-zone pitches (zones 11-14) / total out-of-zone pitches
+  Z-Contact%  = contact (non-miss) on in-zone swings (zones 1-9) / total in-zone swings
+  PullAir%    = pulled fly balls + line drives / total batted balls in play
+  P95_Whiff%  = whiffs on 95+ mph pitches / swings on 95+ mph pitches
+  P95_Chase%  = swings on 95+ mph out-of-zone pitches / total 95+ mph out-of-zone pitches
+  P95_pct     = 95+ mph pitches seen / total pitches seen
+
+Velocity coverage: pitchData.startSpeed requires Trackman/Hawk-Eye at the park.
+  AAA 2023+: near-complete (~100%). Earlier seasons and lower levels: partial or absent.
+  Rows with P95_Pitches=0 have null P95_Whiff% and P95_Chase%.
 
 Outputs (data/api/):
   milb_pitches_agg.csv    -- final metrics, one row per player-season-level
@@ -16,6 +24,7 @@ Outputs (data/api/):
 Run modes:
   First run (no milb_pitches_agg.csv): full history 2006-present (~9 hrs all levels)
   Incremental (output exists): only new current-season games (~seconds to minutes)
+  --rebuild-velocity YEAR: re-process a season to add P95 velocity columns
 """
 
 import argparse
@@ -206,6 +215,9 @@ def parse_game_feed(data: dict, game_pk: int, season: int, level: str) -> list[d
                 InZonePitches=0, InZoneSwings=0, InZoneContacts=0,
                 BattedBalls=0, AirBalls=0, PullAirBalls=0,
                 TotalPitches=0, SwStr=0,
+                # Velocity bucket (95+ mph)
+                P95_Pitches=0, P95_Swings=0, P95_Whiff=0,
+                P95_OutsidePitches=0, P95_OutsideSwings=0,
             )
         agg      = counts[batter_id]
         bat_side = sides[batter_id]
@@ -214,13 +226,29 @@ def parse_game_feed(data: dict, game_pk: int, season: int, level: str) -> list[d
             if not event.get("isPitch", False):
                 continue
 
-            zone      = _zone((event.get("pitchData") or {}).get("zone"))
-            call_code = ((event.get("details") or {}).get("call") or {}).get("code", "")
-            is_swing  = call_code in SWING_CODES
+            pitch_data = event.get("pitchData") or {}
+            zone       = _zone(pitch_data.get("zone"))
+            call_code  = ((event.get("details") or {}).get("call") or {}).get("code", "")
+            is_swing   = call_code in SWING_CODES
+
+            # Velocity bucket
+            start_speed = pitch_data.get("startSpeed")
+            is_p95 = start_speed is not None and start_speed >= 95.0
 
             agg["TotalPitches"] += 1
             if call_code in WHIFF_CODES:
                 agg["SwStr"] += 1
+
+            if is_p95:
+                agg["P95_Pitches"] += 1
+                if is_swing:
+                    agg["P95_Swings"] += 1
+                    if call_code in WHIFF_CODES:
+                        agg["P95_Whiff"] += 1
+                if zone in OUT_ZONE:
+                    agg["P95_OutsidePitches"] += 1
+                    if is_swing:
+                        agg["P95_OutsideSwings"] += 1
 
             if zone in IN_ZONE:
                 agg["InZonePitches"] += 1
@@ -271,6 +299,8 @@ COUNT_COLS = [
     "InZonePitches",  "InZoneSwings", "InZoneContacts",
     "BattedBalls",    "AirBalls",     "PullAirBalls",
     "TotalPitches",   "SwStr",
+    "P95_Pitches",    "P95_Swings",   "P95_Whiff",
+    "P95_OutsidePitches", "P95_OutsideSwings",
 ]
 
 
@@ -286,6 +316,11 @@ def build_agg(games_df: pd.DataFrame, chadwick: pd.DataFrame) -> pd.DataFrame:
     if "SwStr" not in games_df.columns:
         games_df = games_df.copy()
         games_df["SwStr"] = 0  # unknown from old cache; will fill as new games are fetched
+    # Back-fill P95 columns (0 = no velocity data; P95_Pitches=0 → null computed metrics)
+    for col in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]:
+        if col not in games_df.columns:
+            games_df = games_df.copy()
+            games_df[col] = 0
 
     # Deduplicate: one row per (gamePk, MLBAM_ID) prevents double-counting on re-runs
     games_df = games_df.drop_duplicates(subset=["gamePk", "MLBAM_ID"])
@@ -318,15 +353,33 @@ def build_agg(games_df: pd.DataFrame, chadwick: pd.DataFrame) -> pd.DataFrame:
         agg["SwStr"] / total_swings
     ).where(total_swings > 0).round(3)
 
+    # P95+ velocity metrics (null when no velocity data available)
+    agg["P95_Whiff%"] = (
+        agg["P95_Whiff"] / agg["P95_Swings"]
+    ).where(agg["P95_Swings"] > 0).round(3)
+
+    agg["P95_Chase%"] = (
+        agg["P95_OutsideSwings"] / agg["P95_OutsidePitches"]
+    ).where(agg["P95_OutsidePitches"] > 0).round(3)
+
+    agg["P95_pct"] = (
+        agg["P95_Pitches"] / agg["TotalPitches"]
+    ).where(agg["TotalPitches"] > 0).round(3)
+    # Zero P95_Pitches means no velocity data — null out the rate
+    agg.loc[agg["P95_Pitches"] == 0, ["P95_Whiff%", "P95_Chase%", "P95_pct"]] = None
+
     agg = apply_crosswalk(agg, chadwick)
 
     col_order = [
         "PlayerId", "MLBAM_ID", "Season", "Level", "Name",
         "Chase%", "Z-Contact%", "PullAir%", "Whiff%",
+        "P95_Whiff%", "P95_Chase%", "P95_pct",
         "OutsidePitches", "OutsideSwings",
         "InZonePitches",  "InZoneSwings", "InZoneContacts",
         "BattedBalls",    "AirBalls",     "PullAirBalls",
         "TotalPitches",   "SwStr",
+        "P95_Pitches",    "P95_Swings",   "P95_Whiff",
+        "P95_OutsidePitches", "P95_OutsideSwings",
         "Games",
     ]
     return agg[[c for c in col_order if c in agg.columns]]
@@ -343,6 +396,11 @@ def main() -> None:
         help="Fetch a specific season only (e.g. --season 2026). "
              "Default: current season if output exists, full history if not.",
     )
+    parser.add_argument(
+        "--rebuild-velocity", type=int, default=None, metavar="YEAR",
+        help="Re-process a season to add P95 velocity columns (e.g. --rebuild-velocity 2024). "
+             "Removes that season's games from cache and re-fetches them.",
+    )
     args = parser.parse_args()
 
     print("=== fetch_milb_pitches.py ===\n")
@@ -351,7 +409,33 @@ def main() -> None:
     done_pks  = load_cache()
     print(f"Cache: {len(done_pks):,} games already processed")
 
-    if args.season is not None:
+    if args.rebuild_velocity is not None:
+        rv_year = args.rebuild_velocity
+        print(f"Rebuild-velocity mode — re-processing {rv_year} to add P95 columns\n")
+        # Remove that season's games from both the done cache and the games CSV.
+        # Also add P95 columns to existing rows (as 0) so the header matches new rows.
+        if GAMES_OUT.exists():
+            games_df_existing = pd.read_csv(GAMES_OUT, dtype={"MLBAM_ID": "Int64", "gamePk": int}, on_bad_lines="skip")
+            old_count = len(games_df_existing)
+            games_df_existing = games_df_existing[games_df_existing["Season"] != rv_year]
+            # Ensure P95 columns exist in the header so appended rows align correctly
+            for p95c in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]:
+                if p95c not in games_df_existing.columns:
+                    games_df_existing[p95c] = 0
+            games_df_existing.to_csv(GAMES_OUT, index=False)
+            removed = old_count - len(games_df_existing)
+            print(f"  Dropped {removed:,} rows for {rv_year} from milb_pitches_games.csv")
+        # Remove those game PKs from done cache so they get re-fetched
+        season_pks_to_remove: set[int] = set()
+        for level, sport_id in SPORT_IDS.items():
+            sched = fetch_schedule(sport_id, rv_year)
+            season_pks_to_remove.update(sched)
+        removed_from_cache = done_pks & season_pks_to_remove
+        done_pks -= season_pks_to_remove
+        save_cache(done_pks)
+        print(f"  Removed {len(removed_from_cache):,} game PKs from done cache")
+        fetch_seasons = [rv_year]
+    elif args.season is not None:
         fetch_seasons = [args.season] if args.season != 2020 else []
         print(f"Single-season mode — fetching {args.season} only\n")
     elif AGG_OUT.exists():

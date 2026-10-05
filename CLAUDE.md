@@ -306,6 +306,9 @@ These era breaks are encoded in `pipeline/add_era_columns.py` and used for era-r
 
 **Metric definitions:**
 - `Chase% = (swings on zones 11–14) / (all pitches in zones 11–14)`
+- `P95_Whiff% = (whiffs on 95+ mph pitches) / (swings on 95+ mph pitches)`
+- `P95_Chase% = (swings on 95+ mph out-of-zone pitches) / (95+ mph out-of-zone pitches)`
+- `P95_pct = (95+ mph pitches seen) / (total pitches seen)`
 - `Z-Contact% = (contact on zones 1–9) / (swings on zones 1–9)`
 - `PullAir% = (pulled fly balls + pulled line drives) / all batted balls`
 
@@ -348,7 +351,7 @@ N=9,155 player-seasons, R²=0.9999. Coefficients recover the scoring formula exa
 | `milb_advanced.csv` | Rate/batted ball stats from API seasonAdvanced endpoint; includes Whiff% (swingAndMisses/totalSwings, all levels) and SwStr% (swingAndMisses/numberOfPitches) |
 | `milb_pitching.csv` | Raw pitching counting stats from MLB Stats API (2006–2026, IP ≥ 10, Age ≤ 26): G, GS, IP, ER, K, BB, HRA, W, L, SV, HLD, BS, CG, SHO, QS, WP |
 | `milb_pitching_advanced.csv` | Rate/batted ball stats from pitching seasonAdvanced endpoint: K%, BB%, K-BB%, Whiff%, BABIP, GB%, LD%, FB%, GB/FB, QS |
-| `milb_pitches_agg.csv` | Aggregated pitch-level metrics from game feeds: Chase%, Z-Contact% (AAA 2023–2026), PullAir% (all levels/seasons). **Whiff% column is broken — all 7,860 non-null rows are 0 (never computed). Do not use; `milb_advanced.csv` is authoritative for Whiff%.** |
+| `milb_pitches_agg.csv` | Aggregated pitch-level metrics from game feeds: Chase%, Z-Contact% (AAA 2023–2026), PullAir% (all levels/seasons), P95_Whiff%, P95_Chase%, P95_pct (velocity: AAA 2023–2026 where Hawk-Eye present; partial lower levels). **Whiff% column is broken — all 7,860 non-null rows are 0 (never computed). Do not use; `milb_advanced.csv` is authoritative for Whiff%.** |
 | `milb_pitches_games.csv` | Raw game-level pitch cache (one row per player × game) |
 | `milb_expected_stats.csv` | Statcast expected stats per player-season at all 5 MiLB levels (2015–2026): xBA, xSLG, xwOBA, xwOBAcon. Built by `fetch/fetch_milb_splits.py`. |
 | `milb_hitting_lr_splits.csv` | L/R platoon splits for all MiLB hitters (2006–2026, all 5 levels). One row per player × season × level × split (vsLHP/vsRHP). Columns: PlayerId, MLBAM_ID, Name, Season, Level, Split, PA, AB, H, 1B, 2B, 3B, HR, RBI, BB, IBB, HBP, SF, SO, GIDP, TB, AVG, OBP, SLG, BABIP, K_pct, BB_pct, BB_2K, ISO. **R, SB, CS not available from this endpoint** — partial PPPA only (R+SB+CS excluded). Built by `fetch/fetch_milb_lr_splits.py`. |
@@ -467,7 +470,7 @@ fetch/fetch_mlb_data.py                # Refresh hist_mlb_data.csv from MLB Stat
                                        #   incremental by default (current season only); --full refetches 2006–current
 fetch/fetch_milb_data.py               # Refresh milb_hitting.csv + milb_advanced.csv from MLB Stats API
 fetch/fetch_milb_pitching.py           # Refresh milb_pitching.csv + milb_pitching_advanced.csv from MLB Stats API
-fetch/fetch_milb_pitches.py            # Refresh milb_pitches_agg.csv (incremental by default)
+fetch/fetch_milb_pitches.py            # Refresh milb_pitches_agg.csv (incremental by default); --rebuild-velocity YEAR re-processes a season with P95 velocity extraction
 fetch/fetch_milb_splits.py             # Refresh milb_expected_stats.csv (xwOBA per level, 2015+); --season-advanced for full batted-ball breakdown; --career-advanced for career aggregate
 fetch/fetch_milb_lr_splits.py          # Refresh milb_hitting_lr_splits.csv (L/R platoon splits, all levels 2006+); incremental by default; --full refetches all
 fetch/fetch_mlb_statcast.py            # Refresh mlb_statcast.csv + mlb_bat_tracking.csv from Baseball Savant (incremental by default; --full refetches 2015–current)

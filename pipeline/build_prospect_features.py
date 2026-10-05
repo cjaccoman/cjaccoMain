@@ -174,12 +174,19 @@ def main() -> None:
     agg_file_cols = pd.read_csv(DATA_DIR / "api" / "milb_pitches_agg.csv", nrows=0).columns
     if "Whiff%" in agg_file_cols:
         agg_cols.append("Whiff%")
+    # P95 velocity metrics (2023+ AAA; lower levels where Trackman present)
+    for p95col in ["P95_Whiff%", "P95_Chase%", "P95_pct"]:
+        if p95col in agg_file_cols:
+            agg_cols.append(p95col)
     agg = pd.read_csv(DATA_DIR / "api" / "milb_pitches_agg.csv", usecols=agg_cols)
     agg["MLBAM_ID"] = pd.to_numeric(agg["MLBAM_ID"], errors="coerce").astype("Int64")
     agg = agg.drop_duplicates(subset=["MLBAM_ID", "Season", "Level"])
     merged = merged.merge(agg, on=["MLBAM_ID", "Season", "Level"], how="left")
     print(f"  PullAir% populated: {merged['PullAir%'].notna().sum():,} / {len(merged):,}")
     print(f"  Chase% populated:   {merged['Chase%'].notna().sum():,} / {len(merged):,}")
+    for p95col in ["P95_Whiff%", "P95_Chase%", "P95_pct"]:
+        if p95col in merged.columns:
+            print(f"  {p95col} populated:  {merged[p95col].notna().sum():,} / {len(merged):,}")
 
     # ------------------------------------------------------------------
     # ProspectSavant — Spd, MaxEV, EV90 + Chase%/Z-Contact%/Whiff%/PullAir%
@@ -432,6 +439,8 @@ def main() -> None:
         "SB", "CS", "SB_pct",
         # TOOLS — discipline
         "Chase%", "Z-Contact%", "Whiff%", "SwStr%",
+        # TOOLS — velocity vulnerability (P95+ game feeds, 2023+ AAA)
+        "P95_Whiff%", "P95_Chase%", "P95_pct",
         # TOOLS — raw power
         "HR/FB", "career_HR_FB", "career_FBs_est", "prior_FBs_est", "MaxEV", "EV90",
         # TOOLS — athleticism
@@ -471,7 +480,8 @@ def main() -> None:
     # Coverage summary
     print("\nNull rates for key columns:")
     key_cols = ["PPPA_Z_SL", "BB%", "K%", "BB_2K", "PullAir%", "Chase%",
-                "Whiff%", "HR/FB", "Spd", "MaxEV", "SB_pct", "Age_Z_SL"]
+                "Whiff%", "HR/FB", "Spd", "MaxEV", "SB_pct", "Age_Z_SL",
+                "P95_Whiff%", "P95_Chase%", "P95_pct"]
     for c in key_cols:
         if c in out.columns:
             pct = out[c].isna().mean() * 100
