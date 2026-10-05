@@ -158,6 +158,62 @@ luck_records = [
 raw_luck = json.dumps(luck_records, separators=(",", ":"))
 print(f"Luck tracker: {len(luck_records)} prospects")
 
+# ── AFL data ─────────────────────────────────────────────────────────────────
+_afl_hit_path = DATA_DIR / "api" / "afl_hitting.csv"
+_afl_pit_path = DATA_DIR / "api" / "afl_pitching.csv"
+
+if _afl_hit_path.exists():
+    afl_hit = pd.read_csv(_afl_hit_path)
+    if "MLBAM_ID" in ps.columns:
+        _hit_ranks = (ps[["MLBAM_ID","Combined_Rank","Name"]].dropna(subset=["MLBAM_ID"])
+                      .assign(MLBAM_ID=lambda d: d["MLBAM_ID"].astype("Int64")))
+        afl_hit["MLBAM_ID"] = afl_hit["MLBAM_ID"].astype("Int64")
+        afl_hit = afl_hit.merge(_hit_ranks[["MLBAM_ID","Combined_Rank"]].rename(
+            columns={"Combined_Rank":"Prospect_Rank"}), on="MLBAM_ID", how="left")
+    else:
+        afl_hit["Prospect_Rank"] = None
+    for c in ["PPPA","K_pct","BB_pct","ISO","BABIP","SB_pct","Whiff_pct","GB_FB",
+              "LD_pct","GB_pct","FB_pct","POP_pct"]:
+        if c in afl_hit.columns:
+            afl_hit[c] = pd.to_numeric(afl_hit[c], errors="coerce").round(4)
+    afl_hit_cols = ["MLBAM_ID","Name","Team","Season","PA","HR","SB","CS",
+                    "PPPA","K_pct","BB_pct","ISO","BABIP","SB_pct",
+                    "Whiff_pct","GB_FB","LD_pct","GB_pct","FB_pct","POP_pct","Prospect_Rank"]
+    afl_hit_cols = [c for c in afl_hit_cols if c in afl_hit.columns]
+    raw_afl_hit = json.dumps(
+        [{k: _to_json_val(row[k]) for k in afl_hit_cols} for _, row in afl_hit.iterrows()],
+        separators=(",", ":"))
+    print(f"AFL hitters: {len(afl_hit)} rows across {afl_hit['Season'].nunique()} seasons")
+else:
+    raw_afl_hit = "[]"
+    print("afl_hitting.csv not found — AFL tab will be empty")
+
+if _afl_pit_path.exists():
+    afl_pit = pd.read_csv(_afl_pit_path)
+    if _pitcher_path.exists():
+        _pit_ids = (pit[["MLBAM_ID","SP_Rank","RP_Rank"]].dropna(subset=["MLBAM_ID"])
+                    .assign(MLBAM_ID=lambda d: d["MLBAM_ID"].astype("Int64")))
+        afl_pit["MLBAM_ID"] = afl_pit["MLBAM_ID"].astype("Int64")
+        afl_pit = afl_pit.merge(_pit_ids, on="MLBAM_ID", how="left")
+        afl_pit["Prospect_Rank"] = afl_pit["SP_Rank"].combine_first(afl_pit["RP_Rank"])
+    else:
+        afl_pit["Prospect_Rank"] = None
+    for c in ["ERA","K_pct","BB_pct","KBB_pct","Whiff_pct","GB_pct","GB_FB","PPI_skill",
+              "LD_pct","FB_pct","POP_pct"]:
+        if c in afl_pit.columns:
+            afl_pit[c] = pd.to_numeric(afl_pit[c], errors="coerce").round(4)
+    afl_pit_cols = ["MLBAM_ID","Name","Team","Season","Role","G","GS","IP","ERA",
+                    "K_pct","BB_pct","KBB_pct","Whiff_pct","GB_pct","GB_FB",
+                    "LD_pct","FB_pct","POP_pct","PPI_skill","Prospect_Rank"]
+    afl_pit_cols = [c for c in afl_pit_cols if c in afl_pit.columns]
+    raw_afl_pit = json.dumps(
+        [{k: _to_json_val(row[k]) for k in afl_pit_cols} for _, row in afl_pit.iterrows()],
+        separators=(",", ":"))
+    print(f"AFL pitchers: {len(afl_pit)} rows across {afl_pit['Season'].nunique()} seasons")
+else:
+    raw_afl_pit = "[]"
+    print("afl_pitching.csv not found — AFL pitcher table will be empty")
+
 # ── Comps data ────────────────────────────────────────────────────────────────
 _comps_path = DATA_DIR / "rankings" / "prospect_comps.json"
 if _comps_path.exists():
@@ -420,6 +476,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
 .grad-badge.yes{background:var(--flag-good-bg);color:var(--flag-good-text)}
 .grad-badge.no{background:var(--surface2);color:var(--muted)}
 .muted-sm{font-size:11px;color:var(--muted)}
+.afl-view-btn.active{color:var(--accent);border-color:var(--accent)}
 </style>
 
 <!-- ══ Tab bar ══ -->
@@ -430,6 +487,7 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
   <button class="tab-btn" data-tab="aaa">AAA 2026</button>
   <button class="tab-btn" data-tab="luck">Luck Tracker</button>
   <button class="tab-btn" data-tab="comps">Comps</button>
+  <button class="tab-btn" data-tab="afl">AFL</button>
 </div>
 
 <!-- ══ Prospects panel ══ -->
@@ -684,6 +742,81 @@ tr.detail-row td > .detail-inner{padding:10px 14px;display:flex;gap:24px;flex-wr
         <th class="num" data-comps-col="n_grads" data-type="num"># Grads</th>
       </tr></thead>
       <tbody id="comps-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ AFL panel ══ -->
+<div class="panel" id="panel-afl">
+  <div class="controls">
+    <span class="controls-title">Arizona Fall League</span>
+    <span class="controls-count" id="afl-count"></span>
+    <input type="search" id="afl-search" placeholder="Search player…" autocomplete="off" />
+    <select id="afl-season-filter"></select>
+    <select id="afl-team-filter"><option value="">All teams</option></select>
+    <select id="afl-prospect-filter">
+      <option value="">All players</option>
+      <option value="prospects">Prospects only</option>
+    </select>
+    <select id="afl-min-filter">
+      <option value="">All PA / IP</option>
+      <option value="10">≥ 10 PA / IP</option>
+      <option value="20">≥ 20 PA / IP</option>
+      <option value="30">≥ 30 PA / IP</option>
+    </select>
+    <div class="spacer"></div>
+    <button class="clear-btn afl-view-btn active" id="afl-hit-btn">Hitters</button>
+    <button class="clear-btn afl-view-btn" id="afl-pit-btn">Pitchers</button>
+    <button class="clear-btn" id="afl-clear-btn">Clear</button>
+  </div>
+  <!-- Hitter table -->
+  <div class="table-wrap" id="afl-hit-wrap">
+    <table id="afl-hit-table">
+      <thead><tr>
+        <th data-afl-col="Name" data-type="str">Name</th>
+        <th data-afl-col="Team" data-type="str">Team</th>
+        <th class="num" data-afl-col="Season" data-type="num">Year</th>
+        <th class="num" data-afl-col="PA" data-type="num">PA</th>
+        <th class="num" data-afl-col="HR" data-type="num">HR</th>
+        <th class="num" data-afl-col="SB" data-type="num">SB</th>
+        <th class="num" data-afl-col="PPPA" data-type="num">PPPA</th>
+        <th class="num" data-afl-col="K_pct" data-type="num">K%</th>
+        <th class="num" data-afl-col="BB_pct" data-type="num">BB%</th>
+        <th class="num" data-afl-col="ISO" data-type="num">ISO</th>
+        <th class="num" data-afl-col="BABIP" data-type="num">BABIP</th>
+        <th class="num" data-afl-col="SB_pct" data-type="num">SB%</th>
+        <th class="num" data-afl-col="Whiff_pct" data-type="num">Whiff%</th>
+        <th class="num" data-afl-col="GB_FB" data-type="num">GB/FB</th>
+        <th class="num" data-afl-col="LD_pct" data-type="num">LD%</th>
+        <th class="num" data-afl-col="GB_pct" data-type="num">GB%</th>
+        <th class="num" data-afl-col="FB_pct" data-type="num">FB%</th>
+        <th class="num" data-afl-col="Prospect_Rank" data-type="num">Rank</th>
+      </tr></thead>
+      <tbody id="afl-hit-tbody"></tbody>
+    </table>
+  </div>
+  <!-- Pitcher table -->
+  <div class="table-wrap" id="afl-pit-wrap" style="display:none">
+    <table id="afl-pit-table">
+      <thead><tr>
+        <th data-aflp-col="Name" data-type="str">Name</th>
+        <th data-aflp-col="Team" data-type="str">Team</th>
+        <th class="num" data-aflp-col="Season" data-type="num">Year</th>
+        <th data-aflp-col="Role" data-type="str">Role</th>
+        <th class="num" data-aflp-col="IP" data-type="num">IP</th>
+        <th class="num" data-aflp-col="ERA" data-type="num">ERA</th>
+        <th class="num" data-aflp-col="K_pct" data-type="num">K%</th>
+        <th class="num" data-aflp-col="BB_pct" data-type="num">BB%</th>
+        <th class="num" data-aflp-col="KBB_pct" data-type="num">KBB%</th>
+        <th class="num" data-aflp-col="Whiff_pct" data-type="num">Whiff%</th>
+        <th class="num" data-aflp-col="GB_pct" data-type="num">GB%</th>
+        <th class="num" data-aflp-col="GB_FB" data-type="num">GB/FB</th>
+        <th class="num" data-aflp-col="LD_pct" data-type="num">LD%</th>
+        <th class="num" data-aflp-col="FB_pct" data-type="num">FB%</th>
+        <th class="num" data-aflp-col="PPI_skill" data-type="num">PPI</th>
+        <th class="num" data-aflp-col="Prospect_Rank" data-type="num">Rank</th>
+      </tr></thead>
+      <tbody id="afl-pit-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -1408,6 +1541,199 @@ document.querySelectorAll('#comps-table th[data-comps-col]').forEach(th=>{
 applyCompsFilters();
 
 /* ════════════════════════════════════════════
+   AFL TAB
+   ════════════════════════════════════════════ */
+const AFL_HIT = AFL_HIT_PLACEHOLDER;
+const AFL_PIT = AFL_PIT_PLACEHOLDER;
+
+let aflView='hit'; // 'hit' or 'pit'
+let aflHitSortCol='PPPA', aflHitSortDir=-1, aflHitFiltered=AFL_HIT.slice();
+let aflPitSortCol='K_pct', aflPitSortDir=-1, aflPitFiltered=AFL_PIT.slice();
+
+// Populate season filter — unique years descending, default 2026
+const aflSeasons=[...new Set([...AFL_HIT.map(r=>r.Season),...AFL_PIT.map(r=>r.Season)])].sort((a,b)=>b-a);
+const aflSeasonSel=document.getElementById('afl-season-filter');
+{const o=document.createElement('option');o.value='';o.textContent='All years';aflSeasonSel.appendChild(o);}
+aflSeasons.forEach(yr=>{const o=document.createElement('option');o.value=yr;o.textContent=yr;aflSeasonSel.appendChild(o);});
+// Default to most recent season
+if(aflSeasons.length){aflSeasonSel.value=aflSeasons[0];}
+
+// Populate team filter from both datasets
+const aflTeamSel=document.getElementById('afl-team-filter');
+[...new Set([...AFL_HIT.map(r=>r.Team),...AFL_PIT.map(r=>r.Team)])].filter(Boolean).sort().forEach(t=>{
+  const o=document.createElement('option');o.value=t;o.textContent=t;aflTeamSel.appendChild(o);
+});
+
+function aflPctCell(v,dec=1){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  return`<td class="num">${(v*100).toFixed(dec)}%</td>`;
+}
+function aflNumCell(v,dec=2){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  return`<td class="num">${(+v).toFixed(dec)}</td>`;
+}
+function aflRankCell(v){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  return`<td class="num"><span style="color:var(--accent);font-weight:600">#${Math.round(v)}</span></td>`;
+}
+function aflSignCell(v,dec=3){
+  if(v==null||isNaN(v))return'<td class="num null-cell">—</td>';
+  return`<td class="num">${v>=0?'+':''}${(+v).toFixed(dec)}</td>`;
+}
+
+function renderAFLHit(){
+  const tbody=document.getElementById('afl-hit-tbody');
+  document.getElementById('afl-count').textContent=aflHitFiltered.length.toLocaleString()+' hitters';
+  if(!aflHitFiltered.length){
+    tbody.innerHTML='<tr><td colspan="18" class="no-results">No players match.</td></tr>';return;
+  }
+  tbody.innerHTML=aflHitFiltered.map(r=>`<tr>
+    <td class="name">${r.Name}</td>
+    <td>${r.Team||'—'}</td>
+    <td class="num">${r.Season}</td>
+    <td class="num">${r.PA??'—'}</td>
+    <td class="num">${r.HR??'—'}</td>
+    <td class="num">${r.SB??'—'}</td>
+    ${aflNumCell(r.PPPA,3)}
+    ${aflPctCell(r.K_pct)}
+    ${aflPctCell(r.BB_pct)}
+    ${aflNumCell(r.ISO,3)}
+    ${aflNumCell(r.BABIP,3)}
+    ${r.SB_pct!=null?aflPctCell(r.SB_pct):'<td class="num null-cell">—</td>'}
+    ${aflPctCell(r.Whiff_pct)}
+    ${aflNumCell(r.GB_FB,2)}
+    ${aflPctCell(r.LD_pct)}
+    ${aflPctCell(r.GB_pct)}
+    ${aflPctCell(r.FB_pct)}
+    ${aflRankCell(r.Prospect_Rank)}
+  </tr>`).join('');
+}
+
+function renderAFLPit(){
+  const tbody=document.getElementById('afl-pit-tbody');
+  document.getElementById('afl-count').textContent=aflPitFiltered.length.toLocaleString()+' pitchers';
+  if(!aflPitFiltered.length){
+    tbody.innerHTML='<tr><td colspan="16" class="no-results">No players match.</td></tr>';return;
+  }
+  tbody.innerHTML=aflPitFiltered.map(r=>`<tr>
+    <td class="name">${r.Name}</td>
+    <td>${r.Team||'—'}</td>
+    <td class="num">${r.Season}</td>
+    <td>${r.Role||'—'}</td>
+    ${aflNumCell(r.IP,1)}
+    ${aflNumCell(r.ERA,2)}
+    ${aflPctCell(r.K_pct)}
+    ${aflPctCell(r.BB_pct)}
+    ${aflPctCell(r.KBB_pct)}
+    ${aflPctCell(r.Whiff_pct)}
+    ${aflPctCell(r.GB_pct)}
+    ${aflNumCell(r.GB_FB,2)}
+    ${aflPctCell(r.LD_pct)}
+    ${aflPctCell(r.FB_pct)}
+    ${aflSignCell(r.PPI_skill)}
+    ${aflRankCell(r.Prospect_Rank)}
+  </tr>`).join('');
+}
+
+function applyAFLFilters(){
+  const q=(document.getElementById('afl-search').value||'').trim().toLowerCase();
+  const season=parseInt(document.getElementById('afl-season-filter').value)||0;
+  const team=document.getElementById('afl-team-filter').value;
+  const prosp=document.getElementById('afl-prospect-filter').value;
+  const min=parseInt(document.getElementById('afl-min-filter').value)||0;
+
+  if(aflView==='hit'){
+    aflHitFiltered=AFL_HIT.filter(r=>{
+      if(q&&!r.Name.toLowerCase().includes(q))return false;
+      if(season&&r.Season!==season)return false;
+      if(team&&r.Team!==team)return false;
+      if(prosp==='prospects'&&(r.Prospect_Rank==null||isNaN(r.Prospect_Rank)))return false;
+      if(min&&(r.PA??0)<min)return false;
+      return true;
+    });
+    const type=document.querySelector(`th[data-afl-col="${aflHitSortCol}"]`)?.dataset.type;
+    aflHitFiltered.sort((a,b)=>{
+      let av=a[aflHitSortCol],bv=b[aflHitSortCol];
+      if(type==='str')return aflHitSortDir*String(av||'').localeCompare(String(bv||''));
+      return aflHitSortDir*((av??-Infinity)-(bv??-Infinity));
+    });
+    renderAFLHit();
+  } else {
+    aflPitFiltered=AFL_PIT.filter(r=>{
+      if(q&&!r.Name.toLowerCase().includes(q))return false;
+      if(season&&r.Season!==season)return false;
+      if(team&&r.Team!==team)return false;
+      if(prosp==='prospects'&&(r.Prospect_Rank==null||isNaN(r.Prospect_Rank)))return false;
+      if(min&&(r.IP??0)<min)return false;
+      return true;
+    });
+    const type=document.querySelector(`th[data-aflp-col="${aflPitSortCol}"]`)?.dataset.type;
+    aflPitFiltered.sort((a,b)=>{
+      let av=a[aflPitSortCol],bv=b[aflPitSortCol];
+      if(type==='str')return aflPitSortDir*String(av||'').localeCompare(String(bv||''));
+      return aflPitSortDir*((av??-Infinity)-(bv??-Infinity));
+    });
+    renderAFLPit();
+  }
+}
+
+// Column sort — hitters
+document.querySelectorAll('#afl-hit-table th[data-afl-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.aflCol;
+    aflHitSortDir=(aflHitSortCol===col)?-aflHitSortDir:(col==='Name'||col==='Team'?1:-1);
+    aflHitSortCol=col;
+    document.querySelectorAll('#afl-hit-table th').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(aflHitSortDir===1?'sort-asc':'sort-desc');
+    applyAFLFilters();
+  });
+});
+// Column sort — pitchers
+document.querySelectorAll('#afl-pit-table th[data-aflp-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.aflpCol;
+    aflPitSortDir=(aflPitSortCol===col)?-aflPitSortDir:(col==='Name'||col==='Team'||col==='Role'?1:-1);
+    aflPitSortCol=col;
+    document.querySelectorAll('#afl-pit-table th').forEach(h=>h.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(aflPitSortDir===1?'sort-asc':'sort-desc');
+    applyAFLFilters();
+  });
+});
+
+// Filter controls
+['afl-search','afl-season-filter','afl-team-filter','afl-prospect-filter','afl-min-filter'].forEach(id=>{
+  document.getElementById(id).addEventListener(id==='afl-search'?'input':'change',applyAFLFilters);
+});
+
+// Hitter/Pitcher view toggle
+document.getElementById('afl-hit-btn').addEventListener('click',()=>{
+  aflView='hit';
+  document.getElementById('afl-hit-wrap').style.display='';
+  document.getElementById('afl-pit-wrap').style.display='none';
+  document.getElementById('afl-hit-btn').classList.add('active');
+  document.getElementById('afl-pit-btn').classList.remove('active');
+  applyAFLFilters();
+});
+document.getElementById('afl-pit-btn').addEventListener('click',()=>{
+  aflView='pit';
+  document.getElementById('afl-hit-wrap').style.display='none';
+  document.getElementById('afl-pit-wrap').style.display='';
+  document.getElementById('afl-pit-btn').classList.add('active');
+  document.getElementById('afl-hit-btn').classList.remove('active');
+  applyAFLFilters();
+});
+
+document.getElementById('afl-clear-btn').addEventListener('click',()=>{
+  document.getElementById('afl-search').value='';
+  if(aflSeasons.length)document.getElementById('afl-season-filter').value=aflSeasons[0];
+  ['afl-team-filter','afl-prospect-filter','afl-min-filter'].forEach(id=>{ document.getElementById(id).value=''; });
+  applyAFLFilters();
+});
+
+// Initial render
+applyAFLFilters();
+
+/* ════════════════════════════════════════════
    TAB SWITCHING
    ════════════════════════════════════════════ */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -1427,7 +1753,9 @@ html = HTML \
     .replace('RP_DATA_PLACEHOLDER', raw_rp) \
     .replace('AAA_DATA_PLACEHOLDER', raw_aaa) \
     .replace('LUCK_DATA_PLACEHOLDER', raw_luck) \
-    .replace('COMPS_DATA_PLACEHOLDER', raw_comps)
+    .replace('COMPS_DATA_PLACEHOLDER', raw_comps) \
+    .replace('AFL_HIT_PLACEHOLDER', raw_afl_hit) \
+    .replace('AFL_PIT_PLACEHOLDER', raw_afl_pit)
 
 SCRATCHPAD.mkdir(parents=True, exist_ok=True)
 with open(OUT_PATH, 'w', encoding='utf-8') as f:
