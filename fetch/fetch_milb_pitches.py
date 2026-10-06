@@ -1,5 +1,5 @@
 """Fetch MiLB pitch-level data from game feeds to compute Chase%, Z-Contact%, PullAir%,
-and velocity-bucketed metrics (P95+).
+velocity-bucketed metrics (P95+), and exit velocity (MaxEV).
 
 Data source: MLB Stats API game feeds (/api/v1.1/game/{gamePk}/feed/live)
 Coverage: all affiliated MiLB levels (AAA through R), 2006-present
@@ -11,10 +11,16 @@ Metric definitions:
   P95_Whiff%  = whiffs on 95+ mph pitches / swings on 95+ mph pitches
   P95_Chase%  = swings on 95+ mph out-of-zone pitches / total 95+ mph out-of-zone pitches
   P95_pct     = 95+ mph pitches seen / total pitches seen
+  MaxEV       = max hitData.launchSpeed across all in-play events in the season
+                (requires Hawk-Eye; populated at AAA 2023+ and A-ball FSL parks 2021+)
 
 Velocity coverage: pitchData.startSpeed requires Trackman/Hawk-Eye at the park.
   AAA 2023+: near-complete (~100%). Earlier seasons and lower levels: partial or absent.
   Rows with P95_Pitches=0 have null P95_Whiff% and P95_Chase%.
+
+Exit velocity coverage: hitData.launchSpeed requires Hawk-Eye.
+  AAA 2023+: ~100%. A-ball FSL parks (Clearwater/Palm Beach/St. Lucie/Bradenton/Lakeland)
+  2021+: ~100%. All other levels/parks: null.
 
 Outputs (data/api/):
   milb_pitches_agg.csv    -- final metrics, one row per player-season-level
@@ -222,6 +228,8 @@ def parse_game_feed(data: dict, game_pk: int, season: int, level: str) -> list[d
                 # Velocity bucket (95+ mph)
                 P95_Pitches=0, P95_Swings=0, P95_Whiff=0,
                 P95_OutsidePitches=0, P95_OutsideSwings=0,
+                # Exit velocity (Hawk-Eye parks only: AAA 2023+, A-ball FSL 2021+)
+                EV_Max=None, EV_Count=0,
             )
         agg      = counts[batter_id]
         bat_side = sides[batter_id]
@@ -279,6 +287,17 @@ def parse_game_feed(data: dict, game_pk: int, season: int, level: str) -> list[d
                                   (bat_side == "L" and cx > PULL_MID)
                         if is_pull:
                             agg["PullAirBalls"] += 1
+                # Exit velocity (requires Hawk-Eye; null where not tracked)
+                ls = hit_data.get("launchSpeed")
+                if ls is not None:
+                    try:
+                        ls_f = float(ls)
+                        if ls_f > 0:
+                            agg["EV_Count"] += 1
+                            if agg["EV_Max"] is None or ls_f > agg["EV_Max"]:
+                                agg["EV_Max"] = ls_f
+                    except (TypeError, ValueError):
+                        pass
 
     rows = []
     for batter_id, agg in counts.items():
@@ -325,6 +344,13 @@ def build_agg(games_df: pd.DataFrame, chadwick: pd.DataFrame) -> pd.DataFrame:
         if col not in games_df.columns:
             games_df = games_df.copy()
             games_df[col] = 0
+    # Back-fill EV columns (added after initial cache build; EV_Max=NaN means no Hawk-Eye data)
+    if "EV_Max" not in games_df.columns:
+        games_df = games_df.copy()
+        games_df["EV_Max"] = None
+    if "EV_Count" not in games_df.columns:
+        games_df = games_df.copy()
+        games_df["EV_Count"] = 0
 
     # Deduplicate: one row per (gamePk, MLBAM_ID) prevents double-counting on re-runs
     games_df = games_df.drop_duplicates(subset=["gamePk", "MLBAM_ID"])
@@ -338,6 +364,15 @@ def build_agg(games_df: pd.DataFrame, chadwick: pd.DataFrame) -> pd.DataFrame:
     nm   = games_df.groupby(grp)["Name"].last().reset_index()
 
     agg = agg.merge(gcnt, on=grp).merge(nm, on=grp)
+
+    # EV aggregation: MaxEV = max of per-game maxes; EV_Count = sum
+    # These can't go into COUNT_COLS since EV_Max is not summable.
+    ev_max = games_df.groupby(grp, as_index=False)["EV_Max"].max()
+    ev_cnt = games_df.groupby(grp, as_index=False)["EV_Count"].sum()
+    agg = agg.merge(ev_max, on=grp, how="left").merge(ev_cnt, on=grp, how="left")
+    # Null out MaxEV where no EV data was captured (EV_Count=0 means no Hawk-Eye present)
+    no_ev = agg["EV_Count"].fillna(0) == 0
+    agg.loc[no_ev, "EV_Max"] = None
 
     # Compute metrics (null when denominator is zero)
     agg["Chase%"] = (
@@ -378,6 +413,7 @@ def build_agg(games_df: pd.DataFrame, chadwick: pd.DataFrame) -> pd.DataFrame:
         "PlayerId", "MLBAM_ID", "Season", "Level", "Name",
         "Chase%", "Z-Contact%", "PullAir%", "Whiff%",
         "P95_Whiff%", "P95_Chase%", "P95_pct",
+        "MaxEV", "EV_Count",
         "OutsidePitches", "OutsideSwings",
         "InZonePitches",  "InZoneSwings", "InZoneContacts",
         "BattedBalls",    "AirBalls",     "PullAirBalls",
@@ -456,6 +492,11 @@ def main() -> None:
             if p95c not in combined.columns:
                 combined[p95c] = 0
         combined.fillna({c: 0 for c in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]}, inplace=True)
+        # Ensure EV columns exist (added after initial cache build)
+        if "EV_Max" not in combined.columns:
+            combined["EV_Max"] = None
+        if "EV_Count" not in combined.columns:
+            combined["EV_Count"] = 0
         combined.to_csv(GAMES_OUT, index=False)
         print(f"\n  Wrote {len(combined):,} rows -> {GAMES_OUT.name}")
 
@@ -527,7 +568,7 @@ def main() -> None:
         # ------------------------------------------------------------------
         # Original all-levels mode (sequential, modifies main CSV)
         # ------------------------------------------------------------------
-        print(f"Rebuild-velocity mode — re-processing {rv_year} to add P95 columns\n")
+        print(f"Rebuild-velocity mode — re-processing {rv_year} to add P95/EV columns\n")
         if GAMES_OUT.exists():
             games_df_existing = pd.read_csv(GAMES_OUT, dtype={"MLBAM_ID": "Int64", "gamePk": int}, on_bad_lines="skip")
             old_count = len(games_df_existing)
@@ -535,6 +576,10 @@ def main() -> None:
             for p95c in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]:
                 if p95c not in games_df_existing.columns:
                     games_df_existing[p95c] = 0
+            if "EV_Max" not in games_df_existing.columns:
+                games_df_existing["EV_Max"] = None
+            if "EV_Count" not in games_df_existing.columns:
+                games_df_existing["EV_Count"] = 0
             games_df_existing.to_csv(GAMES_OUT, index=False)
             removed = old_count - len(games_df_existing)
             print(f"  Dropped {removed:,} rows for {rv_year} from milb_pitches_games.csv")

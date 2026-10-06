@@ -178,15 +178,23 @@ def main() -> None:
     for p95col in ["P95_Whiff%", "P95_Chase%", "P95_pct"]:
         if p95col in agg_file_cols:
             agg_cols.append(p95col)
+    # MaxEV from game feeds (AAA 2023+; A-ball FSL parks 2021+)
+    if "MaxEV" in agg_file_cols:
+        agg_cols.append("MaxEV")
     agg = pd.read_csv(DATA_DIR / "api" / "milb_pitches_agg.csv", usecols=agg_cols)
     agg["MLBAM_ID"] = pd.to_numeric(agg["MLBAM_ID"], errors="coerce").astype("Int64")
     agg = agg.drop_duplicates(subset=["MLBAM_ID", "Season", "Level"])
+    # Rename game-feed MaxEV to avoid collision with ProspectSavant MaxEV (joined later)
+    if "MaxEV" in agg.columns:
+        agg = agg.rename(columns={"MaxEV": "MaxEV_gf"})
     merged = merged.merge(agg, on=["MLBAM_ID", "Season", "Level"], how="left")
     print(f"  PullAir% populated: {merged['PullAir%'].notna().sum():,} / {len(merged):,}")
     print(f"  Chase% populated:   {merged['Chase%'].notna().sum():,} / {len(merged):,}")
     for p95col in ["P95_Whiff%", "P95_Chase%", "P95_pct"]:
         if p95col in merged.columns:
             print(f"  {p95col} populated:  {merged[p95col].notna().sum():,} / {len(merged):,}")
+    if "MaxEV_gf" in merged.columns:
+        print(f"  MaxEV (game feed):  {merged['MaxEV_gf'].notna().sum():,} / {len(merged):,}")
 
     # ------------------------------------------------------------------
     # ProspectSavant — Spd, MaxEV, EV90 + Chase%/Z-Contact%/Whiff%/PullAir%
@@ -233,7 +241,15 @@ def main() -> None:
         # Drop _ps working columns
         merged = merged.drop(columns=[c for c in merged.columns if c.endswith("_ps")], errors="ignore")
 
+        # Fill-null MaxEV with game-feed values where PS has no data
+        # (PS covers AAA only; game feeds cover AAA 2023+ and A-ball FSL parks 2021+)
+        if "MaxEV_gf" in merged.columns:
+            gf_fill = merged["MaxEV"].isna() & merged["MaxEV_gf"].notna()
+            merged.loc[gf_fill, "MaxEV"] = merged.loc[gf_fill, "MaxEV_gf"]
+            print(f"  MaxEV gf fill-ins:    {gf_fill.sum():,}")
+
         print(f"  Spd populated:        {merged['Spd'].notna().sum():,} / {len(merged):,}")
+        print(f"  MaxEV populated:      {merged['MaxEV'].notna().sum():,} / {len(merged):,}")
         print(f"  Chase% populated:     {merged['Chase%'].notna().sum():,} / {len(merged):,}")
         print(f"  Z-Contact% populated: {merged['Z-Contact%'].notna().sum():,} / {len(merged):,}")
     else:
@@ -464,7 +480,7 @@ def main() -> None:
         "Platoon_BB2K_gap", "Platoon_OBP_gap",
     ]
     # Drop working columns not in final output
-    for drop_col in ["InZoneSwings", "OutsideSwings", "Pitches_adv", "SwStr%_adv", "Whiff%_adv"]:
+    for drop_col in ["InZoneSwings", "OutsideSwings", "Pitches_adv", "SwStr%_adv", "Whiff%_adv", "MaxEV_gf"]:
         merged = merged.drop(columns=[drop_col], errors="ignore")
     out_cols = [c for c in out_cols if c in merged.columns]
     out = merged[out_cols].copy()

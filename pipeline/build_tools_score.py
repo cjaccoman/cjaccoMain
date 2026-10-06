@@ -37,10 +37,13 @@ Discipline sub-weights:
       -P95_Whiff%_z   15%
 
 Power sub-weights:
-  Full tier (ProspectSavant rows: MaxEV + EV90 available):
+  Full tier (ProspectSavant rows: MaxEV + EV90 available — AAA 2023-2026):
     MaxEV_z   35%   ceiling exit velocity
     EV90_z    35%   90th-percentile EV (consistent hard contact)
     HRFB_adj  30%   actual HR production rate (era+level adjusted)
+  MaxEV-only tier (game-feed rows with MaxEV but no EV90 — A-ball FSL parks 2021+):
+    MaxEV_z   70%   ceiling exit velocity (higher weight to compensate for missing EV90)
+    HRFB_adj  30%   actual HR production rate (no shrinkage — MaxEV validates power)
   Fallback (all other rows — no EV data to validate power):
     HRFB_adj × career_shrink  100%
     career_shrink = min(career_FBs_est / FB_CAREER_THRESHOLD, 1.0)
@@ -184,25 +187,33 @@ def build_power(
 ) -> pd.Series:
     hrfb = df["HRFB_adj"]
 
-    full      = maxev_z.notna() & ev90_z.notna() & hrfb.notna()
-    hrfb_only = ~(maxev_z.notna() & ev90_z.notna()) & hrfb.notna()
+    full       = maxev_z.notna() & ev90_z.notna() & hrfb.notna()
+    maxev_only = maxev_z.notna() & ev90_z.isna()  & hrfb.notna()
+    hrfb_only  = maxev_z.isna()                   & hrfb.notna()
 
-    # Career-FB shrinkage for fallback tier only.  EV data in the full tier provides
-    # an independent validation of power, so HRFB at 30% weight there is fine at full
-    # strength.  In the fallback tier HRFB carries 100% of Power, and single-season
-    # HR/FB is too noisy at typical prospect fly-ball counts; shrink toward neutral
-    # until the player has accumulated enough career evidence.
+    # Career-FB shrinkage for fallback (hrfb_only) tier only.  Any tier with EV data
+    # provides independent validation of power, so HRFB at 30% weight there is fine
+    # at full strength.  In the fallback tier HRFB carries 100% of Power, and single-
+    # season HR/FB is too noisy at typical prospect fly-ball counts; shrink toward
+    # neutral until the player has accumulated enough career evidence.
     # Use prior-season FBs only (excludes this row's own contribution) so the
     # current season cannot supply both the extreme HRFB_adj and its own shrinkage weight.
     career_fbs = df["prior_FBs_est"].fillna(0.0)
     career_shrink = (career_fbs / FB_CAREER_THRESHOLD).clip(upper=1.0)
 
     score = pd.Series(np.nan, index=df.index, dtype=float)
+    # Full tier: MaxEV + EV90 + HRFB (ProspectSavant AAA 2023-2026)
     score[full] = (
         WP["maxev"] * maxev_z[full]
         + WP["ev90"]  * ev90_z[full]
         + WP["hrfb"]  * hrfb[full]
     )
+    # MaxEV-only tier: MaxEV + HRFB (game-feed A-ball FSL parks 2021+)
+    score[maxev_only] = (
+        0.70 * maxev_z[maxev_only]
+        + 0.30 * hrfb[maxev_only]
+    )
+    # Fallback tier: HRFB with career-FB shrinkage (no EV validation)
     score[hrfb_only] = (hrfb * career_shrink)[hrfb_only]
     return score
 
@@ -279,9 +290,11 @@ def main() -> None:
     full_disc = (
         df["Chase%_adj"].notna() & df["ZContact%_adj"].notna() & df["Whiff%_adj"].notna()
     )
-    full_pow = maxev_z.notna() & ev90_z.notna() & df["HRFB_adj"].notna()
-    full_ath = spd_z.notna() & df["3B_PA_adj"].notna()
-    has_p95  = p95_whiff_z.notna()
+    full_pow     = maxev_z.notna() & ev90_z.notna() & df["HRFB_adj"].notna()
+    maxev_only   = maxev_z.notna() & ev90_z.isna()  & df["HRFB_adj"].notna()
+    hrfb_only    = maxev_z.isna()                   & df["HRFB_adj"].notna()
+    full_ath     = spd_z.notna() & df["3B_PA_adj"].notna()
+    has_p95      = p95_whiff_z.notna()
 
     print("Tier coverage:")
     print(f"  Discipline  full+P95={( full_disc & has_p95).sum():>5,}  "
@@ -289,7 +302,8 @@ def main() -> None:
           f"fallback+P95={(~full_disc & df['Whiff%_adj'].notna() & has_p95).sum():,}  "
           f"whiff-only={(~full_disc & df['Whiff%_adj'].notna() & ~has_p95).sum():,}")
     print(f"  Power       full={full_pow.sum():>6,}  "
-          f"hrfb-only= {(~(maxev_z.notna()&ev90_z.notna()) & df['HRFB_adj'].notna()).sum():,}")
+          f"maxev-only={maxev_only.sum():>5,}  "
+          f"hrfb-only={hrfb_only.sum():,}")
     print(f"  Athleticism full={full_ath.sum():>6,}  "
           f"3bpa-only= {(~spd_z.notna() & df['3B_PA_adj'].notna()).sum():,}")
 
