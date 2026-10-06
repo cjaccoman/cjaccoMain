@@ -59,6 +59,10 @@ GAMES_OUT  = API_DIR / "milb_pitches_games.csv"
 CACHE_OUT  = API_DIR / "milb_games_done.csv"
 CHAD_CACHE = API_DIR / "chadwick.csv"
 
+def staging_path(level: str, year: int) -> Path:
+    """Per-level staging CSV used during parallel --rebuild-velocity runs."""
+    return API_DIR / f"milb_pitches_games_{level}_{year}.csv"
+
 # Pitch zone codes
 IN_ZONE  = frozenset(range(1, 10))    # zones 1-9: in strike zone
 OUT_ZONE = frozenset(range(11, 15))   # zones 11-14: out of zone / chase zone
@@ -399,33 +403,141 @@ def main() -> None:
     parser.add_argument(
         "--rebuild-velocity", type=int, default=None, metavar="YEAR",
         help="Re-process a season to add P95 velocity columns (e.g. --rebuild-velocity 2024). "
-             "Removes that season's games from cache and re-fetches them.",
+             "Without --level: removes all levels for that season and re-fetches into main CSV. "
+             "With --level: writes only that level to a staging file (parallel-safe).",
+    )
+    parser.add_argument(
+        "--level", default=None, choices=list(SPORT_IDS.keys()),
+        help="Process only this level. Use with --rebuild-velocity for parallel runs. "
+             "Writes to milb_pitches_games_{LEVEL}_{YEAR}.csv (staging). "
+             "Run --merge-year YEAR after all levels finish.",
+    )
+    parser.add_argument(
+        "--merge-year", type=int, default=None, metavar="YEAR",
+        help="Merge per-level staging files for YEAR into the main games CSV and rebuild agg. "
+             "Run this after all --rebuild-velocity YEAR --level X jobs finish.",
     )
     args = parser.parse_args()
 
     print("=== fetch_milb_pitches.py ===\n")
 
     chadwick  = load_chadwick()
+
+    # ------------------------------------------------------------------
+    # --merge-year: combine staging files into main CSV, rebuild agg
+    # ------------------------------------------------------------------
+    if args.merge_year is not None:
+        my = args.merge_year
+        print(f"Merge mode — combining {my} staging files into main games CSV\n")
+        parts: list[pd.DataFrame] = []
+        for level in SPORT_IDS:
+            sp = staging_path(level, my)
+            if sp.exists():
+                df = pd.read_csv(sp, dtype={"MLBAM_ID": "Int64", "gamePk": int}, on_bad_lines="skip")
+                print(f"  {level}: {len(df):,} rows from staging file")
+                parts.append(df)
+                sp.unlink()
+            else:
+                print(f"  {level}: no staging file found (skipped)")
+        if not parts:
+            print("No staging files found. Nothing to merge.")
+            return
+
+        # Load main games CSV (excluding this year's rows to avoid duplication)
+        if GAMES_OUT.exists():
+            main_df = pd.read_csv(GAMES_OUT, dtype={"MLBAM_ID": "Int64", "gamePk": int}, on_bad_lines="skip")
+            main_df = main_df[main_df["Season"] != my]
+            print(f"  Main CSV (after dropping {my}): {len(main_df):,} rows")
+            parts.insert(0, main_df)
+
+        combined = pd.concat(parts, ignore_index=True)
+        # Ensure P95 columns exist
+        for p95c in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]:
+            if p95c not in combined.columns:
+                combined[p95c] = 0
+        combined.fillna({c: 0 for c in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]}, inplace=True)
+        combined.to_csv(GAMES_OUT, index=False)
+        print(f"\n  Wrote {len(combined):,} rows -> {GAMES_OUT.name}")
+
+        # Update main done tracker with all merged gamePks
+        done_pks = load_cache()
+        done_pks.update(combined["gamePk"].astype(int).tolist())
+        save_cache(done_pks)
+        print(f"  Done tracker updated: {len(done_pks):,} total gamePks")
+
+        print("\nRebuilding milb_pitches_agg.csv...")
+        agg = build_agg(combined, chadwick)
+        agg.to_csv(AGG_OUT, index=False)
+        print(f"  Wrote {len(agg):,} player-season-level rows -> {AGG_OUT.name}")
+        seasons_covered = sorted(combined["Season"].unique())
+        print(f"  Seasons: {seasons_covered[0]}-{seasons_covered[-1]}")
+        print(f"  Levels: {sorted(combined['Level'].unique())}")
+        print("\nDone.")
+        return
+
     done_pks  = load_cache()
     print(f"Cache: {len(done_pks):,} games already processed")
 
     if args.rebuild_velocity is not None:
         rv_year = args.rebuild_velocity
+
+        if args.level is not None:
+            # ------------------------------------------------------------------
+            # Per-level staging mode (parallel-safe): write to staging CSV only,
+            # do NOT touch the main games CSV or main done tracker.
+            # ------------------------------------------------------------------
+            level     = args.level
+            sport_id  = SPORT_IDS[level]
+            out_path  = staging_path(level, rv_year)
+            print(f"Rebuild-velocity (staged) — {rv_year} {level} -> {out_path.name}\n")
+
+            schedule = fetch_schedule(sport_id, rv_year)
+            print(f"  {rv_year} {level}: {len(schedule):4} games to fetch")
+
+            pending_rows: list[dict] = []
+            total_new_games = 0
+            for i, game_pk in enumerate(schedule, 1):
+                feed = _game_feed(game_pk)
+                if feed:
+                    rows = parse_game_feed(feed, game_pk, rv_year, level)
+                    pending_rows.extend(rows)
+                total_new_games += 1
+
+                if i % SAVE_INTERVAL == 0:
+                    chunk = pd.DataFrame(pending_rows)
+                    if not out_path.exists():
+                        chunk.to_csv(out_path, index=False)
+                    else:
+                        chunk.to_csv(out_path, mode="a", header=False, index=False)
+                    pending_rows = []
+                    print(f"      [{i}/{len(schedule)}] flushed to {out_path.name}")
+
+            if pending_rows:
+                chunk = pd.DataFrame(pending_rows)
+                if not out_path.exists():
+                    chunk.to_csv(out_path, index=False)
+                else:
+                    chunk.to_csv(out_path, mode="a", header=False, index=False)
+
+            print(f"\nProcessed {total_new_games:,} games -> {out_path.name}")
+            print("Run --merge-year after all level jobs finish to combine and rebuild agg.")
+            print("\nDone.")
+            return
+
+        # ------------------------------------------------------------------
+        # Original all-levels mode (sequential, modifies main CSV)
+        # ------------------------------------------------------------------
         print(f"Rebuild-velocity mode — re-processing {rv_year} to add P95 columns\n")
-        # Remove that season's games from both the done cache and the games CSV.
-        # Also add P95 columns to existing rows (as 0) so the header matches new rows.
         if GAMES_OUT.exists():
             games_df_existing = pd.read_csv(GAMES_OUT, dtype={"MLBAM_ID": "Int64", "gamePk": int}, on_bad_lines="skip")
             old_count = len(games_df_existing)
             games_df_existing = games_df_existing[games_df_existing["Season"] != rv_year]
-            # Ensure P95 columns exist in the header so appended rows align correctly
             for p95c in ["P95_Pitches", "P95_Swings", "P95_Whiff", "P95_OutsidePitches", "P95_OutsideSwings"]:
                 if p95c not in games_df_existing.columns:
                     games_df_existing[p95c] = 0
             games_df_existing.to_csv(GAMES_OUT, index=False)
             removed = old_count - len(games_df_existing)
             print(f"  Dropped {removed:,} rows for {rv_year} from milb_pitches_games.csv")
-        # Remove those game PKs from done cache so they get re-fetched
         season_pks_to_remove: set[int] = set()
         for level, sport_id in SPORT_IDS.items():
             sched = fetch_schedule(sport_id, rv_year)
@@ -435,6 +547,7 @@ def main() -> None:
         save_cache(done_pks)
         print(f"  Removed {len(removed_from_cache):,} game PKs from done cache")
         fetch_seasons = [rv_year]
+
     elif args.season is not None:
         fetch_seasons = [args.season] if args.season != 2020 else []
         print(f"Single-season mode — fetching {args.season} only\n")
@@ -445,11 +558,12 @@ def main() -> None:
         fetch_seasons = [s for s in SEASONS if s != 2020]  # 2020 MiLB cancelled
         print(f"Full history mode — {SEASONS[0]}-{SEASONS[-1]} (2020 skipped)\n")
 
-    pending_rows: list[dict] = []
+    pending_rows_main: list[dict] = []
     total_new_games = 0
+    levels_to_fetch = {args.level: SPORT_IDS[args.level]} if args.level else SPORT_IDS
 
     for season in fetch_seasons:
-        for level, sport_id in SPORT_IDS.items():
+        for level, sport_id in levels_to_fetch.items():
             schedule = fetch_schedule(sport_id, season)
             pending  = [pk for pk in schedule if pk not in done_pks]
 
@@ -463,24 +577,22 @@ def main() -> None:
                 feed = _game_feed(game_pk)
                 if feed:
                     rows = parse_game_feed(feed, game_pk, season, level)
-                    pending_rows.extend(rows)
+                    pending_rows_main.extend(rows)
                 done_pks.add(game_pk)
                 total_new_games += 1
 
                 if i % SAVE_INTERVAL == 0:
-                    flush_game_rows(pending_rows)
-                    pending_rows = []
+                    flush_game_rows(pending_rows_main)
+                    pending_rows_main = []
                     save_cache(done_pks)
                     print(f"      [{i}/{len(pending)}] flushed to disk")
 
-            # Flush remaining rows after each level
-            flush_game_rows(pending_rows)
-            pending_rows = []
+            flush_game_rows(pending_rows_main)
+            pending_rows_main = []
             save_cache(done_pks)
 
     print(f"\nProcessed {total_new_games:,} new games")
 
-    # Rebuild aggregation from full games file
     print("\nRebuilding milb_pitches_agg.csv...")
     if GAMES_OUT.exists():
         games_df = pd.read_csv(
@@ -491,8 +603,6 @@ def main() -> None:
         agg = build_agg(games_df, chadwick)
         agg.to_csv(AGG_OUT, index=False)
         print(f"  Wrote {len(agg):,} player-season-level rows -> {AGG_OUT.name}")
-
-        # Summary
         seasons_covered = sorted(games_df["Season"].unique())
         print(f"  Seasons: {seasons_covered[0]}-{seasons_covered[-1]}")
         print(f"  Levels: {sorted(games_df['Level'].unique())}")
