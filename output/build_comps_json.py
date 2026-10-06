@@ -199,6 +199,8 @@ def _find_comps_fast(query_rec, pool_records, pool_df, params, n=N_COMPS):
 
         if shared < 1 or weight_sum < min_comp_weight:
             continue
+        if len(q_feats) > 2 and shared <= 1:
+            continue
 
         if q_traj_z is not None:
             c_traj_raw = cand.get("PPPA_Z_trajectory")
@@ -255,7 +257,7 @@ def main():
     # Exclude current prospects from comp candidates — they haven't graduated yet
     current_pids = {str(pid) for pid in scores["PlayerId"].dropna()}
     comp_pool_records = [r for r in pool_records if str(r["PlayerId"]) not in current_pids]
-    print(f"Comp pool: {len(pool_records)} total → {len(comp_pool_records)} after excluding {len(current_pids)} current prospects")
+    print(f"Comp pool: {len(pool_records)} total -> {len(comp_pool_records)} after excluding {len(current_pids)} current prospects")
 
     top_scores = (
         scores[scores["Combined_Rank"] <= TOP_N]
@@ -333,7 +335,7 @@ def main():
     with open(OUT_JSON, "w", encoding="utf-8") as f:
         json.dump(output, f, separators=(",", ":"))
     size_kb = OUT_JSON.stat().st_size // 1024
-    print(f"Wrote {len(output)} prospects → {OUT_JSON}  ({size_kb} KB)")
+    print(f"Wrote {len(output)} prospects -> {OUT_JSON}  ({size_kb} KB)")
 
 
 if __name__ == "__main__":

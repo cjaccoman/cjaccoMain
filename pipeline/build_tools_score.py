@@ -15,12 +15,26 @@ Age adjustment: none.
 
 Discipline sub-weights:
   Full tier (Chase% + Z-Contact% available — AAA 2023+, all levels 2026 via ProspectSavant):
-    -Chase%_adj     40%   lower chase = better plate discipline
-    ZContact%_adj   35%   higher z-contact = better in-zone contact
-    -Whiff%_adj     25%   lower whiff = better overall contact
+    Without P95_Whiff%:
+      -Chase%_adj     40%   lower chase = better plate discipline
+      ZContact%_adj   35%   higher z-contact = better in-zone contact
+      -Whiff%_adj     25%   lower whiff = better overall contact
+    With P95_Whiff% (AAA 2023-2026 + A-ball Trackman parks):
+      -Chase%_adj     35%
+      ZContact%_adj   30%
+      -Whiff%_adj     20%
+      -P95_Whiff%_z   15%   velocity handling — whiff rate vs 95+ mph pitches
   Fallback (all other rows — no Chase%/Z-Contact% data):
-    -Whiff%_adj     60%   contact avoidance
-    BB%_adj         40%   pitch recognition (walk rate, era+level adjusted)
+    Without P95_Whiff%:
+      -Whiff%_adj     60%   contact avoidance
+      BB%_adj         40%   pitch recognition (walk rate, era+level adjusted)
+    With P95_Whiff%:
+      -Whiff%_adj     50%
+      BB%_adj         35%
+      -P95_Whiff%_z   15%
+    Whiff%-only + P95_Whiff% (no BB% available):
+      -Whiff%_adj     85%
+      -P95_Whiff%_z   15%
 
 Power sub-weights:
   Full tier (ProspectSavant rows: MaxEV + EV90 available):
@@ -61,8 +75,9 @@ FEATURES_IN = DATA_DIR / "rankings" / "prospect_features.parquet"
 # Top-level component weights
 W = dict(discipline=0.45, power=0.35, athleticism=0.20)
 
-# Discipline sub-weights (full tier)
-WD = dict(chase=0.40, zcontact=0.35, whiff=0.25)
+# Discipline sub-weights
+WD = dict(chase=0.40, zcontact=0.35, whiff=0.25)          # full tier, no P95
+WD_P95 = dict(chase=0.35, zcontact=0.30, whiff=0.20, p95w=0.15)  # full tier + P95
 
 # Power sub-weights (full tier)
 WP = dict(maxev=0.35, ev90=0.35, hrfb=0.30)
@@ -108,10 +123,11 @@ def to_50_10(s: pd.Series) -> pd.Series:
 # Component builders
 # ---------------------------------------------------------------------------
 
-def build_discipline(df: pd.DataFrame) -> pd.Series:
+def build_discipline(df: pd.DataFrame, p95_whiff_z: pd.Series) -> pd.Series:
     inv_whiff   = -df["Whiff%_adj"]
     inv_chase   = -df["Chase%_adj"]
     z_contact   = df["ZContact%_adj"]
+    inv_p95w    = -p95_whiff_z  # higher P95_Whiff% = worse velocity handling
 
     full = (
         df["Chase%_adj"].notna()
@@ -121,18 +137,42 @@ def build_discipline(df: pd.DataFrame) -> pd.Series:
     fallback = ~full & df["Whiff%_adj"].notna()
     bb_adj   = df["BB%_adj"]
 
-    # Fallback sub-masks: blend Whiff%+BB% where both available, else Whiff% only
-    fallback_blend    = fallback & bb_adj.notna()
-    fallback_whiff    = fallback & bb_adj.isna()
+    # P95 sub-masks within each tier
+    full_p95    = full     & inv_p95w.notna()
+    full_nop95  = full     & inv_p95w.isna()
+    fb_p95_bb   = fallback & inv_p95w.notna() & bb_adj.notna()
+    fb_nop95_bb = fallback & inv_p95w.isna()  & bb_adj.notna()
+    fb_p95_w    = fallback & inv_p95w.notna() & bb_adj.isna()
+    fb_nop95_w  = fallback & inv_p95w.isna()  & bb_adj.isna()
 
     score = pd.Series(np.nan, index=df.index, dtype=float)
-    score[full] = (
-        WD["chase"]    * inv_chase[full]
-        + WD["zcontact"] * z_contact[full]
-        + WD["whiff"]    * inv_whiff[full]
+
+    # Full tier + P95
+    score[full_p95] = (
+        WD_P95["chase"]    * inv_chase[full_p95]
+        + WD_P95["zcontact"] * z_contact[full_p95]
+        + WD_P95["whiff"]    * inv_whiff[full_p95]
+        + WD_P95["p95w"]     * inv_p95w[full_p95]
     )
-    score[fallback_blend] = 0.60 * inv_whiff[fallback_blend] + 0.40 * bb_adj[fallback_blend]
-    score[fallback_whiff] = inv_whiff[fallback_whiff]
+    # Full tier without P95
+    score[full_nop95] = (
+        WD["chase"]    * inv_chase[full_nop95]
+        + WD["zcontact"] * z_contact[full_nop95]
+        + WD["whiff"]    * inv_whiff[full_nop95]
+    )
+    # Fallback: Whiff% + BB% + P95
+    score[fb_p95_bb] = (
+        0.50 * inv_whiff[fb_p95_bb]
+        + 0.35 * bb_adj[fb_p95_bb]
+        + 0.15 * inv_p95w[fb_p95_bb]
+    )
+    # Fallback: Whiff% + BB%, no P95
+    score[fb_nop95_bb] = 0.60 * inv_whiff[fb_nop95_bb] + 0.40 * bb_adj[fb_nop95_bb]
+    # Fallback: Whiff% + P95 only (no BB%)
+    score[fb_p95_w] = 0.85 * inv_whiff[fb_p95_w] + 0.15 * inv_p95w[fb_p95_w]
+    # Fallback: Whiff% only
+    score[fb_nop95_w] = inv_whiff[fb_nop95_w]
+
     return score
 
 
@@ -187,15 +227,17 @@ def main() -> None:
     df = pd.read_parquet(FEATURES_IN)
     print(f"Loaded {len(df):,} rows\n")
 
-    # 1. Z-score raw ProspectSavant metrics within Level
-    maxev_z = z_within_level(df, "MaxEV")
-    ev90_z  = z_within_level(df, "EV90")
-    spd_z   = z_within_level(df, "Spd")
+    # 1. Z-score raw metrics within Level
+    maxev_z    = z_within_level(df, "MaxEV")
+    ev90_z     = z_within_level(df, "EV90")
+    spd_z      = z_within_level(df, "Spd")
+    p95_whiff_z = z_within_level(df, "P95_Whiff%")
     print(f"Level-normalized:  MaxEV={maxev_z.notna().sum():,}  "
-          f"EV90={ev90_z.notna().sum():,}  Spd={spd_z.notna().sum():,}")
+          f"EV90={ev90_z.notna().sum():,}  Spd={spd_z.notna().sum():,}  "
+          f"P95_Whiff%={p95_whiff_z.notna().sum():,}")
 
     # 2. Raw component scores
-    disc  = build_discipline(df)
+    disc  = build_discipline(df, p95_whiff_z)
     power = build_power(df, maxev_z, ev90_z)
     ath   = build_athleticism(df, spd_z)
 
@@ -222,6 +264,7 @@ def main() -> None:
     df["MaxEV_z"]        = maxev_z.round(3)
     df["EV90_z"]         = ev90_z.round(3)
     df["Spd_z"]          = spd_z.round(3)
+    df["P95_Whiff%_z"]   = p95_whiff_z.round(3)
 
     df.to_parquet(FEATURES_IN, index=False)
     print(f"Wrote {len(df):,} rows -> {FEATURES_IN}\n")
@@ -238,10 +281,13 @@ def main() -> None:
     )
     full_pow = maxev_z.notna() & ev90_z.notna() & df["HRFB_adj"].notna()
     full_ath = spd_z.notna() & df["3B_PA_adj"].notna()
+    has_p95  = p95_whiff_z.notna()
 
     print("Tier coverage:")
-    print(f"  Discipline  full={full_disc.sum():>6,}  "
-          f"whiff-only={( ~full_disc & df['Whiff%_adj'].notna()).sum():,}")
+    print(f"  Discipline  full+P95={( full_disc & has_p95).sum():>5,}  "
+          f"full={full_disc.sum():>6,}  "
+          f"fallback+P95={(~full_disc & df['Whiff%_adj'].notna() & has_p95).sum():,}  "
+          f"whiff-only={(~full_disc & df['Whiff%_adj'].notna() & ~has_p95).sum():,}")
     print(f"  Power       full={full_pow.sum():>6,}  "
           f"hrfb-only= {(~(maxev_z.notna()&ev90_z.notna()) & df['HRFB_adj'].notna()).sum():,}")
     print(f"  Athleticism full={full_ath.sum():>6,}  "

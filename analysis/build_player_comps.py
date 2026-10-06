@@ -605,6 +605,9 @@ def find_comps(query_name_or_id, pool: pd.DataFrame, n: int = 10,
 
         if shared < min_shared_levels or weight_sum < min_comp_weight:
             continue
+        # When the query player has data at > 2 levels, skip single-level comps.
+        if len(q_feats) > 2 and shared <= 1:
+            continue
 
         # Trajectory term: career-level signal added after level loop
         # Weighted by TRAJ_WEIGHT relative to PPPA_Z=1.0; uses the same effective
