@@ -53,8 +53,9 @@ DISC_GATE_CAP = -2.0   # personal: -4.0
 # Pure Contact bonus slightly reduced: low-K is less uniquely valuable.
 # ---------------------------------------------------------------------------
 ARCHETYPE_ADJ = {
-    "Three True Outcomes": -1.0,   # personal: -3.0
-    "Pure Contact":        +1.5,   # personal: +2.0
+    "Three True Outcomes": -1.0,   # personal: -3.0; empirically confirmed (rec: -0.74)
+    "Pure Contact":        +0.5,   # personal: +2.0; was +1.5 (overpowered); rec: +0.46
+    "Power/K-Risk":        -0.6,   # personal: 0.0; new Fantrax-specific penalty; rec: -0.56
 }
 
 # ---------------------------------------------------------------------------
