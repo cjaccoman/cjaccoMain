@@ -60,6 +60,19 @@ ARCHETYPE_ADJ = {
 }
 
 # ---------------------------------------------------------------------------
+# Blend weights for Current_Score and OVR_Score
+# Empirically derived: TOOLS has near-zero independent Fantrax signal (p=0.91
+# unconstrained OLS) because SO=-0.5 removes K-avoidance as TOOLS' main channel.
+# ABILITY dominates; Slope carries more signal than current 0.20 weight.
+#
+# Personal model:  Current = 0.30/0.50/0.20 (TOOLS/ABILITY/Age)
+#                  OVR     = 0.40/0.40/0.20 (TOOLS/ABILITY/Slope)
+# Fantrax empirical (OVR, N=1,124): TOOLS=0.17 [0.10,0.24], ABILITY=0.53 [0.46,0.60], Slope=0.30 [0.26,0.35]
+# ---------------------------------------------------------------------------
+CURRENT_WEIGHTS = {"tools": 0.30, "ability": 0.70}   # personal: 0.50/0.50
+OVR_WEIGHTS     = {"tools": 0.20, "ability": 0.50, "slope": 0.30}  # personal: 0.40/0.40/0.20
+
+# ---------------------------------------------------------------------------
 # Output directory names (relative to data/)
 # ---------------------------------------------------------------------------
 COMPUTED_DIR = "computed_fantrax"

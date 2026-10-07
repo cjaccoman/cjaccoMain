@@ -222,6 +222,7 @@ def main() -> None:
     global FEATURES_PATH, OUT_PATH, OVR_PATH
     global DISC_HARD_FLOOR, DISC_SOFT_FLOOR
     global DISC_HARD_PENALTY, DISC_SOFT_PENALTY, DISC_PENALTY_CAP
+    global W_TOOLS, W_ABILITY
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
@@ -253,6 +254,9 @@ def main() -> None:
             DISC_SOFT_PENALTY = 0.0
         DISC_PENALTY_CAP  = abs(DISC_GATE_CAP)
         _archetype_adj    = _fx_arch_adj
+        from config.scoring_fantrax import CURRENT_WEIGHTS
+        W_TOOLS   = CURRENT_WEIGHTS["tools"]
+        W_ABILITY = CURRENT_WEIGHTS["ability"]
 
     import pyarrow.parquet as _pq
     _avail_cols = set(_pq.read_schema(FEATURES_PATH).names)

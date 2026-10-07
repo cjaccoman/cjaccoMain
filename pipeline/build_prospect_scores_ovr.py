@@ -126,7 +126,7 @@ def _pa_weighted_slope(level_nums, pppa_vals, pa_weights):
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    global FEATURES_PATH, OUT_PATH
+    global FEATURES_PATH, OUT_PATH, W_TOOLS, W_ABILITY, W_SLOPE
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
@@ -134,9 +134,12 @@ def main() -> None:
 
     if args.profile == "fantrax":
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-        from config.scoring_fantrax import RANKINGS_DIR
+        from config.scoring_fantrax import RANKINGS_DIR, OVR_WEIGHTS
         FEATURES_PATH = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
         OUT_PATH      = DATA_DIR / RANKINGS_DIR / "prospect_scores_ovr.csv"
+        W_TOOLS   = OVR_WEIGHTS["tools"]
+        W_ABILITY = OVR_WEIGHTS["ability"]
+        W_SLOPE   = OVR_WEIGHTS["slope"]
 
     print(f"[{args.profile}] OVR build")
 
