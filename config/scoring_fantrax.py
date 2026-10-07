@@ -79,6 +79,13 @@ OVR_WEIGHTS     = {"tools": 0.20, "ability": 0.50, "slope": 0.30}  # personal: 0
 #   Athleticism:0.20 → 0.25 (marginal gain; emp 0.233 [0.19,0.27])
 TOOLS_WEIGHTS = {"disc": 0.35, "power": 0.40, "ath": 0.25}  # personal: 0.45/0.35/0.20
 
+# ABILITY sub-component weights (FantOut / Discipline / SB / Power)
+# Unconstrained OLS (N=1,462): FantOut p<0.001, Disc p=0.001, SB p=0.44, Power p=0.82.
+# SB/Power have zero independent signal once FantOut controlled (collinear with PPPA_Z_SL).
+# Constrained weights inflated by collinearity — theory-guided adjustment used instead.
+# Personal model: all four components have independent signal (K%=-2 differentiates FantOut vs Disc/Power).
+ABILITY_WEIGHTS = {"fantasy": 0.60, "discipline": 0.25, "sb": 0.08, "power": 0.07}  # personal: 0.47/0.28/0.08/0.17
+
 # ---------------------------------------------------------------------------
 # Output directory names (relative to data/)
 # ---------------------------------------------------------------------------

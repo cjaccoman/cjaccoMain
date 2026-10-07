@@ -44,6 +44,7 @@ DISC_K_MULT_DEFAULT    = 2.0   # BB% − 2×K%
 LEVEL_DISCOUNT      = LEVEL_DISCOUNT_DEFAULT   # overridden per-profile in main()
 DISC_K_MULT         = DISC_K_MULT_DEFAULT      # overridden per-profile in main()
 DYNAMIC_POWER_DISC  = True                     # overridden per-profile in main()
+# W is also overridden per-profile in main() for Fantrax
 
 # ---------------------------------------------------------------------------
 # Z-scoring helpers
@@ -171,7 +172,7 @@ def build_game_power(df: pd.DataFrame) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    global LEVEL_DISCOUNT, DISC_K_MULT, DYNAMIC_POWER_DISC
+    global LEVEL_DISCOUNT, DISC_K_MULT, DYNAMIC_POWER_DISC, W
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
@@ -187,6 +188,8 @@ def main() -> None:
         LEVEL_DISCOUNT     = LD_FX
         DISC_K_MULT        = DKM_FX
         DYNAMIC_POWER_DISC = False  # interaction not significant in Fantrax (p=0.991)
+        from config.scoring_fantrax import ABILITY_WEIGHTS
+        W = ABILITY_WEIGHTS  # fantasy=0.60, discipline=0.25, sb=0.08, power=0.07
         features_in  = DATA_DIR / "rankings" / "prospect_features.parquet"
         features_out = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
         fantrax_pppa_path = DATA_DIR / COMPUTED_DIR / "minorLeagueData.parquet"
