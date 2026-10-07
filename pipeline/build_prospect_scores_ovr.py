@@ -175,6 +175,27 @@ def main() -> None:
     scores = scores[~scores["PlayerId"].isin(pre2006_pids)]
     print(f"Excluded {len(pre2006_pids):,} players with likely pre-2006 career")
 
+    # Per-year standardization: re-score each season relative to that year's
+    # prospect cohort (age <= MAX_PROSPECT_AGE) rather than the all-time pool.
+    # A player's 2018 AA season scores against 2018 prospects, not against 2006-2026.
+    # Cohorts with < 10 rows are left unchanged to avoid fitting on tiny samples.
+    _MIN_YR_POOL = 10
+    for _col in ["TOOLS_Score", "ABILITY_Score"]:
+        for _yr in sorted(scores["Season"].unique()):
+            _mask = (
+                (scores["Season"] == _yr)
+                & (scores["Age"] <= MAX_PROSPECT_AGE)
+                & scores[_col].notna()
+            )
+            _vals = scores.loc[_mask, _col]
+            if len(_vals) >= _MIN_YR_POOL:
+                _mu, _sig = _vals.mean(), _vals.std()
+                if _sig > 0:
+                    scores.loc[_mask, _col] = (
+                        (50 + 10 * (_vals - _mu) / _sig).clip(lower=0)
+                    )
+    print("Per-year standardization applied (TOOLS_Score, ABILITY_Score)")
+
     # Most-recent PROSPECT-ELIGIBLE row per player (age <= MAX_PROSPECT_AGE).
     # Filter BEFORE picking latest so that a player who continued playing AAA
     # at age 25+ (or graduated and returned) doesn't get dropped from the OVR

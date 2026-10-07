@@ -694,6 +694,11 @@ def main() -> None:
     combined_rank_key = pool["Combined_Score"] - HARDFLOOR_RANK_PENALTY * pool["Hard_Floor"]
     pool["Combined_Rank"] = combined_rank_key.rank(ascending=False, method="min").astype(int)
 
+    # Percentile within current prospect pool (0–100, higher = better).
+    # Based on Combined_Score so it matches Combined_Rank ordering.
+    # Hard Floor players are at bottom of rank but percentile reflects raw score.
+    pool["Percentile"] = pool["Combined_Score"].rank(pct=True).mul(100).round(1)
+
     # Position from MLB Stats API via MLBAM_ID crosswalk
     pid_to_mlbam = (
         pd.read_csv(HIT_PATH, usecols=["PlayerId", "MLBAM_ID"])
@@ -764,6 +769,7 @@ def main() -> None:
         "Hard_Floor_Flag", "Power_Ceiling_Flag",
         "Below_OVR_Floor",
         "Age_AA_Debut", "AA_PPPAZ_Combo", "AgeAA_Combo_Bonus", "AgeAA_Combo_Flag_Label",
+        "Percentile",
     ]
     out = pool[[c for c in out_cols if c in pool.columns]].sort_values("Combined_Rank").reset_index(drop=True)
     out.to_csv(OUT_PATH, index=False)
