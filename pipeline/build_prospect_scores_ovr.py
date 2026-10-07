@@ -134,20 +134,31 @@ def main() -> None:
 
     if args.profile == "fantrax":
         sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-        from config.scoring_fantrax import RANKINGS_DIR, OVR_WEIGHTS
+        from config.scoring_fantrax import RANKINGS_DIR, OVR_WEIGHTS, TOOLS_WEIGHTS as _tw
         FEATURES_PATH = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
         OUT_PATH      = DATA_DIR / RANKINGS_DIR / "prospect_scores_ovr.csv"
         W_TOOLS   = OVR_WEIGHTS["tools"]
         W_ABILITY = OVR_WEIGHTS["ability"]
         W_SLOPE   = OVR_WEIGHTS["slope"]
+        _tools_weights = _tw
 
     print(f"[{args.profile}] OVR build")
 
     scores = pd.read_parquet(
         FEATURES_PATH,
         columns=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
-                 "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "PPPA_Z_SL", "Discipline_Flag"],
+                 "TOOLS_Score", "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+                 "Age_Z_SL", "ABILITY_Score", "PPPA_Z_SL", "Discipline_Flag"],
     )
+    # Fantrax: re-blend TOOLS sub-components with empirical weights before aggregation
+    if args.profile == "fantrax" and "_tools_weights" in dir():
+        tw = _tools_weights
+        blend_raw = (tw["disc"]  * scores["TOOLS_Disc"].fillna(0)
+                   + tw["power"] * scores["TOOLS_Power"].fillna(0)
+                   + tw["ath"]   * scores["TOOLS_Ath"].fillna(0))
+        b_mean, b_std = blend_raw.mean(), blend_raw.std()
+        if b_std > 0:
+            scores["TOOLS_Score"] = (50 + 10 * ((blend_raw - b_mean) / b_std)).clip(0, 120)
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.39)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
     print(f"Loaded {len(scores):,} player-season rows")

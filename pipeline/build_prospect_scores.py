@@ -254,19 +254,30 @@ def main() -> None:
             DISC_SOFT_PENALTY = 0.0
         DISC_PENALTY_CAP  = abs(DISC_GATE_CAP)
         _archetype_adj    = _fx_arch_adj
-        from config.scoring_fantrax import CURRENT_WEIGHTS
+        from config.scoring_fantrax import CURRENT_WEIGHTS, TOOLS_WEIGHTS as _tw_fx
         W_TOOLS   = CURRENT_WEIGHTS["tools"]
         W_ABILITY = CURRENT_WEIGHTS["ability"]
+        _tools_weights_fx = _tw_fx
 
     import pyarrow.parquet as _pq
     _avail_cols = set(_pq.read_schema(FEATURES_PATH).names)
     _want_cols  = ["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
-                   "TOOLS_Score", "Age_Z_SL", "ABILITY_Score", "Discipline_Flag",
+                   "TOOLS_Score", "TOOLS_Disc", "TOOLS_Power", "TOOLS_Ath",
+                   "Age_Z_SL", "ABILITY_Score", "Discipline_Flag",
                    "MLBAM_ID", "Height", "HeightIn", "Weight", "Bats"]
     scores = pd.read_parquet(
         FEATURES_PATH,
         columns=[c for c in _want_cols if c in _avail_cols],
     )
+    # Fantrax: re-blend TOOLS sub-components with empirical weights before aggregation
+    if args.profile == "fantrax" and "_tools_weights_fx" in dir():
+        tw = _tools_weights_fx
+        blend_raw = (tw["disc"]  * scores["TOOLS_Disc"].fillna(0)
+                   + tw["power"] * scores["TOOLS_Power"].fillna(0)
+                   + tw["ath"]   * scores["TOOLS_Ath"].fillna(0))
+        b_mean, b_std = blend_raw.mean(), blend_raw.std()
+        if b_std > 0:
+            scores["TOOLS_Score"] = (50 + 10 * ((blend_raw - b_mean) / b_std)).clip(0, 120)
     scores["level_wt"] = scores["Level"].map(LEVEL_DISCOUNT).fillna(0.10)
     scores["wt"]       = scores["PA"] * scores["level_wt"]
 

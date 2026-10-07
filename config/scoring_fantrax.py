@@ -72,6 +72,13 @@ ARCHETYPE_ADJ = {
 CURRENT_WEIGHTS = {"tools": 0.30, "ability": 0.70}   # personal: 0.50/0.50
 OVR_WEIGHTS     = {"tools": 0.20, "ability": 0.50, "slope": 0.30}  # personal: 0.40/0.40/0.20
 
+# TOOLS sub-component weights (Discipline / Power / Athleticism)
+# Empirically derived vs Annual_TP_Z (N=1,462 graduates, constrained OLS + bootstrap):
+#   Discipline: 0.45 → 0.35 (SO=-0.5 removes K-avoidance channel; emp 0.360 [0.32,0.40])
+#   Power:      0.35 → 0.40 (HR=+4 unchanged; emp 0.407 [0.37,0.44])
+#   Athleticism:0.20 → 0.25 (marginal gain; emp 0.233 [0.19,0.27])
+TOOLS_WEIGHTS = {"disc": 0.35, "power": 0.40, "ath": 0.25}  # personal: 0.45/0.35/0.20
+
 # ---------------------------------------------------------------------------
 # Output directory names (relative to data/)
 # ---------------------------------------------------------------------------
