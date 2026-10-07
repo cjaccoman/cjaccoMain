@@ -45,13 +45,17 @@ Prerequisite: build_prospect_scores_ovr.py must run before this script.
 Output: data/rankings/prospect_scores.csv
 """
 
+import argparse
 import re
+import sys
 import unicodedata
 import numpy as np
 import pandas as pd
 from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
+
+# ── Paths and gate constants set here; overridden per-profile in _init_profile() ──
 FEATURES_PATH  = DATA_DIR / "rankings" / "prospect_features.parquet"
 MLB_PATH       = DATA_DIR / "historical" / "hist_mlb_data.parquet"
 OVR_PATH       = DATA_DIR / "rankings" / "prospect_scores_ovr.csv"
@@ -59,17 +63,14 @@ OUT_PATH       = DATA_DIR / "rankings" / "prospect_scores.csv"
 HIT_PATH       = DATA_DIR / "api" / "milb_hitting.csv"
 POS_PATH       = DATA_DIR / "api" / "player_positions.csv"
 LUCK_PATH      = DATA_DIR / "computed" / "babip_luck.csv"
+ARCHETYPE_PATH = DATA_DIR / "rankings" / "archetype_labels.csv"
 
-# Discipline gate — applied post-blend to Combined_Score.
-# Thresholds are percentile cutoffs applied to disc_composite_z (z-scored within pool).
-# Penalties are in Combined_Score points (scale: top prospects range ~70-85).
-# Slope modifier fires when recent_BB2K differs from career_BB2K by >= TREND_THRESHOLD
-# in raw BB_2K rate (BB% − 2×K%); positive trend = improving discipline.
-DISC_HARD_FLOOR   = -1.00   # bottom ~16% of pool composite
-DISC_SOFT_FLOOR   = -0.67   # bottom ~25% of pool composite
-DISC_HARD_PENALTY =  3.0    # pts deducted from Combined_Score
+# Discipline gate defaults (personal model)
+DISC_HARD_FLOOR   = -1.00
+DISC_SOFT_FLOOR   = -0.67
+DISC_HARD_PENALTY =  3.0
 DISC_SOFT_PENALTY =  1.5
-DISC_PENALTY_CAP  =  4.0    # max total deduction
+DISC_PENALTY_CAP  =  4.0
 TREND_THRESHOLD   =  0.02   # raw BB_2K rate shift to trigger slope modifier
 TREND_IMPROVE_MUL =  0.60   # soften penalty when visibly improving
 TREND_WORSEN_MUL  =  1.25   # harden penalty when visibly worsening
@@ -218,6 +219,33 @@ def to_50_10(s: pd.Series) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    global FEATURES_PATH, OUT_PATH, OVR_PATH
+    global DISC_HARD_PENALTY, DISC_SOFT_PENALTY, DISC_PENALTY_CAP
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
+    args = parser.parse_args()
+
+    # Profile-specific path + constant overrides
+    _archetype_adj = {
+        "Three True Outcomes": -3.0,
+        "Pure Contact":         2.0,
+    }
+    if args.profile == "fantrax":
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from config.scoring_fantrax import (
+            RANKINGS_DIR,
+            DISC_GATE, DISC_GATE_CAP,
+            ARCHETYPE_ADJ as _fx_arch_adj,
+        )
+        FEATURES_PATH     = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
+        OUT_PATH          = DATA_DIR / RANKINGS_DIR / "prospect_scores.csv"
+        OVR_PATH          = DATA_DIR / RANKINGS_DIR / "prospect_scores_ovr.csv"
+        DISC_HARD_PENALTY = abs(DISC_GATE[0][1])   # 1.5
+        DISC_SOFT_PENALTY = abs(DISC_GATE[1][1])   # 0.75
+        DISC_PENALTY_CAP  = abs(DISC_GATE_CAP)     # 2.0
+        _archetype_adj    = _fx_arch_adj
+
     import pyarrow.parquet as _pq
     _avail_cols = set(_pq.read_schema(FEATURES_PATH).names)
     _want_cols  = ["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
@@ -550,18 +578,10 @@ def main() -> None:
         pool["Archetype"] = ""
 
     # Archetype level-shift adjustments (k=6 system, beta ~0.046 PPPA_Z per point).
-    # Three True Outcomes: -0.149 career residual -> -3.2 -> -3.0
-    #   High BB% does NOT offset the -2/K PPPA drag. Despite patience, TTO players
-    #   are penalised harder in PPPA than in wRC+/WAR because the K count is very high.
-    # Pure Contact:  +0.109 career residual -> +2.4 -> +2.0
-    #   Low-K/high-contact profiles are systematically under-valued by MiLB production.
-    # Power/K-Risk: after TTO separation + Contact/Power rescue, career residual -0.011
-    #   -> effectively neutral, no adjustment warranted.
-    # Others: career residuals < |0.03| — not significant.
-    ARCHETYPE_ADJ = {
-        "Three True Outcomes": -3.0,
-        "Pure Contact":         2.0,
-    }
+    # Personal: TTO=-3.0 (high K% destroys PPPA), Pure Contact=+2.0 (low-K undervalued).
+    # Fantrax:  TTO=-1.0 (K penalty 4× smaller), Pure Contact=+1.5 (still rewarded, less so).
+    # Values set in _archetype_adj at top of main() per profile.
+    ARCHETYPE_ADJ = _archetype_adj
     pool["Archetype_Adj"] = pool["Archetype"].map(ARCHETYPE_ADJ).fillna(0.0)
     for arch, val in ARCHETYPE_ADJ.items():
         n = (pool["Archetype"] == arch).sum()

@@ -1,74 +1,48 @@
-"""Build ABILITY_Score for every player-season row in prospect_features.csv.
+"""Build ABILITY_Score for every player-season row in prospect_features.parquet.
 
 ABILITY_Score measures demonstrated production, normalized for era and level.
-Output: columns written back into prospect_features.csv in place.
+
+Usage:
+  python pipeline/build_ability_score.py                   # personal model (default)
+  python pipeline/build_ability_score.py --profile fantrax # Fantrax scoring
+
+Profile differences (Fantrax vs personal):
+  Discipline: BB% − 0.5×K%  (vs BB% − 2×K%)  — matches SO=-0.5 scoring weight
+  PPPA_Z_SL:  sourced from data/computed_fantrax/minorLeagueData.parquet
+  Level discounts: from config/scoring_fantrax.py (same values for now)
+  Output:     data/rankings_fantrax/prospect_features.parquet
 
 Component weights (base — power and discipline are dynamic, see below):
   Fantasy Output  47%  -- PPPA_Z_SL with level discount
-  Discipline      28%  -- BB% − 2×K% (BB_2K), z-scored within Season+Level (base)
+  Discipline      28%  -- BB% − K_MULT×K%, z-scored within Season+Level (base)
   SB Talent        8%  -- SB_pct × (SB/PA), z-scored within Season+Level
   Game Power      17%  -- 0.5 × HR/FB + 0.5 × HR_AB, z-scored within Season+Level (base)
-
-Dynamic power/discipline scaling (POWER_SCALE_PER_SD = 0.05, one-directional):
-  Above-average power: power_weight = 0.17 + gp×0.05, disc_weight = 0.28 − gp×0.05
-  Average or below:    both stay at base (0.17 / 0.28)
-  Total always sums to 1.0. gp winsorized at ±3 SD → max shift = +0.15.
-  Missing power → shift = 0 (base weights used).
-
-Age adjustment (AGE_ALPHA = 0.11):
-  Each component is multiplied by (1 + 0.20 × −Age_Z_SL), clipped to ±2 SD.
-  A player 2 SD younger than peers gets a ~40% boost to every component;
-  a player 2 SD older gets a ~40% cut. Weights stay proportional — age is
-  baked into signal strength here; a standalone Age_Score at 20% weight is
-  also added in build_prospect_scores.py for a compounding effect.
-
-PPPA level discount factors (Skill_PPPA full-population study, normalized to AAA=1.0):
-  AAA=1.00, AA=0.59, A+=0.34, A=0.23, R=0.10
-
-Z-scoring approach (peer-relative, era-robust by construction):
-  PPPA_Z_SL  -- already z-scored within Season+League; apply level discount only.
-  BB_2K      -- z-scored within Season+Level; Season+Level peers control for era drift.
-  SB_talent  -- SB_pct × (SB/PA), z-scored within Season+Level.
-  Game Power -- 0.5×HR/FB + 0.5×HR_AB, z-scored within Season+Level.
-
-Sparse Season+Level cells (< MIN_ROWS qualifying rows) fall back to Level-only
-z-scoring. Rows contributing to group params must have PA >= MIN_PA.
-
-All components winsorized at ±3σ before blending.
-Missing component → filled with 0 (neutral, peer-average assumption).
-
-Note: non-linear discipline floor penalty is applied post-blend in
-build_prospect_scores.py as a gate on Combined_Score, using a career+recent
-blend of BB_2K with a slope modifier. It does not fire here.
-
-Final ABILITY_Score standardized to 50±10, clipped at 0.
 """
 
+import argparse
+import sys
 import numpy as np
 import pandas as pd
 from pathlib import Path
 
 DATA_DIR      = Path(__file__).resolve().parent.parent / "data"
-FEATURES_IN   = DATA_DIR / "rankings" / "prospect_features.parquet"
-AGE_MULT_PATH = DATA_DIR / "computed"  / "age_mult_rows.csv"
+AGE_MULT_PATH = DATA_DIR / "computed" / "age_mult_rows.csv"
 MIN_PA        = 50    # minimum PA to count toward group z-score params
 MIN_ROWS      = 10    # minimum rows in Season+Level cell before falling back to Level-only
 
 # Component weights
 W = dict(fantasy=0.47, discipline=0.28, sb=0.08, power=0.17)
 
-# Piecewise age multiplier (empirically derived from career PPPA_Z regression, N=4,655):
-#   mult = 1 + AGE_LINEAR × (−age_z) + AGE_KINK × max(0, −age_z − AGE_KINK_THRESH)
-# Global linear slope: 0.077/SD. Youth kink at −1.5 SD adds 0.192/SD beyond the threshold.
-# Old cliff not statistically significant (p=0.27) — no separate kink on the old side.
-AGE_LINEAR      = 0.0054   # full-population regression (non-graduates = 0); 14x smaller than survivors-only
+AGE_LINEAR      = 0.0054
 AGE_KINK        = 0.192
 AGE_KINK_THRESH = 1.5
 
-# PPPA level discount factors (Skill_PPPA full-population study, analysis/skill_pppa_translation.py)
-LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
+# Personal model defaults
+LEVEL_DISCOUNT_DEFAULT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
+DISC_K_MULT_DEFAULT    = 2.0   # BB% − 2×K%
 
-
+LEVEL_DISCOUNT = LEVEL_DISCOUNT_DEFAULT   # overridden per-profile in main()
+DISC_K_MULT    = DISC_K_MULT_DEFAULT      # overridden per-profile in main()
 
 # ---------------------------------------------------------------------------
 # Z-scoring helpers
@@ -138,8 +112,16 @@ def build_fantasy_output(df: pd.DataFrame) -> pd.Series:
 
 
 def build_discipline(df: pd.DataFrame) -> pd.Series:
-    """BB% − 2×K% (BB_2K), z-scored within Season+Level."""
-    return z_within_sl(df, "BB_2K")
+    """BB% − DISC_K_MULT×K%, z-scored within Season+Level.
+
+    Personal: DISC_K_MULT=2.0 → uses precomputed BB_2K column.
+    Fantrax:  DISC_K_MULT=0.5 → computed on the fly from BB% and K%.
+    """
+    if DISC_K_MULT == 2.0 and "BB_2K" in df.columns:
+        return z_within_sl(df, "BB_2K")
+    tmp = df.copy()
+    tmp["_disc_raw"] = df["BB%"] - DISC_K_MULT * df["K%"]
+    return z_within_sl(tmp, "_disc_raw")
 
 
 def build_sb_talent(df: pd.DataFrame) -> pd.Series:
@@ -188,8 +170,45 @@ def build_game_power(df: pd.DataFrame) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    df = pd.read_parquet(FEATURES_IN)
-    print(f"Loaded {len(df):,} rows\n")
+    global LEVEL_DISCOUNT, DISC_K_MULT
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
+    args = parser.parse_args()
+
+    if args.profile == "fantrax":
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from config.scoring_fantrax import (
+            LEVEL_DISCOUNT as LD_FX,
+            DISC_K_MULT as DKM_FX,
+            RANKINGS_DIR, COMPUTED_DIR,
+        )
+        LEVEL_DISCOUNT = LD_FX
+        DISC_K_MULT    = DKM_FX
+        features_in  = DATA_DIR / "rankings" / "prospect_features.parquet"
+        features_out = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
+        fantrax_pppa_path = DATA_DIR / COMPUTED_DIR / "minorLeagueData.parquet"
+    else:
+        features_in  = DATA_DIR / "rankings" / "prospect_features.parquet"
+        features_out = features_in   # write back in place (personal behavior)
+        fantrax_pppa_path = None
+
+    df = pd.read_parquet(features_in)
+    print(f"[{args.profile}] Loaded {len(df):,} rows\n")
+
+    # For Fantrax: replace PPPA_Z_SL with Fantrax-scored values.
+    # Join on PlayerId + Season + Level (same keys as prospect_features build).
+    if fantrax_pppa_path is not None:
+        fx_pppa = pd.read_parquet(
+            fantrax_pppa_path,
+            columns=["PlayerId", "Season", "Level", "PPPA_Z_SL"],
+        )
+        fx_pppa = fx_pppa.rename(columns={"PPPA_Z_SL": "_PPPA_Z_SL_fx"})
+        df = df.merge(fx_pppa, on=["PlayerId", "Season", "Level"], how="left")
+        filled = df["_PPPA_Z_SL_fx"].notna().sum()
+        print(f"  Fantrax PPPA_Z_SL filled: {filled:,} / {len(df):,} rows")
+        df["PPPA_Z_SL"] = df["_PPPA_Z_SL_fx"].fillna(df["PPPA_Z_SL"])
+        df = df.drop(columns=["_PPPA_Z_SL_fx"])
 
     # 1. Raw components
     fantasy = build_fantasy_output(df)
@@ -291,8 +310,9 @@ def main() -> None:
     disc_flag = disc_flag.where(bb2k_flag != "", whiff_flag)
     df["Discipline_Flag"] = disc_flag
 
-    df.to_parquet(FEATURES_IN, index=False)
-    print(f"Wrote {len(df):,} rows -> {FEATURES_IN}\n")
+    features_out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(features_out, index=False)
+    print(f"[{args.profile}] Wrote {len(df):,} rows -> {features_out}\n")
 
     print(
         f"ABILITY_Score  mean={ability_score.mean():.1f}  "

@@ -5,21 +5,21 @@ columns PlayerId..CS), computes TB, TP, PPG, PPPA and z-scores against season+le
 and season+league baselines, and writes the augmented file back in place. Also refreshes
 the averages_*.csv files used as baselines.
 
-Scoring weights come from images/scoringSystem.png.
+Usage:
+  python pipeline/compute_stats.py                   # personal model (default)
+  python pipeline/compute_stats.py --profile fantrax # Fantrax scoring, output to computed_fantrax/
+
+Scoring weights come from images/scoringSystem.png (personal) or config/scoring_fantrax.py.
 """
 
+import argparse
 from pathlib import Path
 
 import pandas as pd
 
 DATA_DIR     = Path(__file__).resolve().parent.parent / "data"
-COMPUTED_DIR = DATA_DIR / "computed"
-API_CSV  = DATA_DIR / "api" / "milb_hitting.csv"
-OUT_PATH  = COMPUTED_DIR / "minorLeagueData.parquet"
-LEAGUES_DIR = DATA_DIR / "Leagues"
-AVG_SEASON_LEAGUE_CSV     = COMPUTED_DIR / "averages_season_league.csv"
-AVG_SEASON_LEAGUE_AGE_CSV = COMPUTED_DIR / "averages_season_league_age.csv"
-PLAYER_SCORES_CSV = DATA_DIR / "rankings" / "player_scores.csv"
+API_CSV      = DATA_DIR / "api" / "milb_hitting.csv"
+LEAGUES_DIR  = DATA_DIR / "Leagues"
 
 BASE_COLS = [
     "PlayerId", "Season", "Name", "Team", "Level", "Age",
@@ -37,7 +37,8 @@ OUTPUT_COLS = [
     *DERIVED_COLS,
 ]
 
-SCORING_WEIGHTS = {
+# Personal model scoring weights (default)
+SCORING_WEIGHTS_PERSONAL = {
     "1B": 1, "2B": 2, "3B": 3, "HR": 4,
     "R": 1, "RBI": 2, "BB": 1, "IBB": 1.5,
     "SO": -2, "GIDP": -1.5, "SB": 3, "CS": -1.5,
@@ -45,10 +46,14 @@ SCORING_WEIGHTS = {
 }
 
 
-def compute_derived(df: pd.DataFrame) -> pd.DataFrame:
+def compute_derived(df: pd.DataFrame, scoring_weights: dict) -> pd.DataFrame:
     df = df[BASE_COLS].copy()
-    df["TB"] = df["1B"] + 2 * df["2B"] + 3 * df["3B"] + 4 * df["HR"]
-    df["TP"] = sum(weight * df[col] for col, weight in SCORING_WEIGHTS.items())
+    # TB is only used in the personal formula; Fantrax weights omit it
+    if "TB" in scoring_weights:
+        df["TB"] = df["1B"] + 2 * df["2B"] + 3 * df["3B"] + 4 * df["HR"]
+    else:
+        df["TB"] = df["1B"] + 2 * df["2B"] + 3 * df["3B"] + 4 * df["HR"]  # keep col for output compatibility
+    df["TP"] = sum(weight * df[col] for col, weight in scoring_weights.items() if col in df.columns)
     df["PPG"] = (df["TP"] / df["G"]).round(2)
     df["PPPA"] = (df["TP"] / df["PA"]).round(2)
     return df
@@ -163,34 +168,56 @@ def compute_player_scores(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal",
+                        help="Scoring profile to use (default: personal)")
+    args = parser.parse_args()
+
+    if args.profile == "fantrax":
+        import sys; sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from config.scoring_fantrax import SCORING_WEIGHTS, COMPUTED_DIR as COMPUTED_DIR_NAME
+        computed_dir = DATA_DIR / COMPUTED_DIR_NAME
+        rankings_dir = DATA_DIR / "rankings_fantrax"
+    else:
+        SCORING_WEIGHTS = SCORING_WEIGHTS_PERSONAL
+        computed_dir = DATA_DIR / "computed"
+        rankings_dir = DATA_DIR / "rankings"
+
+    computed_dir.mkdir(parents=True, exist_ok=True)
+    rankings_dir.mkdir(parents=True, exist_ok=True)
+
+    out_path = computed_dir / "minorLeagueData.parquet"
+    avg_sl_csv = computed_dir / "averages_season_league.csv"
+    avg_sla_csv = computed_dir / "averages_season_league_age.csv"
+    player_scores_csv = rankings_dir / "player_scores.csv"
+
     raw = pd.read_csv(API_CSV)
     missing = [c for c in BASE_COLS if c not in raw.columns]
     if missing:
         raise ValueError(f"Missing required columns in {API_CSV.name}: {missing}")
 
-    # League is already supplied by the API fetch — preserve it before compute_derived
-    # strips the DataFrame down to BASE_COLS.
     league_map = (
         raw[["PlayerId", "Season", "Team", "Level", "League"]]
         .drop_duplicates(subset=["PlayerId", "Season", "Team", "Level"])
     )
 
-    df = compute_derived(raw)
+    df = compute_derived(raw, SCORING_WEIGHTS)
 
-    # Re-attach League from the API data; fall back to DiscLeague for any gaps.
     df = df.merge(league_map, on=["PlayerId", "Season", "Team", "Level"], how="left")
     df["League"] = df["League"].fillna("DiscLeague")
 
     season_league, season_league_age = compute_averages(df)
-    season_league.to_csv(AVG_SEASON_LEAGUE_CSV, index=False)
-    season_league_age.to_csv(AVG_SEASON_LEAGUE_AGE_CSV, index=False)
+    season_league.to_csv(avg_sl_csv, index=False)
+    season_league_age.to_csv(avg_sla_csv, index=False)
 
     df = attach_z_scores(df, season_league, season_league_age)
     df = df[OUTPUT_COLS]
-    df.to_parquet(OUT_PATH, index=False)
+    df.to_parquet(out_path, index=False)
+    print(f"[{args.profile}] Wrote {len(df):,} rows -> {out_path}")
 
     scores = compute_player_scores(df)
-    scores.to_csv(PLAYER_SCORES_CSV, index=False)
+    scores.to_csv(player_scores_csv, index=False)
+    print(f"[{args.profile}] Wrote {len(scores):,} player scores -> {player_scores_csv}")
 
 
 if __name__ == "__main__":

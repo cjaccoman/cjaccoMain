@@ -34,7 +34,9 @@ Post-processing (run separately after this script):
 Output: data/rankings/prospect_scores_ovr.csv
 """
 
+import argparse
 import re
+import sys
 import unicodedata
 import numpy as np
 import pandas as pd
@@ -124,6 +126,20 @@ def _pa_weighted_slope(level_nums, pppa_vals, pa_weights):
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    global FEATURES_PATH, OUT_PATH
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
+    args = parser.parse_args()
+
+    if args.profile == "fantrax":
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from config.scoring_fantrax import RANKINGS_DIR
+        FEATURES_PATH = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
+        OUT_PATH      = DATA_DIR / RANKINGS_DIR / "prospect_scores_ovr.csv"
+
+    print(f"[{args.profile}] OVR build")
+
     scores = pd.read_parquet(
         FEATURES_PATH,
         columns=["PlayerId", "Season", "Name", "Team", "Level", "Age", "PA",
