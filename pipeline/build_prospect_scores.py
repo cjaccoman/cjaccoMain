@@ -220,6 +220,7 @@ def to_50_10(s: pd.Series) -> pd.Series:
 
 def main() -> None:
     global FEATURES_PATH, OUT_PATH, OVR_PATH
+    global DISC_HARD_FLOOR, DISC_SOFT_FLOOR
     global DISC_HARD_PENALTY, DISC_SOFT_PENALTY, DISC_PENALTY_CAP
 
     parser = argparse.ArgumentParser()
@@ -241,9 +242,16 @@ def main() -> None:
         FEATURES_PATH     = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
         OUT_PATH          = DATA_DIR / RANKINGS_DIR / "prospect_scores.csv"
         OVR_PATH          = DATA_DIR / RANKINGS_DIR / "prospect_scores_ovr.csv"
-        DISC_HARD_PENALTY = abs(DISC_GATE[0][1])   # 1.5
-        DISC_SOFT_PENALTY = abs(DISC_GATE[1][1])   # 0.75
-        DISC_PENALTY_CAP  = abs(DISC_GATE_CAP)     # 2.0
+        # Fantrax gate may be single-tier (one entry) or two-tier (two entries)
+        DISC_HARD_FLOOR   = DISC_GATE[0][0]
+        DISC_HARD_PENALTY = abs(DISC_GATE[0][1])
+        if len(DISC_GATE) >= 2:
+            DISC_SOFT_FLOOR   = DISC_GATE[1][0]
+            DISC_SOFT_PENALTY = abs(DISC_GATE[1][1])
+        else:
+            DISC_SOFT_FLOOR   = DISC_GATE[0][0]   # same as hard — no soft tier fires
+            DISC_SOFT_PENALTY = 0.0
+        DISC_PENALTY_CAP  = abs(DISC_GATE_CAP)
         _archetype_adj    = _fx_arch_adj
 
     import pyarrow.parquet as _pq

@@ -42,10 +42,11 @@ LEVEL_DISCOUNT = {"AAA": 1.00, "AA": 0.77, "A+": 0.39, "A": 0.29, "R": 0.12}
 # Thresholds: (Disc_Composite_Z threshold, penalty_points)
 # ---------------------------------------------------------------------------
 DISC_GATE = [
-    (-1.00, -1.5),   # bottom ~16% of pool: -1.5 pts  (personal: -3.0)
-    (-0.67, -0.75),  # bottom ~25% of pool: -0.75 pts (personal: -1.5)
+    (-0.67, -1.25),  # bottom ~25% of pool: single tier (personal: two tiers at -1.00/-0.67)
+    # Two-tier structure not empirically justified: hard (-1.00) and soft (-0.67) zones
+    # produced identical Annual_TP_Z means (-0.303 vs -0.302). Real cliff is at -0.67.
 ]
-DISC_GATE_CAP = -2.0   # personal: -4.0
+DISC_GATE_CAP = -1.25   # single tier = cap equals penalty
 
 # ---------------------------------------------------------------------------
 # Archetype score adjustments (added to Combined_Score after gate)
@@ -53,9 +54,9 @@ DISC_GATE_CAP = -2.0   # personal: -4.0
 # Pure Contact bonus slightly reduced: low-K is less uniquely valuable.
 # ---------------------------------------------------------------------------
 ARCHETYPE_ADJ = {
-    "Three True Outcomes": -1.0,   # personal: -3.0; empirically confirmed (rec: -0.74)
-    "Pure Contact":        +0.5,   # personal: +2.0; was +1.5 (overpowered); rec: +0.46
-    "Power/K-Risk":        -0.6,   # personal: 0.0; new Fantrax-specific penalty; rec: -0.56
+    "Pure Contact": +0.5,   # personal: +2.0; empirically confirmed (p=0.092, Annual_TP_Z)
+    # TTO (-1.0) and Power/K-Risk (-0.6) removed: penalties dissolve when volume-weighted
+    # (p=0.58 and p=0.94 vs Annual_TP_Z — TTO hitters still play and accumulate HR/BB)
 }
 
 # ---------------------------------------------------------------------------

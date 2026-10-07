@@ -41,8 +41,9 @@ AGE_KINK_THRESH = 1.5
 LEVEL_DISCOUNT_DEFAULT = {"AAA": 1.00, "AA": 0.59, "A+": 0.34, "A": 0.23, "R": 0.10}
 DISC_K_MULT_DEFAULT    = 2.0   # BB% − 2×K%
 
-LEVEL_DISCOUNT = LEVEL_DISCOUNT_DEFAULT   # overridden per-profile in main()
-DISC_K_MULT    = DISC_K_MULT_DEFAULT      # overridden per-profile in main()
+LEVEL_DISCOUNT      = LEVEL_DISCOUNT_DEFAULT   # overridden per-profile in main()
+DISC_K_MULT         = DISC_K_MULT_DEFAULT      # overridden per-profile in main()
+DYNAMIC_POWER_DISC  = True                     # overridden per-profile in main()
 
 # ---------------------------------------------------------------------------
 # Z-scoring helpers
@@ -170,7 +171,7 @@ def build_game_power(df: pd.DataFrame) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    global LEVEL_DISCOUNT, DISC_K_MULT
+    global LEVEL_DISCOUNT, DISC_K_MULT, DYNAMIC_POWER_DISC
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=["personal", "fantrax"], default="personal")
@@ -183,8 +184,9 @@ def main() -> None:
             DISC_K_MULT as DKM_FX,
             RANKINGS_DIR, COMPUTED_DIR,
         )
-        LEVEL_DISCOUNT = LD_FX
-        DISC_K_MULT    = DKM_FX
+        LEVEL_DISCOUNT     = LD_FX
+        DISC_K_MULT        = DKM_FX
+        DYNAMIC_POWER_DISC = False  # interaction not significant in Fantrax (p=0.991)
         features_in  = DATA_DIR / "rankings" / "prospect_features.parquet"
         features_out = DATA_DIR / RANKINGS_DIR / "prospect_features.parquet"
         fantrax_pppa_path = DATA_DIR / COMPUTED_DIR / "minorLeagueData.parquet"
@@ -274,8 +276,14 @@ def main() -> None:
     # For average or below: both stay at base. Total always sums to 1.0.
     # gp winsorized at ±3 SD → max shift = +0.15 (power 0.17→0.32, disc 0.28→0.13).
     # Missing power → shift = 0, base weights used.
+    # DYNAMIC_POWER_DISC=False (Fantrax): interaction not empirically justified (p=0.991);
+    # discipline and power contribute independently at equal strength across all power tiers.
     POWER_SCALE_PER_SD = 0.05
-    power_shift = gp.fillna(0).clip(lower=0) * POWER_SCALE_PER_SD
+    power_shift = (
+        gp.fillna(0).clip(lower=0) * POWER_SCALE_PER_SD
+        if DYNAMIC_POWER_DISC else
+        pd.Series(0.0, index=gp.index)
+    )
     w_power_dyn = W["power"]      + power_shift   # [0.17, 0.32]
     w_disc_dyn  = W["discipline"] - power_shift   # [0.13, 0.28]
 
