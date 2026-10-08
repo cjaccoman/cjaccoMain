@@ -1,0 +1,569 @@
+<title>Dynasty Prospect Rankings — The Fantasy Point</title>
+
+<style>
+/* ─── Design tokens ───────────────────────────────────────────────────────── */
+:root {
+  --bg:        #08101A;
+  --bg2:       #0C1825;
+  --surface:   #101E2E;
+  --surface2:  #142333;
+  --border:    #1A2F45;
+  --border2:   #244560;
+  --amber:     #F59E0B;
+  --amber-dim: #92600A;
+  --amber-glow:#F59E0B22;
+  --blue:      #38BDF8;
+  --blue-dim:  #1B6F9A;
+  --blue-glow: #38BDF818;
+  --green:     #22C55E;
+  --red:       #EF4444;
+  --purple:    #A78BFA;
+  --orange:    #FB923C;
+  --text:      #E8EDF4;
+  --text2:     #8BACC8;
+  --text3:     #4A6A88;
+  --font:      system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --mono:      'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:       #EEF3F9;
+    --bg2:      #E5EDF6;
+    --surface:  #FFFFFF;
+    --surface2: #F4F8FC;
+    --border:   #C8D8E8;
+    --border2:  #9BBAD4;
+    --amber-glow:#F59E0B18;
+    --blue-glow: #0284C718;
+    --text:     #0D1C2E;
+    --text2:    #3A5A7A;
+    --text3:    #7A9AB8;
+  }
+}
+:root[data-theme="light"] {
+  --bg:       #EEF3F9;
+  --bg2:      #E5EDF6;
+  --surface:  #FFFFFF;
+  --surface2: #F4F8FC;
+  --border:   #C8D8E8;
+  --border2:  #9BBAD4;
+  --amber-glow:#F59E0B18;
+  --blue-glow: #0284C718;
+  --text:     #0D1C2E;
+  --text2:    #3A5A7A;
+  --text3:    #7A9AB8;
+}
+:root[data-theme="dark"] {
+  --bg:        #08101A;
+  --bg2:       #0C1825;
+  --surface:   #101E2E;
+  --surface2:  #142333;
+  --border:    #1A2F45;
+  --border2:   #244560;
+  --amber-glow:#F59E0B22;
+  --blue-glow: #38BDF818;
+  --text:      #E8EDF4;
+  --text2:     #8BACC8;
+  --text3:     #4A6A88;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Sticky layer heights ────────────────────────────────────────────────── */
+:root { --nav-h: 50px; --filter-h: 50px; }
+
+/* ─── NAV ─────────────────────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 300;
+  height: var(--nav-h);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 24px;
+  gap: 4px;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 9px;
+  text-decoration: none; color: var(--text);
+  margin-right: 28px; flex-shrink: 0;
+}
+.nav-logo {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--amber);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 900; font-size: 9px;
+  color: #0A0F18; letter-spacing: -0.5px;
+}
+.nav-name {
+  font-weight: 800; font-size: 15px; letter-spacing: -0.3px;
+}
+.nav-name em { font-style: normal; color: var(--amber); }
+.nav-link {
+  padding: 5px 12px; border-radius: 5px;
+  text-decoration: none; font-size: 13px; font-weight: 500;
+  color: var(--text2); transition: all 0.12s;
+}
+.nav-link:hover { color: var(--text); background: var(--surface); }
+.nav-link.active { color: var(--amber); }
+.nav-end { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.season-pill {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  background: var(--amber-glow); border: 1px solid var(--amber-dim);
+  color: var(--amber); letter-spacing: 0.5px;
+}
+.theme-btn {
+  background: none; border: 1px solid var(--border); border-radius: 5px;
+  color: var(--text3); padding: 4px 8px; cursor: pointer; font-size: 13px;
+  transition: all 0.12s;
+}
+.theme-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* ─── HERO ────────────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 18px;
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+}
+.hero-left h1 {
+  font-size: 21px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.1;
+}
+.hero-left h1 span { color: var(--amber); }
+.hero-left p { font-size: 12.5px; color: var(--text2); margin-top: 5px; }
+.hero-scoring {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 13px;
+}
+.scoring-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--text3); flex-basis: 100%;
+}
+.stag {
+  font-size: 12px; font-weight: 600; padding: 2px 8px;
+  border-radius: 4px; font-family: var(--mono); letter-spacing: -0.3px;
+}
+.stag.pos { color: var(--green); background: #22C55E0C; border: 1px solid #22C55E2A; }
+.stag.neg { color: var(--red);   background: #EF44440C; border: 1px solid #EF44442A; }
+.stag.key { color: var(--amber); background: var(--amber-glow); border: 1px solid var(--amber-dim); }
+.hero-stat { text-align: center; }
+.hero-stat .big {
+  font-family: var(--mono); font-size: 26px; font-weight: 900;
+  color: var(--amber); letter-spacing: -1px;
+}
+.hero-stat .sub { font-size: 10.5px; color: var(--text3); margin-top: 2px; letter-spacing: 0.3px; }
+
+/* ─── FILTER BAR ──────────────────────────────────────────────────────────── */
+.filter-bar {
+  position: sticky; top: var(--nav-h); z-index: 200;
+  height: var(--filter-h);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; overflow-x: auto;
+}
+.flabel {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text3); white-space: nowrap;
+}
+.chips { display: flex; gap: 5px; }
+.chip {
+  padding: 4px 10px; border-radius: 14px; cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text2); transition: all 0.12s; user-select: none;
+}
+.chip:hover { border-color: var(--border2); color: var(--text); }
+.chip.on { background: var(--amber); border-color: var(--amber); color: #0A0F18; }
+
+select, .search-input {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text);
+  padding: 5px 10px; font-size: 12.5px; font-family: var(--font);
+  outline: none; transition: border-color 0.12s;
+  -webkit-appearance: none;
+}
+select:focus, .search-input:focus { border-color: var(--amber-dim); }
+select { cursor: pointer; min-width: 88px; padding-right: 22px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234A6A88'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+.search-input { min-width: 170px; }
+.search-input::placeholder { color: var(--text3); }
+.f-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.rcount { font-size: 11.5px; color: var(--text3); white-space: nowrap; font-family: var(--mono); }
+
+/* ─── TABLE ───────────────────────────────────────────────────────────────── */
+.table-outer {
+  padding: 0 24px 48px;
+  overflow-x: auto;
+}
+.scroll-wrap {
+  overflow-y: auto;
+  overflow-x: auto;
+  max-height: calc(100vh - var(--nav-h) - var(--filter-h) - 16px);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-top: 10px;
+}
+table {
+  width: 100%; border-collapse: collapse;
+  min-width: 860px;
+  font-variant-numeric: tabular-nums;
+}
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+thead th {
+  text-align: left; padding: 8px 10px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--text3);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+  background: var(--bg);
+  transition: color 0.12s;
+}
+thead th:hover { color: var(--text2); }
+thead th.sorted { color: var(--amber); }
+.sarrow { margin-left: 3px; font-size: 9px; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.08s; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding: 7px 10px; vertical-align: middle; white-space: nowrap; }
+
+/* ─── Table cell types ────────────────────────────────────────────────────── */
+.rc { /* rank */
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--text3); width: 40px;
+}
+.rc.top3 { color: var(--amber); }
+.rc.top10 { color: var(--text2); }
+
+.nc { min-width: 155px; }
+.pname { font-weight: 600; font-size: 14px; }
+.pmeta { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.pbadge {
+  display: inline-block; font-size: 10.5px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text2); letter-spacing: 0.3px;
+}
+.pbadge.SS { color: var(--amber);  background: var(--amber-glow); border-color: var(--amber-dim); }
+.pbadge.C  { color: var(--purple); background: #A78BFA0A; border-color: #A78BFA33; }
+.pbadge.twob { color: var(--blue); background: var(--blue-glow); border-color: var(--blue-dim); }
+
+.tbadge {
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text2);
+}
+
+.lvbadge {
+  font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+}
+.lv-AAA { color: var(--purple); background: #A78BFA0C; border: 1px solid #A78BFA33; }
+.lv-AA  { color: var(--blue);   background: var(--blue-glow); border: 1px solid #38BDF833; }
+.lv-Ap  { color: var(--green);  background: #22C55E0C; border: 1px solid #22C55E33; }
+.lv-A   { color: var(--orange); background: #FB923C0C; border: 1px solid #FB923C33; }
+.lv-R   { color: var(--amber);  background: var(--amber-glow); border: 1px solid var(--amber-dim); }
+
+.sc { min-width: 130px; } /* main score */
+.score-row { display: flex; align-items: center; gap: 7px; }
+.score-num {
+  font-family: var(--mono); font-weight: 800; font-size: 15px;
+  min-width: 38px;
+}
+.pct-block { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 52px; }
+.pct-num { font-family: var(--mono); font-weight: 800; font-size: 15px; line-height: 1; }
+.tier-badge { display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.06em; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; line-height: 1.4; }
+.tier-elite { color: #F59E0B; background: #F59E0B22; }
+.tier-great { color: #38BDF8; background: #38BDF818; }
+.tier-good  { color: #22C55E; background: #22C55E18; }
+.tier-avg   { color: #8BACC8; background: #8BACC818; }
+.tier-dev   { color: #4A6A88; background: #4A6A8818; }
+.sbar { flex: 1; height: 3px; border-radius: 2px; background: var(--surface2); overflow: hidden; min-width: 44px; max-width: 64px; }
+.sbar-fill { height: 100%; border-radius: 2px; }
+
+.sub-num { font-family: var(--mono); font-size: 13px; }
+
+.abadge {
+  font-size: 11px; padding: 2px 8px; border-radius: 4px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text3);
+  white-space: nowrap;
+}
+.df {
+  font-size: 10.5px; color: var(--red); background: #EF44440A;
+  border: 1px solid #EF444433; padding: 2px 6px; border-radius: 4px;
+  margin-left: 4px; font-weight: 600;
+}
+
+/* ─── FOOTER ──────────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--bg2); border-top: 1px solid var(--border);
+  padding: 22px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 14px;
+}
+.footer-brand { font-size: 12.5px; }
+.footer-brand strong { color: var(--amber); }
+.footer-brand span { color: var(--text2); }
+.footer-links { display: flex; gap: 18px; }
+.footer-links a { font-size: 12px; color: var(--text3); text-decoration: none; transition: color 0.12s; }
+.footer-links a:hover { color: var(--amber); }
+.footer-note { font-size: 11px; color: var(--text3); font-style: italic; }
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .nav { padding: 0 14px; }
+  .hero { padding: 14px 14px 12px; }
+  .hero-scoring { display: none; }
+  .filter-bar { padding: 8px 14px; }
+  .table-outer { padding: 0 8px 32px; }
+}
+</style>
+
+<!-- ╔══ NAV ═══════════════════════════════════════════════════════════════╗ -->
+<nav class="nav">
+  <a class="nav-brand" href="#">
+    <div class="nav-logo">TFP</div>
+    <span class="nav-name">The Fantasy<em>Point</em></span>
+  </a>
+  <a href="#" class="nav-link active">Rankings</a>
+  <a href="#" class="nav-link">Pitchers</a>
+  <a href="#" class="nav-link">Articles</a>
+  <a href="#" class="nav-link">Glossary</a>
+  <div class="nav-end">
+    <span class="season-pill">2026</span>
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">◐</button>
+  </div>
+</nav>
+
+<!-- ╔══ HERO ══════════════════════════════════════════════════════════════╗ -->
+<div class="hero">
+  <div class="hero-left">
+    <h1>Dynasty Prospect <span>Rankings</span></h1>
+    <p>Fantrax competitive dynasty · Points-per-PA model · Updated October 2026</p>
+  </div>
+  <div class="hero-scoring">
+    <div class="scoring-label">Scoring system</div>
+    <span class="stag key">1B +1</span>
+    <span class="stag pos">2B +2</span>
+    <span class="stag pos">3B +3</span>
+    <span class="stag pos">HR +4</span>
+    <span class="stag pos">R +1</span>
+    <span class="stag pos">RBI +1</span>
+    <span class="stag pos">BB +1</span>
+    <span class="stag pos">SB +2</span>
+    <span class="stag neg">SO −0.5</span>
+    <span class="stag neg">CS −1</span>
+  </div>
+  <div class="hero-stat">
+    <div class="big" id="heroCount">3,093</div>
+    <div class="sub">Prospects scored</div>
+  </div>
+</div>
+
+<!-- ╔══ FILTER BAR ════════════════════════════════════════════════════════╗ -->
+<div class="filter-bar">
+  <span class="flabel">Level</span>
+  <div class="chips" id="levelChips">
+    <span class="chip on"  data-val="ALL">All</span>
+    <span class="chip" data-val="AAA">AAA</span>
+    <span class="chip" data-val="AA">AA</span>
+    <span class="chip" data-val="A+">A+</span>
+    <span class="chip" data-val="A">A-ball</span>
+    <span class="chip" data-val="R">Rk</span>
+  </div>
+  <span class="flabel">Team</span>
+  <select id="teamSel"><option value="">All</option></select>
+  <span class="flabel">Pos</span>
+  <select id="posSel"><option value="">All</option></select>
+  <input class="search-input" id="nameSearch" type="text" placeholder="Search player…">
+  <div class="f-right">
+    <span class="flabel">Show</span>
+    <select id="showN">
+      <option value="50">Top 50</option>
+      <option value="100" selected>Top 100</option>
+      <option value="200">Top 200</option>
+      <option value="300">Top 300</option>
+    </select>
+    <span class="rcount" id="rcount"></span>
+  </div>
+</div>
+
+<!-- ╔══ TABLE ═════════════════════════════════════════════════════════════╗ -->
+<div class="table-outer">
+  <div class="scroll-wrap">
+  <table id="tbl">
+    <thead><tr>
+      <th data-col="Combined_Rank" class="sorted"># <span class="sarrow">▲</span></th>
+      <th data-col="Name">Player <span class="sarrow"></span></th>
+      <th data-col="FantasyPos">Pos <span class="sarrow"></span></th>
+      <th data-col="Team">Org <span class="sarrow"></span></th>
+      <th data-col="Level">Level <span class="sarrow"></span></th>
+      <th data-col="Age">Age <span class="sarrow"></span></th>
+      <th data-col="Rating">Rating <span class="sarrow"></span></th>
+      <th data-col="TOOLS_Score">Tools <span class="sarrow"></span></th>
+      <th data-col="ABILITY_Score">Ability <span class="sarrow"></span></th>
+      <th data-col="Archetype">Archetype <span class="sarrow"></span></th>
+      <th data-col="Career_PA">Career PA <span class="sarrow"></span></th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ╔══ FOOTER ════════════════════════════════════════════════════════════╗ -->
+<footer class="footer">
+  <div class="footer-brand">
+    <strong>The Fantasy Point</strong> <span>· dynasty fantasy baseball analytics</span>
+  </div>
+  <div class="footer-links">
+    <a href="#">Twitter / X</a>
+    <a href="#">Discord</a>
+    <a href="#">About the Model</a>
+    <a href="#">Glossary</a>
+  </div>
+  <div class="footer-note">Preview build · Showing top 300 · Full site coming soon</div>
+</footer>
+
+<script>
+const DATA = [{"Combined_Rank": 1, "Pos_Adj_Rank": 1, "Name": "Josue De Paula", "Team": "LAD", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 80.68, "ABILITY_Score": 126.45, "Combined_Score": 101.78, "Career_PA": 2077, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 93.0}, {"Combined_Rank": 2, "Pos_Adj_Rank": 3, "Name": "Theo Gillen", "Team": "TB", "Level": "AA", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 87.73, "ABILITY_Score": 108.51, "Combined_Score": 97.0, "Career_PA": 891, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 86.5}, {"Combined_Rank": 3, "Pos_Adj_Rank": 2, "Name": "Aidan Miller", "Team": "PHI", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 63.68, "ABILITY_Score": 115.39, "Combined_Score": 93.42, "Career_PA": 1079, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 81.7}, {"Combined_Rank": 4, "Pos_Adj_Rank": 5, "Name": "Kendall George", "Team": "LAD", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 61.11, "ABILITY_Score": 119.29, "Combined_Score": 93.1, "Career_PA": 1317, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 81.2}, {"Combined_Rank": 5, "Pos_Adj_Rank": 4, "Name": "Bryan Rincon", "Team": "PHI", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 82.82, "ABILITY_Score": 108.68, "Combined_Score": 90.12, "Career_PA": 1500, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 77.2}, {"Combined_Rank": 6, "Pos_Adj_Rank": 6, "Name": "Luke Adams", "Team": "MIL", "Level": "AAA", "Age": 22.0, "FantasyPos": "3B", "Archetype": "Contact/Power", "TOOLS_Score": 85.0, "ABILITY_Score": 105.12, "Combined_Score": 89.85, "Career_PA": 1509, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 76.8}, {"Combined_Rank": 7, "Pos_Adj_Rank": 7, "Name": "Jesús Made", "Team": "MIL", "Level": "AA", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 70.62, "ABILITY_Score": 104.68, "Combined_Score": 86.55, "Career_PA": 1299, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 72.4}, {"Combined_Rank": 8, "Pos_Adj_Rank": 11, "Name": "Austin Overn", "Team": "TB", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 78.33, "ABILITY_Score": 102.46, "Combined_Score": 86.48, "Career_PA": 865, "Career_Disc_Flag": "hard+worsening", "Bats": "L", "Rating": 72.3}, {"Combined_Rank": 9, "Pos_Adj_Rank": 8, "Name": "Dylan O'Rae", "Team": "MIL", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 78.88, "ABILITY_Score": 102.55, "Combined_Score": 86.39, "Career_PA": 1336, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 72.2}, {"Combined_Rank": 10, "Pos_Adj_Rank": 12, "Name": "Eduardo Quintero", "Team": "LAD", "Level": "A+", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 88.34, "ABILITY_Score": 99.47, "Combined_Score": 86.16, "Career_PA": 1599, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 71.9}, {"Combined_Rank": 11, "Pos_Adj_Rank": 13, "Name": "Xavier Isaac", "Team": "TB", "Level": "AAA", "Age": 22.0, "FantasyPos": "1B", "Archetype": "Three True Outcomes", "TOOLS_Score": 73.95, "ABILITY_Score": 99.84, "Combined_Score": 84.6, "Career_PA": 1564, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 69.8}, {"Combined_Rank": 12, "Pos_Adj_Rank": 15, "Name": "Emmanuel Rodriguez", "Team": "MIN", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 86.88, "ABILITY_Score": 90.21, "Combined_Score": 83.64, "Career_PA": 1529, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 68.5}, {"Combined_Rank": 13, "Pos_Adj_Rank": 9, "Name": "Caleb Bonemer", "Team": "CWS", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 80.04, "ABILITY_Score": 96.75, "Combined_Score": 82.76, "Career_PA": 1071, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 67.3}, {"Combined_Rank": 14, "Pos_Adj_Rank": 14, "Name": "Leo De Vries", "Team": "OAK", "Level": "AA", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 64.97, "ABILITY_Score": 92.64, "Combined_Score": 80.44, "Career_PA": 1324, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 64.1}, {"Combined_Rank": 15, "Pos_Adj_Rank": 22, "Name": "Zyhir Hope", "Team": "DET", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 69.96, "ABILITY_Score": 96.04, "Combined_Score": 80.33, "Career_PA": 1423, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 64.0}, {"Combined_Rank": 16, "Pos_Adj_Rank": 10, "Name": "Rainiel Rodriguez", "Team": "STL", "Level": "AA", "Age": 19.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 65.11, "ABILITY_Score": 92.87, "Combined_Score": 79.59, "Career_PA": 1082, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 63.0}, {"Combined_Rank": 17, "Pos_Adj_Rank": 27, "Name": "Josiah Hartshorn", "Team": "CHC", "Level": "AA", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 76.89, "ABILITY_Score": 84.6, "Combined_Score": 79.15, "Career_PA": 562, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 62.4}, {"Combined_Rank": 18, "Pos_Adj_Rank": 17, "Name": "William Bergolla Jr.", "Team": "CWS", "Level": "AAA", "Age": 21.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 68.3, "ABILITY_Score": 91.54, "Combined_Score": 79.03, "Career_PA": 1262, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 62.2}, {"Combined_Rank": 19, "Pos_Adj_Rank": 28, "Name": "Zach Ehrhard", "Team": "LAD", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 64.1, "ABILITY_Score": 95.46, "Combined_Score": 79.0, "Career_PA": 1269, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 62.2}, {"Combined_Rank": 20, "Pos_Adj_Rank": 26, "Name": "Ralphy Velazquez", "Team": "CLE", "Level": "AAA", "Age": 21.0, "FantasyPos": "1B", "Archetype": "Contact/Power", "TOOLS_Score": 60.22, "ABILITY_Score": 90.19, "Combined_Score": 78.2, "Career_PA": 1563, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 61.1}, {"Combined_Rank": 21, "Pos_Adj_Rank": 16, "Name": "Eli Willits", "Team": "WSH", "Level": "AA", "Age": 18.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 70.68, "ABILITY_Score": 81.87, "Combined_Score": 77.71, "Career_PA": 596, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 60.4}, {"Combined_Rank": 22, "Pos_Adj_Rank": 23, "Name": "Andrew Fischer", "Team": "MIL", "Level": "AA", "Age": 22.0, "FantasyPos": "3B", "Archetype": "Three True Outcomes", "TOOLS_Score": 72.5, "ABILITY_Score": 89.07, "Combined_Score": 77.41, "Career_PA": 647, "Career_Disc_Flag": "hard+worsening", "Bats": "L", "Rating": 60.0}, {"Combined_Rank": 23, "Pos_Adj_Rank": 18, "Name": "Ty Southisene", "Team": "TOR", "Level": "A+", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 74.7, "ABILITY_Score": 84.04, "Combined_Score": 77.21, "Career_PA": 757, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 59.8}, {"Combined_Rank": 24, "Pos_Adj_Rank": 37, "Name": "Kane Kepley", "Team": "CHC", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 86.7, "ABILITY_Score": 82.28, "Combined_Score": 76.97, "Career_PA": 726, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 59.4}, {"Combined_Rank": 25, "Pos_Adj_Rank": 39, "Name": "Brendan Jones", "Team": "MIA", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 63.26, "ABILITY_Score": 92.9, "Combined_Score": 76.91, "Career_PA": 1100, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 59.4}, {"Combined_Rank": 26, "Pos_Adj_Rank": 20, "Name": "Franklin Arias", "Team": "BOS", "Level": "AAA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 63.96, "ABILITY_Score": 88.73, "Combined_Score": 75.59, "Career_PA": 1577, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 57.6}, {"Combined_Rank": 27, "Pos_Adj_Rank": 21, "Name": "José Rodríguez", "Team": "PHI", "Level": "AA", "Age": 24.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 52.31, "ABILITY_Score": 88.98, "Combined_Score": 75.49, "Career_PA": 2247, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 57.4}, {"Combined_Rank": 28, "Pos_Adj_Rank": 49, "Name": "Bo Davidson", "Team": "SF", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 71.43, "ABILITY_Score": 83.57, "Combined_Score": 74.68, "Career_PA": 1392, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 56.4}, {"Combined_Rank": 29, "Pos_Adj_Rank": 51, "Name": "James Tibbs III", "Team": "LAD", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 64.71, "ABILITY_Score": 86.37, "Combined_Score": 74.49, "Career_PA": 1321, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 56.1}, {"Combined_Rank": 30, "Pos_Adj_Rank": 24, "Name": "Sebastian Walcott", "Team": "TEX", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Speed/K-Risk", "TOOLS_Score": 45.31, "ABILITY_Score": 95.18, "Combined_Score": 74.38, "Career_PA": 1453, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 55.9}, {"Combined_Rank": 31, "Pos_Adj_Rank": 31, "Name": "James Triantos", "Team": "CHC", "Level": "AAA", "Age": 23.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 55.16, "ABILITY_Score": 83.7, "Combined_Score": 74.35, "Career_PA": 2425, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 55.9}, {"Combined_Rank": 32, "Pos_Adj_Rank": 52, "Name": "Ryan Cesarini", "Team": "CLE", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 73.91, "ABILITY_Score": 76.83, "Combined_Score": 74.25, "Career_PA": 805, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 55.8}, {"Combined_Rank": 33, "Pos_Adj_Rank": 53, "Name": "Scott Bandura", "Team": "SF", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 69.84, "ABILITY_Score": 85.33, "Combined_Score": 74.24, "Career_PA": 1656, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 55.8}, {"Combined_Rank": 34, "Pos_Adj_Rank": 56, "Name": "Tommy Hawke", "Team": "CLE", "Level": "A+", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 73.0, "ABILITY_Score": 86.43, "Combined_Score": 73.94, "Career_PA": 1115, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 55.4}, {"Combined_Rank": 35, "Pos_Adj_Rank": 29, "Name": "Jesús  Báez", "Team": "STL", "Level": "AA", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 66.79, "ABILITY_Score": 84.19, "Combined_Score": 73.88, "Career_PA": 1635, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 55.3}, {"Combined_Rank": 36, "Pos_Adj_Rank": 19, "Name": "Ricardo Olivar", "Team": "MIN", "Level": "AAA", "Age": 24.0, "FantasyPos": "C", "Archetype": "Average", "TOOLS_Score": 56.2, "ABILITY_Score": 88.92, "Combined_Score": 73.83, "Career_PA": 1676, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 55.2}, {"Combined_Rank": 37, "Pos_Adj_Rank": 35, "Name": "Aron Estrada", "Team": "BAL", "Level": "AAA", "Age": 21.0, "FantasyPos": "2B", "Archetype": "Average", "TOOLS_Score": 69.19, "ABILITY_Score": 79.29, "Combined_Score": 73.66, "Career_PA": 1714, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 55.0}, {"Combined_Rank": 38, "Pos_Adj_Rank": 30, "Name": "JoJo Parker", "Team": "TOR", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 94.83, "ABILITY_Score": 72.83, "Combined_Score": 73.59, "Career_PA": 496, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 54.9}, {"Combined_Rank": 39, "Pos_Adj_Rank": 60, "Name": "Raudi Rodriguez", "Team": "LAA", "Level": "AAA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 64.54, "ABILITY_Score": 84.57, "Combined_Score": 73.44, "Career_PA": 1292, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 54.7}, {"Combined_Rank": 40, "Pos_Adj_Rank": 61, "Name": "Mike Sirota", "Team": "LAD", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 81.17, "ABILITY_Score": 79.5, "Combined_Score": 73.12, "Career_PA": 762, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 54.2}, {"Combined_Rank": 41, "Pos_Adj_Rank": 62, "Name": "Charles Davalan", "Team": "LAD", "Level": "A+", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 72.61, "ABILITY_Score": 81.8, "Combined_Score": 73.06, "Career_PA": 567, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 54.2}, {"Combined_Rank": 42, "Pos_Adj_Rank": 64, "Name": "Josiah Ragsdale", "Team": "STL", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 67.39, "ABILITY_Score": 80.23, "Combined_Score": 72.78, "Career_PA": 616, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 53.8}, {"Combined_Rank": 43, "Pos_Adj_Rank": 32, "Name": "Dax Kilby", "Team": "NYY", "Level": "A", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 75.86, "ABILITY_Score": 77.44, "Combined_Score": 72.72, "Career_PA": 245, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 53.7}, {"Combined_Rank": 44, "Pos_Adj_Rank": 66, "Name": "Enrique Bradfield Jr.", "Team": "BAL", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 59.37, "ABILITY_Score": 86.93, "Combined_Score": 72.67, "Career_PA": 1308, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 53.6}, {"Combined_Rank": 45, "Pos_Adj_Rank": 67, "Name": "Will Turner", "Team": "BOS", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 70.44, "ABILITY_Score": 78.9, "Combined_Score": 72.62, "Career_PA": 706, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 53.6}, {"Combined_Rank": 46, "Pos_Adj_Rank": 33, "Name": "Josh Adamczewski", "Team": "MIL", "Level": "AA", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 63.91, "ABILITY_Score": 83.0, "Combined_Score": 72.56, "Career_PA": 985, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 53.5}, {"Combined_Rank": 47, "Pos_Adj_Rank": 34, "Name": "Jett Williams", "Team": "MIL", "Level": "AAA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 64.34, "ABILITY_Score": 82.63, "Combined_Score": 72.53, "Career_PA": 1654, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 53.5}, {"Combined_Rank": 48, "Pos_Adj_Rank": 45, "Name": "Deniel Ortiz", "Team": "STL", "Level": "AA", "Age": 21.0, "FantasyPos": "3B", "Archetype": "Contact/Power", "TOOLS_Score": 64.19, "ABILITY_Score": 82.92, "Combined_Score": 72.38, "Career_PA": 736, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 53.2}, {"Combined_Rank": 49, "Pos_Adj_Rank": 70, "Name": "Jaison Chourio", "Team": "CLE", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 58.97, "ABILITY_Score": 86.5, "Combined_Score": 72.32, "Career_PA": 1740, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 53.2}, {"Combined_Rank": 50, "Pos_Adj_Rank": 25, "Name": "Cooper Ingle", "Team": "CLE", "Level": "AAA", "Age": 24.0, "FantasyPos": "C", "Archetype": "Average", "TOOLS_Score": 61.2, "ABILITY_Score": 86.06, "Combined_Score": 72.28, "Career_PA": 1460, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 53.1}, {"Combined_Rank": 50, "Pos_Adj_Rank": 47, "Name": "Jake Gelof", "Team": "LAD", "Level": "AA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Three True Outcomes", "TOOLS_Score": 65.12, "ABILITY_Score": 83.68, "Combined_Score": 72.28, "Career_PA": 1524, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 53.1}, {"Combined_Rank": 52, "Pos_Adj_Rank": 35, "Name": "Nico Perez", "Team": "LAD", "Level": "A+", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 70.9, "ABILITY_Score": 77.52, "Combined_Score": 72.16, "Career_PA": 749, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 53.0}, {"Combined_Rank": 53, "Pos_Adj_Rank": 74, "Name": "Nick Morabito", "Team": "NYM", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 60.09, "ABILITY_Score": 84.38, "Combined_Score": 71.76, "Career_PA": 1806, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 52.4}, {"Combined_Rank": 54, "Pos_Adj_Rank": 40, "Name": "Wilder Dalis", "Team": "COL", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 82.47, "ABILITY_Score": 73.37, "Combined_Score": 71.67, "Career_PA": 1137, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 52.3}, {"Combined_Rank": 55, "Pos_Adj_Rank": 77, "Name": "Hendry Mendez", "Team": "MIN", "Level": "AAA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 72.16, "ABILITY_Score": 77.52, "Combined_Score": 71.53, "Career_PA": 2157, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 52.1}, {"Combined_Rank": 56, "Pos_Adj_Rank": 79, "Name": "Fenwick Trimble", "Team": "MIA", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 54.04, "ABILITY_Score": 85.46, "Combined_Score": 71.27, "Career_PA": 848, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 51.7}, {"Combined_Rank": 57, "Pos_Adj_Rank": 80, "Name": "Trevor Cohen", "Team": "SF", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 69.69, "ABILITY_Score": 77.39, "Combined_Score": 71.22, "Career_PA": 738, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 51.7}, {"Combined_Rank": 58, "Pos_Adj_Rank": 42, "Name": "Kyle Lodise", "Team": "CWS", "Level": "A+", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 70.33, "ABILITY_Score": 79.96, "Combined_Score": 71.0, "Career_PA": 638, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 51.4}, {"Combined_Rank": 59, "Pos_Adj_Rank": 43, "Name": "Wyatt Sanford", "Team": "PIT", "Level": "A+", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Power/K-Risk", "TOOLS_Score": 59.72, "ABILITY_Score": 77.66, "Combined_Score": 70.58, "Career_PA": 636, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 50.8}, {"Combined_Rank": 60, "Pos_Adj_Rank": 89, "Name": "Brandon Compton", "Team": "MIA", "Level": "AAA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 57.75, "ABILITY_Score": 72.75, "Combined_Score": 70.36, "Career_PA": 679, "Career_Disc_Flag": "hard+improving", "Bats": "L", "Rating": 50.5}, {"Combined_Rank": 61, "Pos_Adj_Rank": 95, "Name": "Marshall Toole", "Team": "TB", "Level": "A+", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 80.18, "ABILITY_Score": 74.61, "Combined_Score": 70.01, "Career_PA": 649, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 50.0}, {"Combined_Rank": 62, "Pos_Adj_Rank": 69, "Name": "Rafe Perich", "Team": "TEX", "Level": "AA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Contact/Power", "TOOLS_Score": 77.4, "ABILITY_Score": 71.64, "Combined_Score": 69.99, "Career_PA": 942, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 50.0}, {"Combined_Rank": 63, "Pos_Adj_Rank": 37, "Name": "Ethan Anderson", "Team": "BAL", "Level": "AAA", "Age": 22.0, "FantasyPos": "C", "Archetype": "Average", "TOOLS_Score": 65.15, "ABILITY_Score": 79.52, "Combined_Score": 69.97, "Career_PA": 843, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 50.0}, {"Combined_Rank": 64, "Pos_Adj_Rank": 97, "Name": "Tavian Josenberger", "Team": "BAL", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 70.0, "ABILITY_Score": 76.18, "Combined_Score": 69.78, "Career_PA": 1202, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 49.7}, {"Combined_Rank": 65, "Pos_Adj_Rank": 48, "Name": "Daniel Dickinson", "Team": "MIL", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 58.72, "ABILITY_Score": 82.58, "Combined_Score": 69.74, "Career_PA": 518, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 49.7}, {"Combined_Rank": 66, "Pos_Adj_Rank": 50, "Name": "Mitch Jebb", "Team": "PIT", "Level": "AAA", "Age": 24.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 66.79, "ABILITY_Score": 76.21, "Combined_Score": 69.57, "Career_PA": 1504, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 49.5}, {"Combined_Rank": 67, "Pos_Adj_Rank": 104, "Name": "Yensi De La Cruz", "Team": "HOU", "Level": "R", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 90.2, "ABILITY_Score": 65.68, "Combined_Score": 69.26, "Career_PA": 418, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 49.0}, {"Combined_Rank": 68, "Pos_Adj_Rank": 105, "Name": "Aidan Smith", "Team": "NYM", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 67.88, "ABILITY_Score": 77.54, "Combined_Score": 69.22, "Career_PA": 1355, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 49.0}, {"Combined_Rank": 69, "Pos_Adj_Rank": 92, "Name": "Blake Burke", "Team": "MIL", "Level": "AAA", "Age": 23.0, "FantasyPos": "1B", "Archetype": "Contact/Power", "TOOLS_Score": 69.25, "ABILITY_Score": 75.83, "Combined_Score": 69.17, "Career_PA": 1153, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 48.9}, {"Combined_Rank": 70, "Pos_Adj_Rank": 106, "Name": "Patrick Clohisy", "Team": "ATL", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 47.56, "ABILITY_Score": 82.54, "Combined_Score": 69.12, "Career_PA": 1155, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 48.8}, {"Combined_Rank": 71, "Pos_Adj_Rank": 55, "Name": "Aiva Arquette", "Team": "MIA", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 49.47, "ABILITY_Score": 78.96, "Combined_Score": 69.07, "Career_PA": 408, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 48.8}, {"Combined_Rank": 72, "Pos_Adj_Rank": 41, "Name": "Boston Smith", "Team": "SEA", "Level": "AA", "Age": 23.0, "FantasyPos": "C", "Archetype": "Three True Outcomes", "TOOLS_Score": 61.64, "ABILITY_Score": 74.64, "Combined_Score": 69.03, "Career_PA": 493, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 48.7}, {"Combined_Rank": 73, "Pos_Adj_Rank": 58, "Name": "Jefferson Rojas", "Team": "NYM", "Level": "AAA", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 61.36, "ABILITY_Score": 78.4, "Combined_Score": 68.79, "Career_PA": 1920, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 48.4}, {"Combined_Rank": 74, "Pos_Adj_Rank": 72, "Name": "Yamal Encarnacion", "Team": "HOU", "Level": "AA", "Age": 22.0, "FantasyPos": "2B", "Archetype": "Speed", "TOOLS_Score": 51.87, "ABILITY_Score": 82.44, "Combined_Score": 68.63, "Career_PA": 1390, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 48.2}, {"Combined_Rank": 75, "Pos_Adj_Rank": 112, "Name": "Matthew Miura", "Team": "STL", "Level": "A", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 61.26, "ABILITY_Score": 76.85, "Combined_Score": 68.5, "Career_PA": 356, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 48.0}, {"Combined_Rank": 76, "Pos_Adj_Rank": 44, "Name": "Luke Stevenson", "Team": "SEA", "Level": "A+", "Age": 21.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 44.57, "ABILITY_Score": 84.84, "Combined_Score": 68.29, "Career_PA": 574, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 47.7}, {"Combined_Rank": 77, "Pos_Adj_Rank": 119, "Name": "Jaden Fauske", "Team": "CWS", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 82.54, "ABILITY_Score": 69.32, "Combined_Score": 68.04, "Career_PA": 538, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 47.4}, {"Combined_Rank": 78, "Pos_Adj_Rank": 78, "Name": "Luis Escudero", "Team": "NYY", "Level": "A", "Age": 20.0, "FantasyPos": "2B", "Archetype": "Contact/Power", "TOOLS_Score": 72.88, "ABILITY_Score": 66.89, "Combined_Score": 67.99, "Career_PA": 709, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 47.3}, {"Combined_Rank": 79, "Pos_Adj_Rank": 45, "Name": "Alfredo Duno", "Team": "CIN", "Level": "AA", "Age": 20.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 62.23, "ABILITY_Score": 75.76, "Combined_Score": 67.88, "Career_PA": 1262, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 47.2}, {"Combined_Rank": 80, "Pos_Adj_Rank": 63, "Name": "Brady Ebel", "Team": "MIL", "Level": "A+", "Age": 18.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 65.64, "ABILITY_Score": 76.01, "Combined_Score": 67.87, "Career_PA": 604, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 47.2}, {"Combined_Rank": 81, "Pos_Adj_Rank": 65, "Name": "Yolfran Castillo", "Team": "TEX", "Level": "A", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 64.58, "ABILITY_Score": 73.27, "Combined_Score": 67.76, "Career_PA": 1078, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 47.0}, {"Combined_Rank": 82, "Pos_Adj_Rank": 122, "Name": "Edward Florentino", "Team": "PIT", "Level": "A+", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 77.7, "ABILITY_Score": 71.01, "Combined_Score": 67.75, "Career_PA": 1016, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 47.0}, {"Combined_Rank": 83, "Pos_Adj_Rank": 80, "Name": "Roc Riggio", "Team": "COL", "Level": "AAA", "Age": 24.0, "FantasyPos": "2B", "Archetype": "Contact/Power", "TOOLS_Score": 67.54, "ABILITY_Score": 73.75, "Combined_Score": 67.72, "Career_PA": 1431, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 47.0}, {"Combined_Rank": 84, "Pos_Adj_Rank": 124, "Name": "Nolan Sailors", "Team": "KC", "Level": "A+", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 76.2, "ABILITY_Score": 71.42, "Combined_Score": 67.64, "Career_PA": 583, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 46.8}, {"Combined_Rank": 85, "Pos_Adj_Rank": 68, "Name": "Jackson Lovich", "Team": "NYY", "Level": "A+", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Power/K-Risk", "TOOLS_Score": 67.39, "ABILITY_Score": 70.26, "Combined_Score": 67.57, "Career_PA": 536, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 46.8}, {"Combined_Rank": 86, "Pos_Adj_Rank": 71, "Name": "Eliomar Garces", "Team": "TB", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 79.78, "ABILITY_Score": 66.61, "Combined_Score": 67.28, "Career_PA": 429, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 46.4}, {"Combined_Rank": 87, "Pos_Adj_Rank": 132, "Name": "Matthew Etzel", "Team": "MIA", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 57.31, "ABILITY_Score": 78.34, "Combined_Score": 67.18, "Career_PA": 1483, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 46.2}, {"Combined_Rank": 88, "Pos_Adj_Rank": 100, "Name": "Jake Munroe", "Team": "LAA", "Level": "AA", "Age": 22.0, "FantasyPos": "3B", "Archetype": "Average", "TOOLS_Score": 53.51, "ABILITY_Score": 76.17, "Combined_Score": 67.15, "Career_PA": 572, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 46.2}, {"Combined_Rank": 89, "Pos_Adj_Rank": 54, "Name": "Josue Briceño", "Team": "DET", "Level": "AAA", "Age": 21.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 58.68, "ABILITY_Score": 71.1, "Combined_Score": 67.09, "Career_PA": 1185, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 46.1}, {"Combined_Rank": 90, "Pos_Adj_Rank": 101, "Name": "Mac Horvath", "Team": "TB", "Level": "AA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Speed", "TOOLS_Score": 59.82, "ABILITY_Score": 78.09, "Combined_Score": 66.9, "Career_PA": 1508, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 45.8}, {"Combined_Rank": 90, "Pos_Adj_Rank": 73, "Name": "Marco Vargas", "Team": "NYM", "Level": "AA", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 58.28, "ABILITY_Score": 75.59, "Combined_Score": 66.9, "Career_PA": 1373, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 45.8}, {"Combined_Rank": 92, "Pos_Adj_Rank": 57, "Name": "Ryan Sprock", "Team": "TOR", "Level": "A+", "Age": 21.0, "FantasyPos": "C", "Archetype": "Pure Contact", "TOOLS_Score": 65.12, "ABILITY_Score": 69.79, "Combined_Score": 66.89, "Career_PA": 513, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 45.8}, {"Combined_Rank": 93, "Pos_Adj_Rank": 138, "Name": "Dylan Dreiling", "Team": "TEX", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 75.51, "ABILITY_Score": 67.17, "Combined_Score": 66.87, "Career_PA": 1127, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 45.8}, {"Combined_Rank": 93, "Pos_Adj_Rank": 88, "Name": "Isaiah Barkett", "Team": "SF", "Level": "A+", "Age": 22.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 68.44, "ABILITY_Score": 70.68, "Combined_Score": 66.87, "Career_PA": 383, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 45.8}, {"Combined_Rank": 95, "Pos_Adj_Rank": 143, "Name": "John Spikerman", "Team": "NYM", "Level": "A+", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 59.28, "ABILITY_Score": 72.37, "Combined_Score": 66.68, "Career_PA": 558, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 45.6}, {"Combined_Rank": 96, "Pos_Adj_Rank": 59, "Name": "Chris Suero", "Team": "NYM", "Level": "AA", "Age": 22.0, "FantasyPos": "C", "Archetype": "Three True Outcomes", "TOOLS_Score": 55.57, "ABILITY_Score": 77.14, "Combined_Score": 66.66, "Career_PA": 1641, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 45.5}, {"Combined_Rank": 97, "Pos_Adj_Rank": 75, "Name": "Michael Arroyo", "Team": "SEA", "Level": "AAA", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 59.71, "ABILITY_Score": 74.45, "Combined_Score": 66.64, "Career_PA": 2157, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 45.5}, {"Combined_Rank": 98, "Pos_Adj_Rank": 76, "Name": "Stiven Marinez", "Team": "NYY", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 80.26, "ABILITY_Score": 65.56, "Combined_Score": 66.63, "Career_PA": 455, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 45.5}, {"Combined_Rank": 99, "Pos_Adj_Rank": 149, "Name": "Edwin Sanchez", "Team": "HOU", "Level": "R", "Age": 21.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 75.41, "ABILITY_Score": 68.33, "Combined_Score": 66.38, "Career_PA": 742, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 45.1}, {"Combined_Rank": 100, "Pos_Adj_Rank": 151, "Name": "Carlos Gutierrez", "Team": "BOS", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 67.39, "ABILITY_Score": 73.7, "Combined_Score": 66.26, "Career_PA": 811, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 45.0}, {"Combined_Rank": 101, "Pos_Adj_Rank": 83, "Name": "Adrian Santana", "Team": "MIA", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 53.76, "ABILITY_Score": 75.2, "Combined_Score": 66.12, "Career_PA": 1307, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 44.8}, {"Combined_Rank": 102, "Pos_Adj_Rank": 111, "Name": "Brayden Taylor", "Team": "MIA", "Level": "AAA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Speed/K-Risk", "TOOLS_Score": 67.61, "ABILITY_Score": 71.25, "Combined_Score": 66.06, "Career_PA": 1562, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 44.7}, {"Combined_Rank": 102, "Pos_Adj_Rank": 157, "Name": "Caden Kendle", "Team": "MIN", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 61.84, "ABILITY_Score": 63.17, "Combined_Score": 66.06, "Career_PA": 796, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 44.7}, {"Combined_Rank": 104, "Pos_Adj_Rank": 162, "Name": "Hayden Alvarez", "Team": "LAA", "Level": "A+", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 58.35, "ABILITY_Score": 75.44, "Combined_Score": 65.85, "Career_PA": 1065, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 44.4}, {"Combined_Rank": 105, "Pos_Adj_Rank": 163, "Name": "Kala'i Rosario", "Team": "MIN", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 66.29, "ABILITY_Score": 72.47, "Combined_Score": 65.79, "Career_PA": 2449, "Career_Disc_Flag": "hard", "Bats": "R", "Rating": 44.3}, {"Combined_Rank": 106, "Pos_Adj_Rank": 169, "Name": "Dylan Campbell", "Team": "CWS", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 48.43, "ABILITY_Score": 79.95, "Combined_Score": 65.7, "Career_PA": 1597, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 44.2}, {"Combined_Rank": 107, "Pos_Adj_Rank": 84, "Name": "John Gil", "Team": "ATL", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 54.47, "ABILITY_Score": 75.94, "Combined_Score": 65.62, "Career_PA": 1648, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 44.1}, {"Combined_Rank": 108, "Pos_Adj_Rank": 118, "Name": "Jonathon Long", "Team": "MIA", "Level": "AAA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Average", "TOOLS_Score": 64.92, "ABILITY_Score": 69.65, "Combined_Score": 65.6, "Career_PA": 1796, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 44.1}, {"Combined_Rank": 109, "Pos_Adj_Rank": 107, "Name": "Reyli Mariano", "Team": "LAD", "Level": "R", "Age": 19.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 77.39, "ABILITY_Score": 64.88, "Combined_Score": 65.55, "Career_PA": 477, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 44.0}, {"Combined_Rank": 110, "Pos_Adj_Rank": 86, "Name": "Carson DeMartini", "Team": "PHI", "Level": "AA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 60.68, "ABILITY_Score": 73.58, "Combined_Score": 65.49, "Career_PA": 870, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 43.9}, {"Combined_Rank": 111, "Pos_Adj_Rank": 109, "Name": "Jonathan Martinez", "Team": "CLE", "Level": "A", "Age": 19.0, "FantasyPos": "2B", "Archetype": "Three True Outcomes", "TOOLS_Score": 63.38, "ABILITY_Score": 67.94, "Combined_Score": 65.38, "Career_PA": 636, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 43.8}, {"Combined_Rank": 112, "Pos_Adj_Rank": 90, "Name": "Marek Houston", "Team": "MIN", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 62.51, "ABILITY_Score": 69.9, "Combined_Score": 65.31, "Career_PA": 664, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 43.7}, {"Combined_Rank": 113, "Pos_Adj_Rank": 91, "Name": "Starlyn Caba", "Team": "MIA", "Level": "A+", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 65.34, "ABILITY_Score": 70.32, "Combined_Score": 65.28, "Career_PA": 1108, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 43.7}, {"Combined_Rank": 114, "Pos_Adj_Rank": 93, "Name": "Eric Bitonti", "Team": "MIL", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Three True Outcomes", "TOOLS_Score": 68.41, "ABILITY_Score": 69.98, "Combined_Score": 65.15, "Career_PA": 1428, "Career_Disc_Flag": "hard+worsening", "Bats": "L", "Rating": 43.5}, {"Combined_Rank": 115, "Pos_Adj_Rank": 183, "Name": "Nick Mitchell", "Team": "WSH", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 65.23, "ABILITY_Score": 70.03, "Combined_Score": 65.1, "Career_PA": 930, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 43.4}, {"Combined_Rank": 116, "Pos_Adj_Rank": 184, "Name": "Braylon Payne", "Team": "MIL", "Level": "AA", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Power/K-Risk", "TOOLS_Score": 60.1, "ABILITY_Score": 73.0, "Combined_Score": 65.06, "Career_PA": 828, "Career_Disc_Flag": "hard+worsening", "Bats": "L", "Rating": 43.4}, {"Combined_Rank": 117, "Pos_Adj_Rank": 94, "Name": "Welbyn Francisca", "Team": "CLE", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 58.04, "ABILITY_Score": 71.53, "Combined_Score": 65.03, "Career_PA": 1287, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 43.3}, {"Combined_Rank": 118, "Pos_Adj_Rank": 96, "Name": "Cristofer Torin", "Team": "AZ", "Level": "AA", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 63.08, "ABILITY_Score": 70.87, "Combined_Score": 64.9, "Career_PA": 2121, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 43.1}, {"Combined_Rank": 119, "Pos_Adj_Rank": 192, "Name": "Eric Hartman", "Team": "ATL", "Level": "AA", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 59.98, "ABILITY_Score": 73.08, "Combined_Score": 64.87, "Career_PA": 980, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 43.1}, {"Combined_Rank": 120, "Pos_Adj_Rank": 194, "Name": "Robert Arias", "Team": "CLE", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 59.03, "ABILITY_Score": 69.48, "Combined_Score": 64.82, "Career_PA": 568, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 43.0}, {"Combined_Rank": 121, "Pos_Adj_Rank": 98, "Name": "Emil Morales", "Team": "LAD", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 70.22, "ABILITY_Score": 67.62, "Combined_Score": 64.72, "Career_PA": 1160, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 42.9}, {"Combined_Rank": 121, "Pos_Adj_Rank": 98, "Name": "Josuar Gonzalez", "Team": "SF", "Level": "A", "Age": 18.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 70.2, "ABILITY_Score": 63.83, "Combined_Score": 64.72, "Career_PA": 503, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 42.9}, {"Combined_Rank": 123, "Pos_Adj_Rank": 120, "Name": "Mitch Voit", "Team": "NYM", "Level": "AA", "Age": 21.0, "FantasyPos": "2B", "Archetype": "Speed", "TOOLS_Score": 52.06, "ABILITY_Score": 72.39, "Combined_Score": 64.5, "Career_PA": 582, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 42.6}, {"Combined_Rank": 124, "Pos_Adj_Rank": 206, "Name": "Samuel Zavala", "Team": "CWS", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 59.19, "ABILITY_Score": 73.55, "Combined_Score": 64.46, "Career_PA": 2363, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 42.6}, {"Combined_Rank": 125, "Pos_Adj_Rank": 102, "Name": "Termarr Johnson", "Team": "PIT", "Level": "AAA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 49.99, "ABILITY_Score": 74.22, "Combined_Score": 64.39, "Career_PA": 1997, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 42.5}, {"Combined_Rank": 126, "Pos_Adj_Rank": 209, "Name": "Wilson Rodriguez", "Team": "NYY", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 70.08, "ABILITY_Score": 65.33, "Combined_Score": 64.36, "Career_PA": 664, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 42.4}, {"Combined_Rank": 127, "Pos_Adj_Rank": 103, "Name": "Jaiden Lo Re", "Team": "BAL", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 58.74, "ABILITY_Score": 69.46, "Combined_Score": 64.32, "Career_PA": 368, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 42.4}, {"Combined_Rank": 128, "Pos_Adj_Rank": 141, "Name": "Brent Iredale", "Team": "PIT", "Level": "A", "Age": 22.0, "FantasyPos": "3B", "Archetype": "Three True Outcomes", "TOOLS_Score": 88.15, "ABILITY_Score": 62.15, "Combined_Score": 64.28, "Career_PA": 392, "Career_Disc_Flag": "hard+worsening", "Bats": "R", "Rating": 42.3}, {"Combined_Rank": 129, "Pos_Adj_Rank": 82, "Name": "Ramon Ramirez", "Team": "KC", "Level": "A+", "Age": 21.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 67.83, "ABILITY_Score": 66.39, "Combined_Score": 64.21, "Career_PA": 1056, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 42.2}, {"Combined_Rank": 130, "Pos_Adj_Rank": 123, "Name": "Nate Furman", "Team": "SF", "Level": "AAA", "Age": 24.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 70.24, "ABILITY_Score": 65.29, "Combined_Score": 64.18, "Career_PA": 1286, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 42.2}, {"Combined_Rank": 131, "Pos_Adj_Rank": 216, "Name": "Jonny Farmelo", "Team": "SEA", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 65.45, "ABILITY_Score": 68.41, "Combined_Score": 64.1, "Career_PA": 963, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 42.1}, {"Combined_Rank": 132, "Pos_Adj_Rank": 108, "Name": "Marconi German", "Team": "WSH", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 72.58, "ABILITY_Score": 64.25, "Combined_Score": 63.98, "Career_PA": 399, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 41.9}, {"Combined_Rank": 133, "Pos_Adj_Rank": 109, "Name": "Geraldo Quintero", "Team": "ATL", "Level": "AA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 40.76, "ABILITY_Score": 78.83, "Combined_Score": 63.88, "Career_PA": 2103, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 41.8}, {"Combined_Rank": 134, "Pos_Adj_Rank": 129, "Name": "Justin Riemer", "Team": "OAK", "Level": "AAA", "Age": 24.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 71.4, "ABILITY_Score": 62.87, "Combined_Score": 63.82, "Career_PA": 759, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 41.7}, {"Combined_Rank": 135, "Pos_Adj_Rank": 225, "Name": "Carson Roccaforte", "Team": "KC", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 64.18, "ABILITY_Score": 69.85, "Combined_Score": 63.71, "Career_PA": 1846, "Career_Disc_Flag": "hard+worsening", "Bats": "L", "Rating": 41.5}, {"Combined_Rank": 136, "Pos_Adj_Rank": 155, "Name": "Jacob Reimer", "Team": "NYM", "Level": "AA", "Age": 22.0, "FantasyPos": "3B", "Archetype": "Average", "TOOLS_Score": 56.59, "ABILITY_Score": 70.58, "Combined_Score": 63.61, "Career_PA": 1433, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 41.4}, {"Combined_Rank": 137, "Pos_Adj_Rank": 85, "Name": "Axiel Plaz", "Team": "PIT", "Level": "A+", "Age": 20.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 79.41, "ABILITY_Score": 61.06, "Combined_Score": 63.5, "Career_PA": 1210, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 41.3}, {"Combined_Rank": 138, "Pos_Adj_Rank": 87, "Name": "Edian Espinal", "Team": "DET", "Level": "A+", "Age": 21.0, "FantasyPos": "C", "Archetype": "Pure Contact", "TOOLS_Score": 69.1, "ABILITY_Score": 64.43, "Combined_Score": 63.39, "Career_PA": 390, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 41.1}, {"Combined_Rank": 139, "Pos_Adj_Rank": 113, "Name": "Elaineiker Coronado", "Team": "TOR", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 79.13, "ABILITY_Score": 60.56, "Combined_Score": 63.38, "Career_PA": 377, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 41.1}, {"Combined_Rank": 140, "Pos_Adj_Rank": 239, "Name": "Carlos Jimenez", "Team": "SEA", "Level": "A+", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 68.1, "ABILITY_Score": 64.42, "Combined_Score": 63.3, "Career_PA": 1787, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 41.0}, {"Combined_Rank": 141, "Pos_Adj_Rank": 243, "Name": "Devin Taylor", "Team": "OAK", "Level": "AAA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 63.96, "ABILITY_Score": 66.22, "Combined_Score": 63.23, "Career_PA": 776, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 40.9}, {"Combined_Rank": 142, "Pos_Adj_Rank": 114, "Name": "Ryan Weingartner", "Team": "STL", "Level": "A+", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 63.35, "ABILITY_Score": 68.69, "Combined_Score": 63.18, "Career_PA": 524, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 40.8}, {"Combined_Rank": 143, "Pos_Adj_Rank": 116, "Name": "Yeferson Portolatin", "Team": "STL", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 67.53, "ABILITY_Score": 64.66, "Combined_Score": 63.14, "Career_PA": 305, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 40.8}, {"Combined_Rank": 144, "Pos_Adj_Rank": 117, "Name": "Miguel Welch", "Team": "BOS", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 73.94, "ABILITY_Score": 62.23, "Combined_Score": 63.13, "Career_PA": 387, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 40.8}, {"Combined_Rank": 145, "Pos_Adj_Rank": 145, "Name": "Frederick Bencosme", "Team": "BAL", "Level": "AA", "Age": 23.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 55.42, "ABILITY_Score": 70.16, "Combined_Score": 63.11, "Career_PA": 2099, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 40.7}, {"Combined_Rank": 146, "Pos_Adj_Rank": 218, "Name": "Carter Graham", "Team": "CIN", "Level": "AA", "Age": 24.0, "FantasyPos": "1B", "Archetype": "Contact/Power", "TOOLS_Score": 67.22, "ABILITY_Score": 63.66, "Combined_Score": 62.98, "Career_PA": 1331, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 40.6}, {"Combined_Rank": 147, "Pos_Adj_Rank": 254, "Name": "Cameron Nelson", "Team": "COL", "Level": "A+", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 72.13, "ABILITY_Score": 63.95, "Combined_Score": 62.86, "Career_PA": 411, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 40.4}, {"Combined_Rank": 148, "Pos_Adj_Rank": 121, "Name": "Sebastian Dos Santos", "Team": "STL", "Level": "A", "Age": 18.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 67.41, "ABILITY_Score": 66.36, "Combined_Score": 62.78, "Career_PA": 533, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 40.3}, {"Combined_Rank": 148, "Pos_Adj_Rank": 255, "Name": "Eddie Micheletti Jr.", "Team": "LAA", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 64.67, "ABILITY_Score": 67.48, "Combined_Score": 62.78, "Career_PA": 1068, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 40.3}, {"Combined_Rank": 150, "Pos_Adj_Rank": 258, "Name": "Travis Honeyman", "Team": "STL", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 62.19, "ABILITY_Score": 66.3, "Combined_Score": 62.68, "Career_PA": 769, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 40.1}, {"Combined_Rank": 151, "Pos_Adj_Rank": 126, "Name": "Juan Ortuno", "Team": "MIL", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 64.28, "ABILITY_Score": 70.39, "Combined_Score": 62.6, "Career_PA": 805, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 40.0}, {"Combined_Rank": 151, "Pos_Adj_Rank": 156, "Name": "Emmanuel Cedeno", "Team": "TB", "Level": "R", "Age": 18.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 71.69, "ABILITY_Score": 62.57, "Combined_Score": 62.6, "Career_PA": 455, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 40.0}, {"Combined_Rank": 153, "Pos_Adj_Rank": 127, "Name": "Jorge Lara", "Team": "AZ", "Level": "R", "Age": 20.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 74.33, "ABILITY_Score": 62.46, "Combined_Score": 62.59, "Career_PA": 563, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 40.0}, {"Combined_Rank": 154, "Pos_Adj_Rank": 262, "Name": "Colby Shade", "Team": "MIA", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 48.23, "ABILITY_Score": 71.91, "Combined_Score": 62.58, "Career_PA": 1226, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 40.0}, {"Combined_Rank": 155, "Pos_Adj_Rank": 160, "Name": "Jadher Areinamo", "Team": "TB", "Level": "AAA", "Age": 22.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 41.09, "ABILITY_Score": 74.38, "Combined_Score": 62.49, "Career_PA": 2263, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 39.9}, {"Combined_Rank": 156, "Pos_Adj_Rank": 265, "Name": "Cam Cannarella", "Team": "MIA", "Level": "AAA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 48.1, "ABILITY_Score": 68.79, "Combined_Score": 62.39, "Career_PA": 533, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 39.8}, {"Combined_Rank": 157, "Pos_Adj_Rank": 128, "Name": "Johan Machado", "Team": "MIA", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 71.57, "ABILITY_Score": 62.12, "Combined_Score": 62.36, "Career_PA": 457, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 39.7}, {"Combined_Rank": 158, "Pos_Adj_Rank": 193, "Name": "Cayden Wallace", "Team": "WSH", "Level": "AAA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Average", "TOOLS_Score": 53.78, "ABILITY_Score": 69.47, "Combined_Score": 62.34, "Career_PA": 1964, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 39.7}, {"Combined_Rank": 159, "Pos_Adj_Rank": 129, "Name": "Ian Lewis Jr.", "Team": "MIA", "Level": "AA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 61.3, "ABILITY_Score": 65.89, "Combined_Score": 62.32, "Career_PA": 1406, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 39.7}, {"Combined_Rank": 160, "Pos_Adj_Rank": 131, "Name": "Henry Godbout", "Team": "BOS", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 52.7, "ABILITY_Score": 61.66, "Combined_Score": 62.28, "Career_PA": 336, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 39.6}, {"Combined_Rank": 161, "Pos_Adj_Rank": 133, "Name": "Woody Hadeen", "Team": "DET", "Level": "AA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 56.79, "ABILITY_Score": 65.24, "Combined_Score": 62.08, "Career_PA": 882, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 39.3}, {"Combined_Rank": 162, "Pos_Adj_Rank": 278, "Name": "Braylon Whitaker", "Team": "BAL", "Level": "A+", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 70.26, "ABILITY_Score": 61.87, "Combined_Score": 62.06, "Career_PA": 438, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 39.3}, {"Combined_Rank": 163, "Pos_Adj_Rank": 134, "Name": "Kayson Cunningham", "Team": "AZ", "Level": "A+", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 57.78, "ABILITY_Score": 64.68, "Combined_Score": 61.95, "Career_PA": 542, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 39.2}, {"Combined_Rank": 164, "Pos_Adj_Rank": 135, "Name": "Chase Jaworsky", "Team": "MIA", "Level": "A+", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 53.9, "ABILITY_Score": 68.54, "Combined_Score": 61.9, "Career_PA": 920, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 39.1}, {"Combined_Rank": 164, "Pos_Adj_Rank": 135, "Name": "Enmanuel Tejeda", "Team": "NYY", "Level": "A+", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 63.59, "ABILITY_Score": 65.43, "Combined_Score": 61.9, "Career_PA": 1280, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 39.1}, {"Combined_Rank": 166, "Pos_Adj_Rank": 289, "Name": "Hector Osorio", "Team": "TEX", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 66.87, "ABILITY_Score": 62.93, "Combined_Score": 61.85, "Career_PA": 1118, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 39.0}, {"Combined_Rank": 167, "Pos_Adj_Rank": 140, "Name": "Tre Richardson III", "Team": "STL", "Level": "AA", "Age": 24.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 53.67, "ABILITY_Score": 65.78, "Combined_Score": 61.8, "Career_PA": 1134, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 39.0}, {"Combined_Rank": 168, "Pos_Adj_Rank": 291, "Name": "Angel Ortiz", "Team": "AZ", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 55.33, "ABILITY_Score": 68.43, "Combined_Score": 61.78, "Career_PA": 1675, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.9}, {"Combined_Rank": 169, "Pos_Adj_Rank": 293, "Name": "Trent Youngblood", "Team": "AZ", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 69.71, "ABILITY_Score": 59.16, "Combined_Score": 61.74, "Career_PA": 871, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.9}, {"Combined_Rank": 170, "Pos_Adj_Rank": 181, "Name": "Luis De La Cruz", "Team": "CLE", "Level": "A+", "Age": 19.0, "FantasyPos": "2B", "Archetype": "Contact/Power", "TOOLS_Score": 54.15, "ABILITY_Score": 64.28, "Combined_Score": 61.7, "Career_PA": 726, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 38.8}, {"Combined_Rank": 171, "Pos_Adj_Rank": 146, "Name": "Juan Matheus", "Team": "MIA", "Level": "AAA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 56.89, "ABILITY_Score": 66.44, "Combined_Score": 61.56, "Career_PA": 1539, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 38.6}, {"Combined_Rank": 172, "Pos_Adj_Rank": 308, "Name": "Sam Shaw", "Team": "TOR", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 65.19, "ABILITY_Score": 58.57, "Combined_Score": 61.48, "Career_PA": 693, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.5}, {"Combined_Rank": 173, "Pos_Adj_Rank": 148, "Name": "Jhonny Level", "Team": "SF", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 65.89, "ABILITY_Score": 63.86, "Combined_Score": 61.46, "Career_PA": 1171, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 38.5}, {"Combined_Rank": 174, "Pos_Adj_Rank": 189, "Name": "Keiner Delgado", "Team": "PIT", "Level": "AAA", "Age": 22.0, "FantasyPos": "2B", "Archetype": "Average", "TOOLS_Score": 48.9, "ABILITY_Score": 71.22, "Combined_Score": 61.42, "Career_PA": 1900, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 38.4}, {"Combined_Rank": 174, "Pos_Adj_Rank": 189, "Name": "Dylan Palmer", "Team": "PIT", "Level": "A+", "Age": 22.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 64.28, "ABILITY_Score": 62.13, "Combined_Score": 61.42, "Career_PA": 472, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.4}, {"Combined_Rank": 176, "Pos_Adj_Rank": 223, "Name": "Tony Santa Maria", "Team": "TB", "Level": "AAA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Speed", "TOOLS_Score": 57.04, "ABILITY_Score": 67.29, "Combined_Score": 61.35, "Career_PA": 557, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 38.4}, {"Combined_Rank": 177, "Pos_Adj_Rank": 314, "Name": "Agustin Acosta", "Team": "LAD", "Level": "R", "Age": 21.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 69.4, "ABILITY_Score": 61.57, "Combined_Score": 61.3, "Career_PA": 539, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.3}, {"Combined_Rank": 178, "Pos_Adj_Rank": 317, "Name": "Jonathan Hogart", "Team": "PHI", "Level": "A", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 77.92, "ABILITY_Score": 59.16, "Combined_Score": 61.28, "Career_PA": 486, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 38.3}, {"Combined_Rank": 179, "Pos_Adj_Rank": 320, "Name": "Dillon Head", "Team": "MIA", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 72.17, "ABILITY_Score": 58.72, "Combined_Score": 61.22, "Career_PA": 1068, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.2}, {"Combined_Rank": 180, "Pos_Adj_Rank": 323, "Name": "Allan Castro", "Team": "BOS", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 57.4, "ABILITY_Score": 65.93, "Combined_Score": 61.18, "Career_PA": 2288, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 38.1}, {"Combined_Rank": 180, "Pos_Adj_Rank": 153, "Name": "Kellon Lindsey", "Team": "LAD", "Level": "A", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Three True Outcomes", "TOOLS_Score": 56.88, "ABILITY_Score": 70.64, "Combined_Score": 61.18, "Career_PA": 473, "Career_Disc_Flag": "hard", "Bats": "R", "Rating": 38.1}, {"Combined_Rank": 182, "Pos_Adj_Rank": 115, "Name": "Blake Mitchell", "Team": "KC", "Level": "A+", "Age": 21.0, "FantasyPos": "C", "Archetype": "Three True Outcomes", "TOOLS_Score": 65.62, "ABILITY_Score": 64.61, "Combined_Score": 61.16, "Career_PA": 1304, "Career_Disc_Flag": "hard+worsening", "Bats": "L", "Rating": 38.1}, {"Combined_Rank": 183, "Pos_Adj_Rank": 200, "Name": "Yeisy Celesten", "Team": "TEX", "Level": "R", "Age": 21.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 71.52, "ABILITY_Score": 59.89, "Combined_Score": 61.12, "Career_PA": 446, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 38.0}, {"Combined_Rank": 184, "Pos_Adj_Rank": 230, "Name": "Sam Kulasingam", "Team": "KC", "Level": "AA", "Age": 24.0, "FantasyPos": "3B", "Archetype": "Pure Contact", "TOOLS_Score": 64.52, "ABILITY_Score": 63.15, "Combined_Score": 61.04, "Career_PA": 1207, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 37.9}, {"Combined_Rank": 184, "Pos_Adj_Rank": 159, "Name": "Brandon Butterworth", "Team": "BAL", "Level": "AAA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 56.33, "ABILITY_Score": 66.45, "Combined_Score": 61.04, "Career_PA": 1000, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.9}, {"Combined_Rank": 186, "Pos_Adj_Rank": 334, "Name": "Cam Maldonado", "Team": "SF", "Level": "A+", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 49.02, "ABILITY_Score": 60.36, "Combined_Score": 61.02, "Career_PA": 508, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.9}, {"Combined_Rank": 187, "Pos_Adj_Rank": 161, "Name": "Edwin Darville", "Team": "BOS", "Level": "R", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 65.29, "ABILITY_Score": 61.87, "Combined_Score": 60.97, "Career_PA": 384, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.8}, {"Combined_Rank": 188, "Pos_Adj_Rank": 341, "Name": "Merphy Hernandez", "Team": "MIN", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 58.37, "ABILITY_Score": 66.52, "Combined_Score": 60.95, "Career_PA": 522, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.8}, {"Combined_Rank": 189, "Pos_Adj_Rank": 344, "Name": "Spencer Nivens", "Team": "KC", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 53.96, "ABILITY_Score": 67.58, "Combined_Score": 60.9, "Career_PA": 1526, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.7}, {"Combined_Rank": 190, "Pos_Adj_Rank": 353, "Name": "Anthony Huezo", "Team": "HOU", "Level": "AA", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Power/K-Risk", "TOOLS_Score": 71.46, "ABILITY_Score": 58.71, "Combined_Score": 60.79, "Career_PA": 977, "Career_Disc_Flag": "hard", "Bats": "L", "Rating": 37.6}, {"Combined_Rank": 191, "Pos_Adj_Rank": 164, "Name": "Everett Cooper III", "Team": "WSH", "Level": "A", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 71.74, "ABILITY_Score": 57.29, "Combined_Score": 60.78, "Career_PA": 504, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.6}, {"Combined_Rank": 192, "Pos_Adj_Rank": 167, "Name": "Arjun Nimmala", "Team": "LAA", "Level": "AA", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 52.58, "ABILITY_Score": 68.34, "Combined_Score": 60.74, "Career_PA": 1355, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.5}, {"Combined_Rank": 193, "Pos_Adj_Rank": 169, "Name": "Harold Gonzalez", "Team": "LAD", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 61.85, "ABILITY_Score": 62.99, "Combined_Score": 60.7, "Career_PA": 470, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.5}, {"Combined_Rank": 194, "Pos_Adj_Rank": 124, "Name": "Jirvin Morillo", "Team": "CIN", "Level": "A", "Age": 19.0, "FantasyPos": "C", "Archetype": NaN, "TOOLS_Score": 74.0, "ABILITY_Score": 59.95, "Combined_Score": 60.64, "Career_PA": 624, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 37.4}, {"Combined_Rank": 195, "Pos_Adj_Rank": 172, "Name": "Tyriq Kemp", "Team": "KC", "Level": "A+", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 77.89, "ABILITY_Score": 58.13, "Combined_Score": 60.63, "Career_PA": 520, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.4}, {"Combined_Rank": 196, "Pos_Adj_Rank": 173, "Name": "Tate Southisene", "Team": "ATL", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 60.51, "ABILITY_Score": 65.68, "Combined_Score": 60.61, "Career_PA": 483, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.4}, {"Combined_Rank": 197, "Pos_Adj_Rank": 302, "Name": "Wooyeoul Shin", "Team": "TB", "Level": "A", "Age": 23.0, "FantasyPos": "1B", "Archetype": "Speed", "TOOLS_Score": 67.16, "ABILITY_Score": 61.71, "Combined_Score": 60.6, "Career_PA": 462, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.3}, {"Combined_Rank": 198, "Pos_Adj_Rank": 174, "Name": "DJ Layton", "Team": "BAL", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Speed/K-Risk", "TOOLS_Score": 54.7, "ABILITY_Score": 63.88, "Combined_Score": 60.57, "Career_PA": 625, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 37.3}, {"Combined_Rank": 199, "Pos_Adj_Rank": 374, "Name": "Pablo Nunez", "Team": "CIN", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 65.69, "ABILITY_Score": 60.27, "Combined_Score": 60.55, "Career_PA": 422, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.3}, {"Combined_Rank": 200, "Pos_Adj_Rank": 175, "Name": "Xavier Neyens", "Team": "HOU", "Level": "A+", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Three True Outcomes", "TOOLS_Score": 54.04, "ABILITY_Score": 68.04, "Combined_Score": 60.54, "Career_PA": 466, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.3}, {"Combined_Rank": 201, "Pos_Adj_Rank": 217, "Name": "Darian Castillo", "Team": "SD", "Level": "R", "Age": 19.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 71.04, "ABILITY_Score": 59.0, "Combined_Score": 60.5, "Career_PA": 414, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 37.2}, {"Combined_Rank": 202, "Pos_Adj_Rank": 176, "Name": "Jendy Martinez", "Team": "MIN", "Level": "R", "Age": 17.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 69.55, "ABILITY_Score": 59.32, "Combined_Score": 60.44, "Career_PA": 210, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 37.1}, {"Combined_Rank": 202, "Pos_Adj_Rank": 382, "Name": "Nate George", "Team": "BAL", "Level": "A+", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 52.67, "ABILITY_Score": 66.26, "Combined_Score": 60.44, "Career_PA": 464, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 37.1}, {"Combined_Rank": 204, "Pos_Adj_Rank": 177, "Name": "Core Jackson", "Team": "NYY", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 58.16, "ABILITY_Score": 61.96, "Combined_Score": 60.42, "Career_PA": 563, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.1}, {"Combined_Rank": 204, "Pos_Adj_Rank": 177, "Name": "Angel Salio", "Team": "CIN", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 75.14, "ABILITY_Score": 57.56, "Combined_Score": 60.42, "Career_PA": 410, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 37.1}, {"Combined_Rank": 206, "Pos_Adj_Rank": 390, "Name": "Korbyn Dickerson", "Team": "SEA", "Level": "A+", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 52.52, "ABILITY_Score": 59.44, "Combined_Score": 60.3, "Career_PA": 482, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.9}, {"Combined_Rank": 207, "Pos_Adj_Rank": 179, "Name": "Jack Penney", "Team": "DET", "Level": "R", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Average", "TOOLS_Score": 56.58, "ABILITY_Score": 59.56, "Combined_Score": 60.28, "Career_PA": 429, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.9}, {"Combined_Rank": 208, "Pos_Adj_Rank": 393, "Name": "Kemp Alderman", "Team": "MIA", "Level": "AAA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Power/K-Risk", "TOOLS_Score": 61.88, "ABILITY_Score": 62.25, "Combined_Score": 60.25, "Career_PA": 1428, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.9}, {"Combined_Rank": 209, "Pos_Adj_Rank": 395, "Name": "David Carrera", "Team": "NYY", "Level": "R", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 66.24, "ABILITY_Score": 61.26, "Combined_Score": 60.23, "Career_PA": 514, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.8}, {"Combined_Rank": 210, "Pos_Adj_Rank": 397, "Name": "Djean Macares", "Team": "SF", "Level": "R", "Age": 18.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 76.88, "ABILITY_Score": 56.53, "Combined_Score": 60.22, "Career_PA": 438, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.8}, {"Combined_Rank": 210, "Pos_Adj_Rank": 397, "Name": "Francisco Renteria", "Team": "PHI", "Level": "R", "Age": 17.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 68.85, "ABILITY_Score": 59.31, "Combined_Score": 60.22, "Career_PA": 236, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.8}, {"Combined_Rank": 212, "Pos_Adj_Rank": 399, "Name": "Cameron Leary", "Team": "OAK", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 58.22, "ABILITY_Score": 65.69, "Combined_Score": 60.21, "Career_PA": 1140, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.8}, {"Combined_Rank": 213, "Pos_Adj_Rank": 182, "Name": "Cesar Mateo", "Team": "TEX", "Level": "R", "Age": 17.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 64.86, "ABILITY_Score": 60.71, "Combined_Score": 60.15, "Career_PA": 225, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.7}, {"Combined_Rank": 214, "Pos_Adj_Rank": 184, "Name": "Émilien Pitre", "Team": "NYM", "Level": "AAA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 58.3, "ABILITY_Score": 63.69, "Combined_Score": 60.06, "Career_PA": 1130, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.6}, {"Combined_Rank": 215, "Pos_Adj_Rank": 231, "Name": "Carlos  Garces", "Team": "CLE", "Level": "R", "Age": 19.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 71.24, "ABILITY_Score": 58.66, "Combined_Score": 60.02, "Career_PA": 493, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 36.6}, {"Combined_Rank": 215, "Pos_Adj_Rank": 186, "Name": "Juan Cespedes", "Team": "LAA", "Level": "R", "Age": 17.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 59.88, "ABILITY_Score": 62.38, "Combined_Score": 60.02, "Career_PA": 211, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.6}, {"Combined_Rank": 217, "Pos_Adj_Rank": 187, "Name": "Luis Peña", "Team": "MIL", "Level": "AA", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 53.69, "ABILITY_Score": 70.8, "Combined_Score": 59.98, "Career_PA": 894, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.5}, {"Combined_Rank": 218, "Pos_Adj_Rank": 419, "Name": "Ryan Mitchell", "Team": "STL", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 52.6, "ABILITY_Score": 70.42, "Combined_Score": 59.91, "Career_PA": 496, "Career_Disc_Flag": "hard", "Bats": "L", "Rating": 36.4}, {"Combined_Rank": 219, "Pos_Adj_Rank": 191, "Name": "Eriel Dihigo", "Team": "COL", "Level": "R", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 68.59, "ABILITY_Score": 60.22, "Combined_Score": 59.9, "Career_PA": 585, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.4}, {"Combined_Rank": 219, "Pos_Adj_Rank": 135, "Name": "Colin Tuft", "Team": "BAL", "Level": "AA", "Age": 23.0, "FantasyPos": "C", "Archetype": "Three True Outcomes", "TOOLS_Score": 62.78, "ABILITY_Score": 58.6, "Combined_Score": 59.9, "Career_PA": 717, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.4}, {"Combined_Rank": 221, "Pos_Adj_Rank": 236, "Name": "Dauri Fernández", "Team": "CLE", "Level": "A+", "Age": 19.0, "FantasyPos": "2B", "Archetype": "Speed", "TOOLS_Score": 56.28, "ABILITY_Score": 64.76, "Combined_Score": 59.88, "Career_PA": 816, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 36.4}, {"Combined_Rank": 222, "Pos_Adj_Rank": 425, "Name": "Won-Bin Cho", "Team": "STL", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 53.52, "ABILITY_Score": 64.5, "Combined_Score": 59.82, "Career_PA": 1819, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.3}, {"Combined_Rank": 222, "Pos_Adj_Rank": 139, "Name": "Reiner Herrera", "Team": "CLE", "Level": "A", "Age": 20.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 68.35, "ABILITY_Score": 55.59, "Combined_Score": 59.82, "Career_PA": 711, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.3}, {"Combined_Rank": 224, "Pos_Adj_Rank": 195, "Name": "Luis Lameda", "Team": "MIL", "Level": "A+", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 54.01, "ABILITY_Score": 61.71, "Combined_Score": 59.8, "Career_PA": 869, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 36.3}, {"Combined_Rank": 225, "Pos_Adj_Rank": 196, "Name": "Dean Curley", "Team": "CLE", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Three True Outcomes", "TOOLS_Score": 59.26, "ABILITY_Score": 63.52, "Combined_Score": 59.78, "Career_PA": 562, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.2}, {"Combined_Rank": 226, "Pos_Adj_Rank": 240, "Name": "Diego Fernandez", "Team": "CLE", "Level": "R", "Age": 17.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 66.4, "ABILITY_Score": 59.47, "Combined_Score": 59.77, "Career_PA": 204, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.2}, {"Combined_Rank": 227, "Pos_Adj_Rank": 142, "Name": "Miguel Rodríguez", "Team": "BAL", "Level": "A", "Age": 20.0, "FantasyPos": "C", "Archetype": "Pure Contact", "TOOLS_Score": 64.95, "ABILITY_Score": 60.12, "Combined_Score": 59.72, "Career_PA": 688, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.2}, {"Combined_Rank": 228, "Pos_Adj_Rank": 436, "Name": "Junior Perez", "Team": "CWS", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Three True Outcomes", "TOOLS_Score": 58.0, "ABILITY_Score": 65.95, "Combined_Score": 59.71, "Career_PA": 3203, "Career_Disc_Flag": "hard", "Bats": "R", "Rating": 36.1}, {"Combined_Rank": 228, "Pos_Adj_Rank": 197, "Name": "Elijah Hainline", "Team": "LAD", "Level": "AA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Contact/Power", "TOOLS_Score": 61.19, "ABILITY_Score": 62.15, "Combined_Score": 59.71, "Career_PA": 1069, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.1}, {"Combined_Rank": 230, "Pos_Adj_Rank": 439, "Name": "Jared Thomas", "Team": "COL", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 35.86, "ABILITY_Score": 77.6, "Combined_Score": 59.68, "Career_PA": 710, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.1}, {"Combined_Rank": 231, "Pos_Adj_Rank": 199, "Name": "Duce Gourson", "Team": "PIT", "Level": "AAA", "Age": 23.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 55.48, "ABILITY_Score": 65.37, "Combined_Score": 59.66, "Career_PA": 1028, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.1}, {"Combined_Rank": 232, "Pos_Adj_Rank": 245, "Name": "Danny Cancro", "Team": "COL", "Level": "R", "Age": 19.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 66.97, "ABILITY_Score": 59.19, "Combined_Score": 59.64, "Career_PA": 453, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.0}, {"Combined_Rank": 232, "Pos_Adj_Rank": 144, "Name": "Jackson Appel", "Team": "CWS", "Level": "A+", "Age": 24.0, "FantasyPos": "C", "Archetype": "Pure Contact", "TOOLS_Score": 68.89, "ABILITY_Score": 58.92, "Combined_Score": 59.64, "Career_PA": 450, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 36.0}, {"Combined_Rank": 234, "Pos_Adj_Rank": 248, "Name": "Dameury Pena", "Team": "TOR", "Level": "A+", "Age": 20.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 64.01, "ABILITY_Score": 62.79, "Combined_Score": 59.62, "Career_PA": 1178, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.0}, {"Combined_Rank": 235, "Pos_Adj_Rank": 201, "Name": "Trey Snyder", "Team": "NYM", "Level": "A+", "Age": 20.0, "FantasyPos": "SS", "Archetype": "Speed", "TOOLS_Score": 61.24, "ABILITY_Score": 62.32, "Combined_Score": 59.61, "Career_PA": 863, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 36.0}, {"Combined_Rank": 236, "Pos_Adj_Rank": 448, "Name": "Dante Nori", "Team": "PHI", "Level": "AA", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 71.73, "ABILITY_Score": 56.16, "Combined_Score": 59.6, "Career_PA": 966, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 36.0}, {"Combined_Rank": 237, "Pos_Adj_Rank": 278, "Name": "Aroon Escobar", "Team": "PHI", "Level": "AA", "Age": 21.0, "FantasyPos": "3B", "Archetype": "Average", "TOOLS_Score": 55.4, "ABILITY_Score": 64.22, "Combined_Score": 59.56, "Career_PA": 1531, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.9}, {"Combined_Rank": 237, "Pos_Adj_Rank": 202, "Name": "Yorvin Morla", "Team": "SD", "Level": "R", "Age": 20.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 67.32, "ABILITY_Score": 58.94, "Combined_Score": 59.56, "Career_PA": 436, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.9}, {"Combined_Rank": 239, "Pos_Adj_Rank": 203, "Name": "Antoni Urena", "Team": "LAD", "Level": "R", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 69.29, "ABILITY_Score": 58.18, "Combined_Score": 59.54, "Career_PA": 336, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.9}, {"Combined_Rank": 239, "Pos_Adj_Rank": 451, "Name": "Anthony Millan", "Team": "HOU", "Level": "R", "Age": 18.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 67.37, "ABILITY_Score": 58.96, "Combined_Score": 59.54, "Career_PA": 343, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.9}, {"Combined_Rank": 239, "Pos_Adj_Rank": 451, "Name": "RJ Austin", "Team": "BAL", "Level": "A+", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 65.24, "ABILITY_Score": 59.31, "Combined_Score": 59.54, "Career_PA": 353, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.9}, {"Combined_Rank": 242, "Pos_Adj_Rank": 147, "Name": "Santiago Mendoza", "Team": "TB", "Level": "R", "Age": 18.0, "FantasyPos": "C", "Archetype": NaN, "TOOLS_Score": 70.79, "ABILITY_Score": 57.51, "Combined_Score": 59.53, "Career_PA": 288, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.9}, {"Combined_Rank": 243, "Pos_Adj_Rank": 251, "Name": "Robert Moore", "Team": "PHI", "Level": "AAA", "Age": 24.0, "FantasyPos": "2B", "Archetype": "Average", "TOOLS_Score": 42.92, "ABILITY_Score": 70.14, "Combined_Score": 59.52, "Career_PA": 1808, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.9}, {"Combined_Rank": 244, "Pos_Adj_Rank": 205, "Name": "Hector Campusano", "Team": "BAL", "Level": "A", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 62.12, "ABILITY_Score": 61.38, "Combined_Score": 59.49, "Career_PA": 593, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.8}, {"Combined_Rank": 245, "Pos_Adj_Rank": 460, "Name": "Juneiker Caceres", "Team": "CLE", "Level": "A+", "Age": 18.0, "FantasyPos": "OF", "Archetype": "Pure Contact", "TOOLS_Score": 65.12, "ABILITY_Score": 62.14, "Combined_Score": 59.4, "Career_PA": 794, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 35.7}, {"Combined_Rank": 246, "Pos_Adj_Rank": 464, "Name": "Luis Fragoza", "Team": "MIN", "Level": "A+", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Power/K-Risk", "TOOLS_Score": 54.19, "ABILITY_Score": 59.43, "Combined_Score": 59.37, "Career_PA": 665, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.7}, {"Combined_Rank": 247, "Pos_Adj_Rank": 150, "Name": "Thayron Liranzo", "Team": "DET", "Level": "AA", "Age": 22.0, "FantasyPos": "C", "Archetype": "Contact/Power", "TOOLS_Score": 56.02, "ABILITY_Score": 62.77, "Combined_Score": 59.31, "Career_PA": 1890, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.6}, {"Combined_Rank": 248, "Pos_Adj_Rank": 469, "Name": "Avery Owusu-Asiedu", "Team": "AZ", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 58.63, "ABILITY_Score": 59.43, "Combined_Score": 59.29, "Career_PA": 1337, "Career_Disc_Flag": "hard+improving", "Bats": "R", "Rating": 35.6}, {"Combined_Rank": 249, "Pos_Adj_Rank": 470, "Name": "Yhoswar Garcia", "Team": "MIL", "Level": "A+", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 38.97, "ABILITY_Score": 68.63, "Combined_Score": 59.28, "Career_PA": 1070, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.6}, {"Combined_Rank": 250, "Pos_Adj_Rank": 152, "Name": "Jacob Friend", "Team": "CIN", "Level": "A+", "Age": 23.0, "FantasyPos": "C", "Archetype": "Three True Outcomes", "TOOLS_Score": 56.68, "ABILITY_Score": 62.66, "Combined_Score": 59.25, "Career_PA": 699, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 35.5}, {"Combined_Rank": 251, "Pos_Adj_Rank": 471, "Name": "Luis Morejon", "Team": "COL", "Level": "R", "Age": 18.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 68.01, "ABILITY_Score": 58.42, "Combined_Score": 59.24, "Career_PA": 423, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.5}, {"Combined_Rank": 252, "Pos_Adj_Rank": 211, "Name": "Liberts Aponte", "Team": "CIN", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 71.74, "ABILITY_Score": 56.78, "Combined_Score": 59.22, "Career_PA": 343, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.5}, {"Combined_Rank": 253, "Pos_Adj_Rank": 479, "Name": "Wanderly De La Cruz", "Team": "CIN", "Level": "R", "Age": 18.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 73.26, "ABILITY_Score": 56.2, "Combined_Score": 59.18, "Career_PA": 344, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 35.4}, {"Combined_Rank": 254, "Pos_Adj_Rank": 213, "Name": "Jared Sprague-Lott", "Team": "OAK", "Level": "AA", "Age": 24.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 63.29, "ABILITY_Score": 58.52, "Combined_Score": 59.17, "Career_PA": 852, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.4}, {"Combined_Rank": 255, "Pos_Adj_Rank": 154, "Name": "Ike Irish", "Team": "BAL", "Level": "A+", "Age": 22.0, "FantasyPos": "C", "Archetype": "Average", "TOOLS_Score": 50.14, "ABILITY_Score": 60.97, "Combined_Score": 59.15, "Career_PA": 424, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 35.4}, {"Combined_Rank": 256, "Pos_Adj_Rank": 214, "Name": "Jaider Suárez", "Team": "KC", "Level": "R", "Age": 17.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 68.46, "ABILITY_Score": 57.61, "Combined_Score": 59.14, "Career_PA": 177, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.4}, {"Combined_Rank": 257, "Pos_Adj_Rank": 488, "Name": "Drew Burress", "Team": "OAK", "Level": "A", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 56.98, "ABILITY_Score": 62.23, "Combined_Score": 59.1, "Career_PA": 137, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.3}, {"Combined_Rank": 258, "Pos_Adj_Rank": 491, "Name": "Randy Guzman", "Team": "NYM", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Power/K-Risk", "TOOLS_Score": 70.67, "ABILITY_Score": 51.02, "Combined_Score": 59.08, "Career_PA": 830, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.3}, {"Combined_Rank": 259, "Pos_Adj_Rank": 157, "Name": "Cole Conn", "Team": "OAK", "Level": "AAA", "Age": 24.0, "FantasyPos": "C", "Archetype": "Average", "TOOLS_Score": 48.3, "ABILITY_Score": 65.4, "Combined_Score": 59.06, "Career_PA": 1187, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.3}, {"Combined_Rank": 260, "Pos_Adj_Rank": 497, "Name": "Aaron Walton", "Team": "CLE", "Level": "AA", "Age": 22.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 56.1, "ABILITY_Score": 63.18, "Combined_Score": 59.01, "Career_PA": 640, "Career_Disc_Flag": "hard+improving", "Bats": "R", "Rating": 35.2}, {"Combined_Rank": 261, "Pos_Adj_Rank": 498, "Name": "Albertson Asigen", "Team": "CWS", "Level": "R", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 58.98, "ABILITY_Score": 62.0, "Combined_Score": 59.0, "Career_PA": 945, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.2}, {"Combined_Rank": 262, "Pos_Adj_Rank": 502, "Name": "Alessander De La Cruz", "Team": "COL", "Level": "R", "Age": 20.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 74.26, "ABILITY_Score": 55.8, "Combined_Score": 58.98, "Career_PA": 704, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.2}, {"Combined_Rank": 263, "Pos_Adj_Rank": 505, "Name": "Lonnie White Jr.", "Team": "PIT", "Level": "AA", "Age": 23.0, "FantasyPos": "OF", "Archetype": "Power/K-Risk", "TOOLS_Score": 65.44, "ABILITY_Score": 61.84, "Combined_Score": 58.96, "Career_PA": 1497, "Career_Disc_Flag": "hard+worsening", "Bats": "R", "Rating": 35.1}, {"Combined_Rank": 264, "Pos_Adj_Rank": 220, "Name": "Coy James", "Team": "WSH", "Level": "A", "Age": 19.0, "FantasyPos": "SS", "Archetype": "Speed/K-Risk", "TOOLS_Score": 56.82, "ABILITY_Score": 64.58, "Combined_Score": 58.94, "Career_PA": 514, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.1}, {"Combined_Rank": 264, "Pos_Adj_Rank": 509, "Name": "Enddy Azocar", "Team": "BAL", "Level": "A+", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 67.15, "ABILITY_Score": 55.22, "Combined_Score": 58.94, "Career_PA": 973, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.1}, {"Combined_Rank": 266, "Pos_Adj_Rank": 264, "Name": "David Smith", "Team": "DET", "Level": "A", "Age": 24.0, "FantasyPos": "2B", "Archetype": "Speed", "TOOLS_Score": 60.42, "ABILITY_Score": 61.47, "Combined_Score": 58.91, "Career_PA": 670, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.1}, {"Combined_Rank": 267, "Pos_Adj_Rank": 520, "Name": "Luis Rives", "Team": "HOU", "Level": "R", "Age": 21.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 66.41, "ABILITY_Score": 58.04, "Combined_Score": 58.84, "Career_PA": 389, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 35.0}, {"Combined_Rank": 267, "Pos_Adj_Rank": 520, "Name": "Graham Brown", "Team": "MIN", "Level": "AA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 49.55, "ABILITY_Score": 58.89, "Combined_Score": 58.84, "Career_PA": 277, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 35.0}, {"Combined_Rank": 269, "Pos_Adj_Rank": 224, "Name": "Luis Steven King", "Team": "KC", "Level": "R", "Age": 18.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 61.44, "ABILITY_Score": 60.06, "Combined_Score": 58.83, "Career_PA": 325, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.9}, {"Combined_Rank": 270, "Pos_Adj_Rank": 524, "Name": "Josue Brito", "Team": "BOS", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 70.22, "ABILITY_Score": 59.61, "Combined_Score": 58.82, "Career_PA": 560, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.9}, {"Combined_Rank": 271, "Pos_Adj_Rank": 268, "Name": "Juan Torres", "Team": "NYY", "Level": "R", "Age": 18.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 61.87, "ABILITY_Score": 60.04, "Combined_Score": 58.81, "Career_PA": 418, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.9}, {"Combined_Rank": 272, "Pos_Adj_Rank": 525, "Name": "Angel Gonzalez", "Team": "MIL", "Level": "R", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 65.09, "ABILITY_Score": 58.62, "Combined_Score": 58.8, "Career_PA": 440, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.9}, {"Combined_Rank": 273, "Pos_Adj_Rank": 270, "Name": "Yordani Martinez", "Team": "MIA", "Level": "R", "Age": 19.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 71.18, "ABILITY_Score": 60.67, "Combined_Score": 58.78, "Career_PA": 487, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 34.9}, {"Combined_Rank": 273, "Pos_Adj_Rank": 164, "Name": "Caden Bodine", "Team": "TB", "Level": "AAA", "Age": 22.0, "FantasyPos": "C", "Archetype": "Pure Contact", "TOOLS_Score": 52.56, "ABILITY_Score": 61.07, "Combined_Score": 58.78, "Career_PA": 592, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 34.9}, {"Combined_Rank": 273, "Pos_Adj_Rank": 164, "Name": "Khadim Diaw", "Team": "MIN", "Level": "AA", "Age": 22.0, "FantasyPos": "C", "Archetype": "Pure Contact", "TOOLS_Score": 58.42, "ABILITY_Score": 61.31, "Combined_Score": 58.78, "Career_PA": 744, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.9}, {"Combined_Rank": 276, "Pos_Adj_Rank": 533, "Name": "Angel Guzman", "Team": "SF", "Level": "A", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Contact/Power", "TOOLS_Score": 72.75, "ABILITY_Score": 58.97, "Combined_Score": 58.72, "Career_PA": 752, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.8}, {"Combined_Rank": 277, "Pos_Adj_Rank": 168, "Name": "Gustavo Baptista", "Team": "CLE", "Level": "R", "Age": 18.0, "FantasyPos": "C", "Archetype": NaN, "TOOLS_Score": 72.9, "ABILITY_Score": 55.58, "Combined_Score": 58.71, "Career_PA": 367, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 34.8}, {"Combined_Rank": 278, "Pos_Adj_Rank": 321, "Name": "Murf Gray", "Team": "PIT", "Level": "AA", "Age": 22.0, "FantasyPos": "3B", "Archetype": "Contact/Power", "TOOLS_Score": 60.82, "ABILITY_Score": 59.36, "Combined_Score": 58.7, "Career_PA": 558, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.8}, {"Combined_Rank": 278, "Pos_Adj_Rank": 274, "Name": "Adrian Pinto", "Team": "TOR", "Level": "AA", "Age": 23.0, "FantasyPos": "2B", "Archetype": "Pure Contact", "TOOLS_Score": 60.3, "ABILITY_Score": 61.0, "Combined_Score": 58.7, "Career_PA": 983, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.8}, {"Combined_Rank": 280, "Pos_Adj_Rank": 535, "Name": "Nelson Rada", "Team": "LAA", "Level": "AAA", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 37.77, "ABILITY_Score": 72.13, "Combined_Score": 58.68, "Career_PA": 2422, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.7}, {"Combined_Rank": 281, "Pos_Adj_Rank": 171, "Name": "Ire Garcia", "Team": "HOU", "Level": "R", "Age": 18.0, "FantasyPos": "C", "Archetype": NaN, "TOOLS_Score": 65.17, "ABILITY_Score": 58.31, "Combined_Score": 58.67, "Career_PA": 261, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.7}, {"Combined_Rank": 282, "Pos_Adj_Rank": 226, "Name": "Christopher Alvarado", "Team": "BOS", "Level": "R", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 60.93, "ABILITY_Score": 60.28, "Combined_Score": 58.66, "Career_PA": 479, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.7}, {"Combined_Rank": 282, "Pos_Adj_Rank": 442, "Name": "Yael Romero", "Team": "CIN", "Level": "A", "Age": 20.0, "FantasyPos": "1B", "Archetype": NaN, "TOOLS_Score": 60.57, "ABILITY_Score": 60.01, "Combined_Score": 58.66, "Career_PA": 483, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.7}, {"Combined_Rank": 282, "Pos_Adj_Rank": 226, "Name": "Moises Polanco", "Team": "MIL", "Level": "A", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 56.6, "ABILITY_Score": 61.47, "Combined_Score": 58.66, "Career_PA": 500, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.7}, {"Combined_Rank": 285, "Pos_Adj_Rank": 228, "Name": "Angel Suarez", "Team": "AZ", "Level": "R", "Age": 17.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 64.66, "ABILITY_Score": 58.43, "Combined_Score": 58.64, "Career_PA": 233, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.7}, {"Combined_Rank": 286, "Pos_Adj_Rank": 544, "Name": "Colton Ledbetter", "Team": "STL", "Level": "AAA", "Age": 24.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 48.69, "ABILITY_Score": 66.29, "Combined_Score": 58.58, "Career_PA": 1544, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.6}, {"Combined_Rank": 286, "Pos_Adj_Rank": 544, "Name": "Yeremy Cabrera", "Team": "WSH", "Level": "A+", "Age": 20.0, "FantasyPos": "OF", "Archetype": "Speed", "TOOLS_Score": 57.39, "ABILITY_Score": 63.1, "Combined_Score": 58.58, "Career_PA": 1641, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.6}, {"Combined_Rank": 288, "Pos_Adj_Rank": 229, "Name": "Connor Rasmussen", "Team": "KC", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 74.34, "ABILITY_Score": 54.1, "Combined_Score": 58.56, "Career_PA": 388, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.6}, {"Combined_Rank": 288, "Pos_Adj_Rank": 546, "Name": "Jesus Pinto", "Team": "DET", "Level": "A", "Age": 19.0, "FantasyPos": "OF", "Archetype": "Average", "TOOLS_Score": 73.21, "ABILITY_Score": 57.67, "Combined_Score": 58.56, "Career_PA": 776, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.6}, {"Combined_Rank": 290, "Pos_Adj_Rank": 232, "Name": "Gregory Barrios", "Team": "TB", "Level": "AA", "Age": 22.0, "FantasyPos": "SS", "Archetype": "Pure Contact", "TOOLS_Score": 35.24, "ABILITY_Score": 70.65, "Combined_Score": 58.5, "Career_PA": 1985, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.5}, {"Combined_Rank": 291, "Pos_Adj_Rank": 234, "Name": "Albert Fermín", "Team": "HOU", "Level": "R", "Age": 17.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 61.38, "ABILITY_Score": 59.38, "Combined_Score": 58.48, "Career_PA": 206, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 34.5}, {"Combined_Rank": 292, "Pos_Adj_Rank": 555, "Name": "Pascual Archila", "Team": "TOR", "Level": "R", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 60.67, "ABILITY_Score": 61.32, "Combined_Score": 58.47, "Career_PA": 625, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.5}, {"Combined_Rank": 293, "Pos_Adj_Rank": 559, "Name": "Ricardo Crespo", "Team": "SF", "Level": "R", "Age": 19.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 65.34, "ABILITY_Score": 57.75, "Combined_Score": 58.44, "Career_PA": 320, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.4}, {"Combined_Rank": 293, "Pos_Adj_Rank": 559, "Name": "Samuell Sanchez", "Team": "DET", "Level": "R", "Age": 20.0, "FantasyPos": "OF", "Archetype": NaN, "TOOLS_Score": 70.4, "ABILITY_Score": 56.06, "Combined_Score": 58.44, "Career_PA": 346, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.4}, {"Combined_Rank": 295, "Pos_Adj_Rank": 563, "Name": "Jaron Elkins", "Team": "LAD", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 54.81, "ABILITY_Score": 64.64, "Combined_Score": 58.43, "Career_PA": 1218, "Career_Disc_Flag": "hard+improving", "Bats": "R", "Rating": 34.4}, {"Combined_Rank": 296, "Pos_Adj_Rank": 235, "Name": "Jonathan Rangel", "Team": "MIL", "Level": "R", "Age": 19.0, "FantasyPos": "SS", "Archetype": NaN, "TOOLS_Score": 69.77, "ABILITY_Score": 56.24, "Combined_Score": 58.41, "Career_PA": 424, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.4}, {"Combined_Rank": 297, "Pos_Adj_Rank": 284, "Name": "Gabriel Terrero", "Team": "NYY", "Level": "R", "Age": 19.0, "FantasyPos": "2B", "Archetype": NaN, "TOOLS_Score": 62.42, "ABILITY_Score": 58.65, "Combined_Score": 58.39, "Career_PA": 431, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 34.4}, {"Combined_Rank": 298, "Pos_Adj_Rank": 237, "Name": "Juan Villavicencio", "Team": "PHI", "Level": "A+", "Age": 21.0, "FantasyPos": "SS", "Archetype": "Speed/K-Risk", "TOOLS_Score": 67.37, "ABILITY_Score": 57.36, "Combined_Score": 58.37, "Career_PA": 1134, "Career_Disc_Flag": NaN, "Bats": "L", "Rating": 34.3}, {"Combined_Rank": 299, "Pos_Adj_Rank": 569, "Name": "Yasser Mercedes", "Team": "MIN", "Level": "A+", "Age": 21.0, "FantasyPos": "OF", "Archetype": "Speed/K-Risk", "TOOLS_Score": 58.65, "ABILITY_Score": 62.84, "Combined_Score": 58.34, "Career_PA": 1456, "Career_Disc_Flag": NaN, "Bats": "R", "Rating": 34.3}, {"Combined_Rank": 300, "Pos_Adj_Rank": 351, "Name": "Israfell Bautista", "Team": "TB", "Level": "R", "Age": 19.0, "FantasyPos": "3B", "Archetype": NaN, "TOOLS_Score": 58.4, "ABILITY_Score": 66.53, "Combined_Score": 58.3, "Career_PA": 593, "Career_Disc_Flag": NaN, "Bats": "S", "Rating": 34.2}];
+
+let sortCol = 'Combined_Rank', sortAsc = true;
+let lvl = 'ALL', team = '', pos = '', search = '', show = 100;
+
+// populate dropdowns
+const teams = [...new Set(DATA.map(r=>r.Team))].sort();
+const poss  = [...new Set(DATA.map(r=>r.FantasyPos).filter(Boolean))].sort();
+const tSel = document.getElementById('teamSel');
+const pSel = document.getElementById('posSel');
+teams.forEach(t => { const o=document.createElement('option'); o.value=o.textContent=t; tSel.appendChild(o); });
+poss.forEach(p  => { const o=document.createElement('option'); o.value=o.textContent=p; pSel.appendChild(o); });
+
+// chip events
+document.querySelectorAll('#levelChips .chip').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('#levelChips .chip').forEach(x => x.classList.remove('on'));
+  c.classList.add('on'); lvl = c.dataset.val; render();
+}));
+tSel.addEventListener('change', e => { team = e.target.value; render(); });
+pSel.addEventListener('change', e => { pos  = e.target.value; render(); });
+document.getElementById('nameSearch').addEventListener('input', e => { search = e.target.value.toLowerCase(); render(); });
+document.getElementById('showN').addEventListener('change', e => { show = +e.target.value; render(); });
+
+// sort events
+document.querySelectorAll('#tbl thead th').forEach(th => th.addEventListener('click', () => {
+  const c = th.dataset.col;
+  if (sortCol === c) sortAsc = !sortAsc;
+  else { sortCol = c; sortAsc = c === 'Combined_Rank' || c === 'Age'; }
+  render();
+}));
+
+function tierInfo(rating) {
+  if (rating >= 83) return { label: 'Elite',     cls: 'tier-elite', color: '#F59E0B' };
+  if (rating >= 76) return { label: 'Great',     cls: 'tier-great', color: '#38BDF8' };
+  if (rating >= 67) return { label: 'Good',      cls: 'tier-good',  color: '#22C55E' };
+  if (rating >= 56) return { label: 'Average',   cls: 'tier-avg',   color: '#8BACC8' };
+  return               { label: 'Developing', cls: 'tier-dev',   color: '#4A6A88' };
+}
+function scoreColor(v) {
+  if (v >= 90) return '#F59E0B';
+  if (v >= 80) return '#38BDF8';
+  if (v >= 70) return '#22C55E';
+  if (v >= 60) return '#A78BFA';
+  if (v >= 52) return '#FB923C';
+  return '#4A6A88';
+}
+
+function lvClass(l) {
+  return l==='AAA'?'lv-AAA': l==='AA'?'lv-AA': l==='A+'?'lv-Ap': l==='A'?'lv-A': 'lv-R';
+}
+
+function posClass(p) {
+  return p==='SS'?'SS': p==='C'?'C': p==='2B'?'twob': '';
+}
+
+function render() {
+  // update header arrows
+  document.querySelectorAll('#tbl thead th').forEach(th => {
+    th.classList.remove('sorted');
+    th.querySelector('.sarrow').textContent = '';
+  });
+  const active = [...document.querySelectorAll('#tbl thead th')].find(th => th.dataset.col === sortCol);
+  if (active) { active.classList.add('sorted'); active.querySelector('.sarrow').textContent = sortAsc ? '▲' : '▼'; }
+
+  const filtered = DATA.filter(r => {
+    if (lvl !== 'ALL') {
+      if (lvl === 'A+' && r.Level !== 'A+') return false;
+      if (lvl !== 'A+' && r.Level !== lvl) return false;
+    }
+    if (team && r.Team !== team) return false;
+    if (pos  && r.FantasyPos !== pos) return false;
+    if (search && !r.Name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  filtered.sort((a,b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb||'').toLowerCase(); }
+    if (va == null) return 1; if (vb == null) return -1;
+    return sortAsc ? (va < vb ? -1 : va > vb ? 1 : 0) : (va > vb ? -1 : va < vb ? 1 : 0);
+  });
+
+  document.getElementById('rcount').textContent = `${filtered.length} players`;
+  const shown = filtered.slice(0, show);
+
+  document.getElementById('tbody').innerHTML = shown.map(r => {
+    const rating = r.Rating != null ? r.Rating : 0;
+    const tier = tierInfo(rating);
+    const sc = tier.color;
+    const tc = scoreColor(r.TOOLS_Score);
+    const ac = scoreColor(r.ABILITY_Score);
+    const pct = s => Math.max(0, Math.min(100, (s - 50) / 50 * 100)).toFixed(1);
+    const rk = r.Combined_Rank;
+    const rkCls = rk <= 3 ? 'rc top3' : rk <= 10 ? 'rc top10' : 'rc';
+    const df = r.Career_Disc_Flag ? `<span class="df" title="${r.Career_Disc_Flag}">⚑</span>` : '';
+    const pc = posClass(r.FantasyPos);
+    return `<tr>
+      <td class="${rkCls}">${rk}</td>
+      <td class="nc">
+        <div class="pname">${r.Name}${df}</div>
+        <div class="pmeta">${r.Bats || '?'} · ${(r.Career_PA||0).toLocaleString()} PA</div>
+      </td>
+      <td><span class="pbadge ${pc}">${r.FantasyPos||'—'}</span></td>
+      <td><span class="tbadge">${r.Team}</span></td>
+      <td><span class="lvbadge ${lvClass(r.Level)}">${r.Level}</span></td>
+      <td class="sub-num" style="color:var(--text2)">${r.Age}</td>
+      <td class="sc">
+        <div class="score-row">
+          <div class="pct-block">
+            <span class="pct-num" style="color:${sc}">${rating.toFixed(1)}</span>
+            <span class="tier-badge ${tier.cls}">${tier.label}</span>
+          </div>
+          <div class="sbar"><div class="sbar-fill" style="width:${Math.min(rating,100).toFixed(1)}%;background:${sc}"></div></div>
+        </div>
+      </td>
+      <td class="sub-num" style="color:${tc}">${r.TOOLS_Score}</td>
+      <td class="sub-num" style="color:${ac}">${r.ABILITY_Score}</td>
+      <td><span class="abadge">${r.Archetype||'—'}</span></td>
+      <td class="sub-num" style="color:var(--text2)">${(r.Career_PA||0).toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleTheme() {
+  const t = document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = t === 'light' ? 'dark' : 'light';
+}
+
+render();
+</script>
